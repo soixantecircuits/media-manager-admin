@@ -6,15 +6,14 @@
 </template>
 
 <script>
-import Counter from './components/Counter'
 import Mylist from './components/Mylist'
 export default {
   components: {
-    Counter,
     Mylist
   }
 }
 </script>
+
 <style>
 
 html {
