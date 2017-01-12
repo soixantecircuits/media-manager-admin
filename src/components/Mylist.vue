@@ -6,11 +6,16 @@
         <th class="path-field">Path</th>
         <th class="state-field">State</th>
       </tr>
-      <tr class="mylist-line" v-for="item in items">
+      <tr v-for="(item, index) in items" v-bind:class="[ 'mylist-line', index % 2 == 0 ? 'mylist-line-alt' : '' ]">
         <td class="filename-field">{{ item.filename }}</td>
         <td class="path-field">{{ item.path }}</td>
         <td class="state-field">
-          <input class="state-input" type="text" v-model="item.state"><button v-on:click="updateState(item._id, item.state)">Ok</button>
+          <input v-if="!states || states.length === 0" v-model="item.state" class="state-input" type="text" v-bind:disabled="!item.editing">
+          <select v-else v-model="item.state" class="state-input">
+            <option v-for="state in states" v-bind:value="state">{{ state }}</option>
+          </select>
+          <button v-if="(!states || states.length === 0) && item.editing === false" v-on:click="item.editing = true">Edit</button>
+          <button v-else v-on:click="updateState(item._id, item.state)">Ok</button>
         </td>
       </tr>
     </table>
@@ -18,35 +23,49 @@
 </template>
 
 <script>
+  import Vue from 'vue'
   import request from 'superagent/superagent'
-  var medias = []
+  import config from '../../settings/default.json'
 
-  var data = {
-    items: medias
+  let data = {
+    items: [],
+    states: config.states
   }
 
-  module.exports = {
-    data: function () {
+  export default {
+    data() {
       return data
     },
     methods: {
-      updateState: updateState
+      getMediaList: getMediaList,
+      
+      updateState(id, state) {
+        request.put(`http://${config.moderatorServer}/api/v1/medias/${id}`)
+          .send({ state: state })
+          .end((err, res) => { return err })
+
+        let item = this.items.find(function (elem) {
+          return elem._id === id
+        })
+        item.editing = false
+      }
     }
   }
 
-  request.get('http://localhost:8080/api/v1/medias/all')
-    .end(function (err, res) {
-      medias = JSON.parse(res.text)
-      data.items = medias
-    })
-
-  function updateState(id, state) {
-    request.put(`http://localhost:8080/api/v1/medias/${id}`)
-    .send({ state: state })
-    .end(function (err, res) {
-      console.log(res)
-    })
+  getMediaList()
+  function getMediaList() {
+    request.get(`http://${config.moderatorServer}/api/v1/medias/all`)
+      .end(function (err, res) {
+        let list = JSON.parse(res.text)
+        list.forEach((item) => {
+          item.editing = false
+        })
+        list.forEach((item) => {
+          data.items.push(item)
+        })
+      })
   }
+
 </script>
 
 <style>
@@ -60,6 +79,8 @@
 .mylist-table {
   width: 80%;
   background-color: #f0f0f0;
+  border-style: solid;
+  border-width: 0px 4px 0px 4px;
 }
 
 .mylist-line {
@@ -67,10 +88,12 @@
   border-width: 1px 0px 1px 0px;
 }
 
+.mylist-line-alt {
+  background-color: #d0d0d0;
+}
+
 .filename-field {
   width: 30%;
-  border-style: solid;
-  border-width: 0px 0px 0px 4px;
 }
 
 .path-field {
@@ -79,8 +102,6 @@
 
 .state-field {
   width: 20%;
-  border-style: solid;
-  border-width: 0px 4px 0px 0px;
 }
 
 .state-input {

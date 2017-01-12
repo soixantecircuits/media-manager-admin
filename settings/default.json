@@ -1,7 +1,4 @@
 {
-  "name": "Default settings file",
-  "something": 10,
-  "count": {
-    "default": 5
-  }
+  "moderatorServer": "localhost:8080",
+  "states": [ "public", "private", "unlisted" ]
 }
