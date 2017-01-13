@@ -1,8 +1,9 @@
 <template>
   <div class="mylist">
     <button v-on:click="goToPreviousPage">Prev</button>
-    <span>Page {{ currentListPage + 1}}</span>
+    <span>Page {{ currentListPage + 1 }}</span>
     <button v-on:click="goToNextPage">Next</button> Items per page <input type="number" min="1" v-model="nbToDisplay" v-on:input="$store.commit('setNbFilesToDisplay', nbToDisplay)">
+    <span>Total files: {{ filesList.length }}</span>
     <table align="center" class="mylist-table">
       <tr class="mylist-line">
         <th></th>
@@ -37,7 +38,7 @@
   import moderatorapi from '../lib/mediamoderatorAPI'
 
   let data = {
-    nbToDisplay: config.filesPerPage
+    nbToDisplay: config.filesPerPage,
   }
 
   export default {
@@ -62,6 +63,7 @@
 
     created() {
       this.getFilesList()
+      this.getServerConfig()
     },
 
     mounted() {
@@ -70,17 +72,34 @@
     },
 
     methods: {
+      getServerConfig() {
+        let instance = this
+        moderatorapi.getConfig()
+        .then((res) => {
+          instance.$store.commit('setStates', res.states)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      },
+
       getFilesList() {
         let instance = this
         moderatorapi.getFilesList()
           .then((res) => {
-            res.forEach((item) => {
+            res.data.forEach((item) => {
               item.editing = false
             })
-            instance.$store.commit('setFiles', res)
+            instance.$store.commit('setFiles', res.data)
+            setTimeout(function() {
+              instance.getFilesList()
+            }, config.listRefreshInterval * 1000);
           })
           .catch((err) => {
             console.log(err)
+            setTimeout(function() {
+              instance.getFilesList()
+            }, config.listRefreshInterval * 1000);
           })
       },
 

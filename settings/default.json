@@ -1,5 +1,6 @@
 {
   "moderatorServer": "localhost:8080",
-  "apiRoute": "/api/v1",
-  "filesPerPage" : 10
+  "apiRoute": "/api/v1/medias",
+  "filesPerPage" : 10,
+  "listRefreshInterval": 4
 }

@@ -11,7 +11,7 @@ var FilesList = {
 }
 
 const mutations = {
-  setState(state, states) {
+  setStates(state, states) {
     state.states = states
   },
   setFiles(state, files) {
