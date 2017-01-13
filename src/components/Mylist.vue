@@ -1,9 +1,11 @@
 <template>
   <div class="mylist">
-    <button v-on:click="goToPreviousPage">Prev</button>
-    <span>Page {{ currentListPage + 1 }}</span>
-    <button v-on:click="goToNextPage">Next</button> Items per page <input type="number" min="1" v-model="nbToDisplay" v-on:input="$store.commit('setNbFilesToDisplay', nbToDisplay)">
-    <span>Total files: {{ filesList.length }}</span>
+    <div class="list-nav">
+      <button v-on:click="goToPreviousPage">Prev</button>
+      <span>Page {{ currentListPage + 1 }}</span>
+      <button v-on:click="goToNextPage">Next</button> Items per page <input type="number" min="1" v-model="nbToDisplay" v-on:input="$store.commit('setNbFilesToDisplay', nbToDisplay)">
+      <span>Total files: {{ filesList.length }}</span>
+    </div>
     <table align="center" class="mylist-table">
       <tr class="mylist-line">
         <th></th>
@@ -26,9 +28,11 @@
         </td>
       </tr>
     </table>
-    <button v-on:click="goToPreviousPage">Prev</button>
-    <span>Page {{ currentListPage + 1}}</span>
-    <button v-on:click="goToNextPage">Next</button>
+    <div class="list-nav">
+      <button v-on:click="goToPreviousPage">Prev</button>
+      <span>Page {{ currentListPage + 1}}</span>
+      <button v-on:click="goToNextPage">Next</button>
+    </div>
   </div>
 </template>
 
@@ -75,12 +79,12 @@
       getServerConfig() {
         let instance = this
         moderatorapi.getConfig()
-        .then((res) => {
-          instance.$store.commit('setStates', res.states)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+          .then((res) => {
+            instance.$store.commit('setStates', res.states)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       },
 
       getFilesList() {
@@ -91,27 +95,27 @@
               item.editing = false
             })
             instance.$store.commit('setFiles', res.data)
-            setTimeout(function() {
+            setTimeout(function () {
               instance.getFilesList()
             }, config.listRefreshInterval * 1000);
           })
           .catch((err) => {
             console.log(err)
-            setTimeout(function() {
+            setTimeout(function () {
               instance.getFilesList()
             }, config.listRefreshInterval * 1000);
           })
       },
 
-getStatesList() {
-moderatorapi.getStatesList()
-.then((res) => {
+      getStatesList() {
+        moderatorapi.getStatesList()
+          .then((res) => {
 
-})
-.catch((err) => {
-  console.log(err)
-})
-},
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
 
       updateState(id, state) {
         moderatorapi.updateState(id, state)
@@ -161,6 +165,12 @@ moderatorapi.getStatesList()
   text-align: left;
   line-height: 40px;
   user-select: none;
+}
+
+.list-nav {
+  width: 80%;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
 .mylist-table {
