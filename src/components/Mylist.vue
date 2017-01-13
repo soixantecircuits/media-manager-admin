@@ -1,8 +1,8 @@
 <template>
   <div class="mylist">
     <button v-on:click="goToPreviousPage">Prev</button>
-    <button v-on:click="goToNextPage">Next</button> Items per page <input type="number" min="0" v-model="nbItemsToDisplay"
-      v-on:keyup="checkCurrentPageValidity()">
+    <span>Page {{ currentListPage + 1}}</span>
+    <button v-on:click="goToNextPage">Next</button> Items per page <input type="number" min="1" v-model="nbToDisplay" v-on:input="$store.commit('setNbFilesToDisplay', nbToDisplay)">
     <table align="center" class="mylist-table">
       <tr class="mylist-line">
         <th></th>
@@ -10,7 +10,7 @@
         <th class="path-field">Path</th>
         <th class="state-field">State</th>
       </tr>
-      <tr v-for="(item, index) in items" v-if="index >= (nbItemsToDisplay * currentListPage) && index < ((nbItemsToDisplay * currentListPage) + nbItemsToDisplay)"
+      <tr v-for="(item, index) in filesList" v-if="index >= (nbFilesToDisplay * currentListPage) && index < ((nbFilesToDisplay * currentListPage) + nbFilesToDisplay)"
         v-bind:class="[ 'mylist-line', index % 2 == 0 ? 'mylist-line-alt' : '' ]">
         <td class="delete-field"><button v-on:click="deleteItem(item._id)">Delete</button></td>
         <td class="filename-field">{{ item.filename }}</td>
@@ -26,86 +26,114 @@
       </tr>
     </table>
     <button v-on:click="goToPreviousPage">Prev</button>
+    <span>Page {{ currentListPage + 1}}</span>
     <button v-on:click="goToNextPage">Next</button>
   </div>
 </template>
 
 <script>
   import Vue from 'vue'
-  import request from 'superagent/superagent'
   import config from '../../settings/default.json'
+  import moderatorapi from '../lib/mediamoderatorAPI'
 
   let data = {
-    items: [],
-    nbItemsToDisplay: 2,
-    currentListPage: 0,
-    states: config.states,
+    nbToDisplay: config.filesPerPage
   }
 
   export default {
     data() {
       return data
     },
+
+    computed: {
+      filesList() {
+        return this.$store.state.filesList
+      },
+      nbFilesToDisplay() {
+        return this.$store.state.nbFilesToDisplay
+      },
+      currentListPage() {
+        return this.$store.state.currentListPage
+      },
+      states() {
+        return this.$store.state.states
+      }
+    },
+
+    created() {
+      this.getFilesList()
+    },
+
+    mounted() {
+      this.nbToDisplay = config.filesPerPage
+      this.$store.commit('setNbFilesToDisplay', this.nbToDisplay)
+    },
+
     methods: {
-      getMediaList: getMediaList,
+      getFilesList() {
+        let instance = this
+        moderatorapi.getFilesList()
+          .then((res) => {
+            res.forEach((item) => {
+              item.editing = false
+            })
+            instance.$store.commit('setFiles', res)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+
+getStatesList() {
+moderatorapi.getStatesList()
+.then((res) => {
+
+})
+.catch((err) => {
+  console.log(err)
+})
+},
 
       updateState(id, state) {
-        request.put(`http://${config.moderatorServer}/api/v1/medias/${id}`)
-          .send({ state: state })
-          .end((err, res) => { return err })
-
-        let item = this.items.find(function (elem) {
-          return elem._id === id
-        })
-        item.editing = false
+        moderatorapi.updateState(id, state)
+          .then((res) => {
+            let item = this.filesList.find(elem => elem._id === id)
+            item.editing = false
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       },
 
       deleteItem(id) {
-        request.delete(`http://${config.moderatorServer}/api/v1/medias/${id}`)
-          .end((err, res) => {
-            if (!err) {
-              let itemToDelete = this.items.find((item) => { return item._id === id })
-              let index = this.items.indexOf(itemToDelete)
-              this.items.splice(index, 1)
-            }
-            return err
+        moderatorapi.deleteFile(id)
+          .then((res) => {
+            let itemToDelete = this.filesList.find(item => item._id === id)
+            let index = this.filesList.indexOf(itemToDelete)
+            this.filesList.splice(index, 1)
+            console.log('Deleted file ' + id)
+          })
+          .catch((err) => {
+            console.log(err)
           })
       },
 
       goToPreviousPage() {
-        this.currentListPage = this.currentListPage > 0 ? this.currentListPage - 1 : 0
+        let newPage = this.currentListPage > 0 ? this.currentListPage - 1 : 0
+        this.$store.commit('setCurrentListPage', newPage)
       },
 
       goToNextPage() {
-        this.currentListPage =
-          this.currentListPage < ((this.items.length / this.nbItemsToDisplay) - 1) ?
+        let newPage =
+          this.currentListPage + 1 < ((this.filesList.length / this.nbFilesToDisplay)) ?
             this.currentListPage + 1 :
-            ((this.items.length / this.nbItemsToDisplay) - 1)
-      },
-
-      checkCurrentPageValidity() {
-        if ((this.currentListPage * this.nbItemsToDisplay) >= this.items.length) {
-          console.log('item length ' + this.items.length + '  displat ' + this.nbItemsToDisplay)
-          this.currentListPage = Math.max(Math.floor(this.items.length / this.nbItemsToDisplay) - 1, 0)
-        }
+            this.currentListPage
+        newPage = Math.max(Math.floor(newPage), 0)
+        this.$store.commit('setCurrentListPage', newPage)
       }
     }
-  }
 
-  getMediaList()
-  function getMediaList() {
-    request.get(`http://${config.moderatorServer}/api/v1/medias/`)
-      .end(function (err, res) {
-        let list = JSON.parse(res.text)
-        list.forEach((item) => {
-          item.editing = false
-        })
-        list.forEach((item) => {
-          data.items.push(item)
-        })
-      })
   }
-
 </script>
 
 <style>

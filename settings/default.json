@@ -1,4 +1,5 @@
 {
   "moderatorServer": "localhost:8080",
-  "states": [ "public", "private", "unlisted" ]
+  "apiRoute": "/api/v1",
+  "filesPerPage" : 10
 }
