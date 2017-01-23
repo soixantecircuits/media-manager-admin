@@ -1,43 +1,50 @@
 <template>
-  <div class="mylist">
-    <div class="list-nav">
-      <button v-on:click="goToPreviousPage">Prev</button>
-      <span>Page {{ currentListPage + 1 }}</span>
-      <button v-on:click="goToNextPage">Next</button> Items per page <input type="number" min="1" v-model="nbToDisplay" v-on:input="$store.commit('setNbFilesToDisplay', nbToDisplay)">
-      <span>Total files: {{ filesList.length }}</span>
-    </div>
-    <table align="center" class="mylist-table">
-      <tr class="mylist-line">
-        <th></th>
-        <th class="filename-field">Filename</th>
-        <th class="path-field">Path</th>
-        <th class="state-field">State</th>
-      </tr>
-      <tr v-for="(item, index) in filesList" v-if="index >= (nbFilesToDisplay * currentListPage) && index < ((nbFilesToDisplay * currentListPage) + nbFilesToDisplay)"
-        v-bind:class="[ 'mylist-line', index % 2 == 0 ? 'mylist-line-alt' : '' ]">
-        <td class="delete-field"><button v-on:click="deleteItem(item._id)">Delete</button></td>
-        <td class="filename-field">{{ item.filename }}</td>
-        <td class="path-field">{{ item.path }}</td>
-        <td class="state-field">
-          <input v-if="!states || states.length === 0" v-model="item.state" class="state-input" type="text" v-bind:disabled="!item.editing">
-          <select v-else v-model="item.state" class="state-input">
-            <option v-for="state in states" v-bind:value="state">{{ state }}</option>
-          </select>
-          <button v-if="(!states || states.length === 0) && item.editing === false" v-on:click="item.editing = true">Edit</button>
-          <button v-else v-on:click="updateState(item._id, item.state)">Ok</button>
-        </td>
-      </tr>
-    </table>
-    <div class="list-nav">
-      <button v-on:click="goToPreviousPage">Prev</button>
-      <span>Page {{ currentListPage + 1}}</span>
-      <button v-on:click="goToNextPage">Next</button>
-    </div>
-  </div>
+  <md-table-card>
+    <md-toolbar>
+      <h1 class="md-title">File Moderation</h1>
+      <md-button class="md-icon-button">
+        <md-icon>filter_list</md-icon>
+      </md-button>
+
+      <md-button class="md-icon-button">
+        <md-icon>search</md-icon>
+      </md-button>
+    </md-toolbar>
+
+    <md-table>
+      <md-table-header>
+        <md-table-row>
+          <md-table-head md-sort-by="filename">Filename</md-table-head>
+          <md-table-head md-sort-by="path">Path</md-table-head>
+          <md-table-head md-sort-by="state">State</md-table-head>
+        </md-table-row>
+      </md-table-header>
+
+      <md-table-body>
+        <md-table-row v-for="(row, rowIndex) in filesList" :key="rowIndex" :md-item="row" md-auto-select md-selection>
+          <md-table-cell :key="0">{{ row.filename }}</md-table-cell>
+          <md-table-cell :key="1">{{ row.path }}</md-table-cell>
+          <md-table-cell :key="2">{{ row.state }}</md-table-cell>
+        </md-table-row>
+      </md-table-body>
+    </md-table>
+
+    <md-table-pagination v-bind:md-size="nbFilesToDisplay" v-bind:md-total="filesList.length" v-bind:md-page="currentListPage" md-label="Files" md-separator="of" :md-page-options="[5, 10, 25, 50]"></md-table-pagination>
+  </md-table-card>
+
+  <!--<div class="mylist">
+    <listnav></listnav>
+    <mylist-table></mylist-table>
+    <listnav></listnav>
+  </div>-->
 </template>
 
 <script>
   import Vue from 'vue'
+  import VueMaterial from 'vue-material'
+  import 'vue-material/dist/vue-material.css'
+  import ListNav from './ListNav.vue'
+  import MylistTable from './MylistTable.vue'
   import config from '../../settings/default.json'
   import moderatorapi from '../lib/mediamoderatorAPI'
 
@@ -50,7 +57,15 @@
       return data
     },
 
+    components: {
+      'listnav': ListNav,
+      'mylist-table': MylistTable
+    },
+
     computed: {
+      moderatorURL() {
+        return `http://${config.moderatorServer}${config.apiRoute}`
+      },
       filesList() {
         return this.$store.state.filesList
       },
@@ -60,13 +75,19 @@
       currentListPage() {
         return this.$store.state.currentListPage
       },
+      firstCursor() {
+        return this.$store.state.firstCursor
+      },
+      lastCursor() {
+        return this.$store.state.lastCursor
+      },
       states() {
         return this.$store.state.states
       }
     },
 
     created() {
-      this.getFilesList()
+      this.getFilesList(this.nbToDisplay)
       this.getServerConfig()
     },
 
@@ -87,14 +108,16 @@
           })
       },
 
-      getFilesList() {
+      getFilesList(limit, cursor, state) {
         let instance = this
-        moderatorapi.getFilesList()
+        moderatorapi.getFilesList(limit, cursor, state)
           .then((res) => {
             res.data.forEach((item) => {
               item.editing = false
             })
             instance.$store.commit('setFiles', res.data)
+            instance.$store.commit('setFirstCursor', res.firstCursor)
+            instance.$store.commit('setLastCursor', res.lastCursor)
             setTimeout(function () {
               instance.getFilesList()
             }, config.listRefreshInterval * 1000);
@@ -139,20 +162,6 @@
           .catch((err) => {
             console.log(err)
           })
-      },
-
-      goToPreviousPage() {
-        let newPage = this.currentListPage > 0 ? this.currentListPage - 1 : 0
-        this.$store.commit('setCurrentListPage', newPage)
-      },
-
-      goToNextPage() {
-        let newPage =
-          this.currentListPage + 1 < ((this.filesList.length / this.nbFilesToDisplay)) ?
-            this.currentListPage + 1 :
-            this.currentListPage
-        newPage = Math.max(Math.floor(newPage), 0)
-        this.$store.commit('setCurrentListPage', newPage)
       }
     }
 
@@ -165,12 +174,6 @@
   text-align: left;
   line-height: 40px;
   user-select: none;
-}
-
-.list-nav {
-  width: 80%;
-  padding-left: 10%;
-  padding-right: 10%;
 }
 
 .mylist-table {
