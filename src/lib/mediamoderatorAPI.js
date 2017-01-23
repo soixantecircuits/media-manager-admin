@@ -12,9 +12,12 @@ export default {
     })
   },
 
-  getFilesList() {
+  getFilesList(limit, cursor, state) {
     return new Promise((resolve, reject) => {
       request.get(`http://${serverDomain}${apiRoute}`)
+        .query({ limit: limit })
+        .query({ cursor: cursor })
+//        .query({ state: state })
         .end(function (err, res) {
           if (err) {
             return reject(err)
@@ -53,12 +56,12 @@ export default {
   getConfig() {
     return new Promise((resolve, reject) => {
       request.get(`http://${serverDomain}${apiRoute}/config`)
-      .end((err, res) => {
-        if (err) {
-          return reject(err)
-        }
-        return resolve(JSON.parse(res.text))
-      })
+        .end((err, res) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(JSON.parse(res.text))
+        })
     })
   }
 }

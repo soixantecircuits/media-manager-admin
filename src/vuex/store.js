@@ -7,10 +7,22 @@ var FilesList = {
   files: [],
   nbFilesToDisplay: 2,
   currentListPage: 0,
-  states: []
+  firstCursor: '',
+  lastCursor: '',
+  states: [],
+  stateToSearch: ''
 }
 
 const mutations = {
+  setStateToSearch(state, val) {
+    state.stateToSearch = val
+  },
+  setFirstCursor(state, val) {
+    state.firstCursor = val
+  },
+  setLastCursor(state, val) {
+    state.lastCursor = val
+  },
   setStates(state, states) {
     state.states = states
   },
@@ -36,7 +48,10 @@ const store = new Vuex.Store({
     filesList: FilesList.files,
     nbFilesToDisplay: FilesList.nbFilesToDisplay,
     currentListPage: FilesList.currentListPage,
-    states: FilesList.states
+    firstCursor: FilesList.firstCursor,
+    lastCursor: FilesList.lastCursor,
+    states: FilesList.states,
+    stateToSearch: FilesList.stateToSearch
   },
 mutations})
 

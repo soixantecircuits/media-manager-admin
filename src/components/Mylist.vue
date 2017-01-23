@@ -14,10 +14,13 @@
         <th class="path-field">Path</th>
         <th class="state-field">State</th>
       </tr>
-      <tr v-for="(item, index) in filesList" v-if="index >= (nbFilesToDisplay * currentListPage) && index < ((nbFilesToDisplay * currentListPage) + nbFilesToDisplay)"
-        v-bind:class="[ 'mylist-line', index % 2 == 0 ? 'mylist-line-alt' : '' ]">
+      <!--<tr v-for="(item, index) in filesList" v-if="index >= (nbFilesToDisplay * currentListPage) && index < ((nbFilesToDisplay * currentListPage) + nbFilesToDisplay)"
+        v-bind:class="[ 'mylist-line', index % 2 == 0 ? 'mylist-line-alt' : '' ]">-->
+      <tr v-for="(item, index) in filesList" v-bind:class="[ 'mylist-line', index % 2 == 0 ? 'mylist-line-alt' : '' ]">
         <td class="delete-field"><button v-on:click="deleteItem(item._id)">Delete</button></td>
-        <td><a v-bind:href="`${moderatorURL}/${item._id}`" target="_blank"><img v-bind:src="`${moderatorURL}/${item._id}`" width="200" height="200"></a></td>
+        <td>
+          <a v-bind:href="`${moderatorURL}/${item._id}`" target="_blank"><img v-bind:src="`${moderatorURL}/${item._id}`" width="200" height="200"></a>
+        </td>
         <td class="filename-field">{{ item.filename }}</td>
         <td class="path-field">{{ item.path }}</td>
         <td class="state-field">
@@ -53,6 +56,15 @@
     },
 
     computed: {
+      firstCursor() {
+        return this.$store.state.firstCursor
+      },
+      lastCursor() {
+        return this.$store.state.lastCursor
+      },
+      stateToSearch() {
+        return this.$store.state.stateToSearch
+      },
       moderatorURL() {
         return `http://${config.moderatorServer}${config.apiRoute}`
       },
@@ -94,12 +106,19 @@
 
       getFilesList() {
         let instance = this
-        moderatorapi.getFilesList()
+        console.log(instance.nbFilesToDisplay + '   ' + instance.firstCursor + '   ' + instance.stateToSearch)
+        moderatorapi.getFilesList(instance.nbFilesToDisplay, instance.firstCursor, instance.stateToSearch)
           .then((res) => {
             res.data.forEach((item) => {
               item.editing = false
             })
             instance.$store.commit('setFiles', res.data)
+            if (instance.firstCursor === '') {
+              instance.$store.commit('setFirstCursor', res.firstCursor)
+            }
+            if (instance.lastCursor === '') {
+              instance.$store.commit('setLastCursor', res.lastCursor)
+            }
             setTimeout(function () {
               instance.getFilesList()
             }, config.listRefreshInterval * 1000);
@@ -149,6 +168,7 @@
       goToPreviousPage() {
         let newPage = this.currentListPage > 0 ? this.currentListPage - 1 : 0
         this.$store.commit('setCurrentListPage', newPage)
+        this.$store.commit('setNbFilesToDisplay', this.nbFilesToDisplay)
       },
 
       goToNextPage() {
@@ -158,6 +178,7 @@
             this.currentListPage
         newPage = Math.max(Math.floor(newPage), 0)
         this.$store.commit('setCurrentListPage', newPage)
+        //this.$store.commit('setFirstCursor', this.lastCursor)
       }
     }
 
