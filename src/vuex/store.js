@@ -5,10 +5,10 @@ Vue.use(Vuex)
 
 var FilesList = {
   files: [],
-  nbFilesToDisplay: 5,
+  nbFilesToDisplay: 10,
   currentListPage: 0,
-  firstCursor: '',
-  lastCursor: '',
+  firstCursor: undefined,
+  lastCursor: undefined,
   states: []
 }
 

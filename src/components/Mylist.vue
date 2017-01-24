@@ -1,50 +1,64 @@
 <template>
-  <md-table-card>
-    <md-toolbar>
-      <h1 class="md-title">File Moderation</h1>
-      <md-button class="md-icon-button">
-        <md-icon>filter_list</md-icon>
-      </md-button>
+  <md-table-card style="padding-left: 10%; padding-right: 10%;">
+<md-toolbar>
+  <h1 class="md-title">File Moderation</h1>
+</md-toolbar>
 
-      <md-button class="md-icon-button">
-        <md-icon>search</md-icon>
-      </md-button>
-    </md-toolbar>
+<div>
+  <md-button @click="goToPreviousPage">Prev</md-button>
+  <md-button @click="goToNextPage">Next</md-button>
+  <md-input-container style="width:10%;">
+<label for="toDisplay">Files per page</label>
+<md-select v-model="nbToDisplay" @change="$store.commit('setNbFilesToDisplay', nbToDisplay)">
+  <md-option :value="5">5</md-option>
+  <md-option :value="10">10</md-option>
+  <md-option :value="25">25</md-option>
+  <md-option :value="50">50</md-option>
+</md-select>
+</md-input-container>
+</div>
 
-    <md-table>
-      <md-table-header>
-        <md-table-row>
-          <md-table-head md-sort-by="filename">Filename</md-table-head>
-          <md-table-head md-sort-by="path">Path</md-table-head>
-          <md-table-head md-sort-by="state">State</md-table-head>
-        </md-table-row>
-      </md-table-header>
+<md-table>
+  <md-table-header>
+    <md-table-row>
+      <md-table-head>Delete</md-table-head>
+      <md-table-head>Picture</md-table-head>
+      <md-table-head md-sort-by="filename">Filename</md-table-head>
+      <md-table-head md-sort-by="path">Path</md-table-head>
+      <md-table-head md-sort-by="state">State</md-table-head>
+    </md-table-row>
+  </md-table-header>
 
-      <md-table-body>
-        <md-table-row v-for="(row, rowIndex) in filesList" :key="rowIndex" :md-item="row" md-auto-select md-selection>
-          <md-table-cell :key="0">{{ row.filename }}</md-table-cell>
-          <md-table-cell :key="1">{{ row.path }}</md-table-cell>
-          <md-table-cell :key="2">{{ row.state }}</md-table-cell>
-        </md-table-row>
-      </md-table-body>
-    </md-table>
+  <md-table-body>
+    <md-table-row v-for="(row, rowIndex) in filesList" :key="rowIndex" :md-item="row">
+      <md-table-cell>
+        <md-button class="md-raised md-warn" style="min-width:82px;" @click="deleteFile(row._id)">Delete</md-button>
+</md-table-cell>
+<md-table-cell>
+  <md-image :md-src="`${moderatorURL}/${row._id}`" width="200" height="200"></md-image>
+</md-table-cell>
+<md-table-cell align="left">{{ row.filename }}</md-table-cell>
+<md-table-cell align="left">{{ row.path }}</md-table-cell>
+<md-table-cell align="left">
+  <md-input-container>
+    <md-select v-model="row.state" @change="updateState(row._id, row.state)">
+      <md-option v-for="state in states" :value="state">{{ state }}</md-option>
+    </md-select>
+  </md-input-container>
+</md-table-cell>
+</md-table-row>
+</md-table-body>
+</md-table>
 
-    <md-table-pagination v-bind:md-size="nbFilesToDisplay" v-bind:md-total="filesList.length" v-bind:md-page="currentListPage" md-label="Files" md-separator="of" :md-page-options="[5, 10, 25, 50]"></md-table-pagination>
-  </md-table-card>
-
-  <!--<div class="mylist">
-    <listnav></listnav>
-    <mylist-table></mylist-table>
-    <listnav></listnav>
-  </div>-->
+<!--<md-table-pagination v-bind:md-size="nbFilesToDisplay" v-bind:md-total="filesList.length" v-bind:md-page="1" md-label="Files"
+  md-separator="of" :md-page-options="[5, 10, 25, 50]"></md-table-pagination>-->
+</md-table-card>
 </template>
 
 <script>
   import Vue from 'vue'
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
-  import ListNav from './ListNav.vue'
-  import MylistTable from './MylistTable.vue'
   import config from '../../settings/default.json'
   import moderatorapi from '../lib/mediamoderatorAPI'
 
@@ -55,11 +69,6 @@
   export default {
     data() {
       return data
-    },
-
-    components: {
-      'listnav': ListNav,
-      'mylist-table': MylistTable
     },
 
     computed: {
@@ -87,7 +96,7 @@
     },
 
     created() {
-      this.getFilesList(this.nbToDisplay)
+      this.getFilesList(this.nbToDisplay, undefined, undefined, this.timeoutGetFiles)
       this.getServerConfig()
     },
 
@@ -108,35 +117,30 @@
           })
       },
 
-      getFilesList(limit, cursor, state) {
+      timeoutGetFiles() {
+        let instance = this
+        setTimeout(function () {
+          instance.getFilesList(instance.nbFilesToDisplay, instance.firstCursor, instance.stateToSearch, instance.timeoutGetFiles)
+        }, config.listRefreshInterval * 1000);
+      },
+
+      getFilesList(limit, cursor, state, callback) {
         let instance = this
         moderatorapi.getFilesList(limit, cursor, state)
           .then((res) => {
-            res.data.forEach((item) => {
-              item.editing = false
-            })
+
             instance.$store.commit('setFiles', res.data)
-            instance.$store.commit('setFirstCursor', res.firstCursor)
             instance.$store.commit('setLastCursor', res.lastCursor)
-            setTimeout(function () {
-              instance.getFilesList()
-            }, config.listRefreshInterval * 1000);
+
+            if (callback && typeof callback === 'function') {
+              callback(res)
+            }
           })
           .catch((err) => {
             console.log(err)
             setTimeout(function () {
-              instance.getFilesList()
+              instance.getFilesList(limit, cursor, state, callback)
             }, config.listRefreshInterval * 1000);
-          })
-      },
-
-      getStatesList() {
-        moderatorapi.getStatesList()
-          .then((res) => {
-
-          })
-          .catch((err) => {
-            console.log(err)
           })
       },
 
@@ -144,14 +148,13 @@
         moderatorapi.updateState(id, state)
           .then((res) => {
             let item = this.filesList.find(elem => elem._id === id)
-            item.editing = false
           })
           .catch((err) => {
             console.log(err)
           })
       },
 
-      deleteItem(id) {
+      deleteFile(id) {
         moderatorapi.deleteFile(id)
           .then((res) => {
             let itemToDelete = this.filesList.find(item => item._id === id)
@@ -162,6 +165,18 @@
           .catch((err) => {
             console.log(err)
           })
+      },
+
+      goToPreviousPage() {
+        let instance = this
+        this.getFilesList(-this.nbFilesToDisplay, this.firstCursor, this.stateToSearch, (res) => {
+          instance.$store.commit('setFirstCursor', res.firstCursor)
+        })
+      },
+
+      goToNextPage() {
+        this.$store.commit('setFirstCursor', this.lastCursor)
+        this.getFilesList(this.nbFilesToDisplay, this.lastCursor, this.stateToSearch)
       }
     }
 
@@ -169,45 +184,5 @@
 </script>
 
 <style>
-.mylist {
-  margin: 100px auto;
-  text-align: left;
-  line-height: 40px;
-  user-select: none;
-}
 
-.mylist-table {
-  width: 80%;
-  background-color: #f0f0f0;
-  border-style: solid;
-  border-width: 0px 4px 0px 4px;
-}
-
-.mylist-line {
-  border-style: solid;
-  border-width: 1px 0px 1px 0px;
-}
-
-.mylist-line-alt {
-  background-color: #d0d0d0;
-}
-
-.delete-field {
-  width: 10%;
-}
-.filename-field {
-  width: 30%;
-}
-
-.path-field {
-  width: 40%;
-}
-
-.state-field {
-  width: 20%;
-}
-
-.state-input {
-  width: 60%;
-}
 </style>

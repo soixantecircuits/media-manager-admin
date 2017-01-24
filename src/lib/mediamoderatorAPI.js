@@ -6,12 +6,6 @@ let serverDomain = config.moderatorServer || 'localhost:8080'
 let apiRoute = config.apiRoute || '/api/v1/medias'
 
 export default {
-  getStatesList() {
-    return new Promise((resolve, reject) => {
-      resolve()
-    })
-  },
-
   getFilesList(limit, cursor, state) {
     return new Promise((resolve, reject) => {
       request.get(`http://${serverDomain}${apiRoute}`)

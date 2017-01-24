@@ -1,17 +1,18 @@
 <template>
   <div class="root">
-    <h2>File Moderation</h2>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <mylist></mylist>
   </div>
 </template>
 
 <script>
-import Mylist from './components/Mylist'
-export default {
-  components: {
-    Mylist
+  import Mylist from './components/Mylist'
+  export default {
+    components: {
+      Mylist
+    }
   }
-}
 </script>
 
 <style>
