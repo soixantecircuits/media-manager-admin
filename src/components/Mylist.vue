@@ -5,17 +5,22 @@
 </md-toolbar>
 
 <div>
-  <md-button @click="goToPreviousPage">Prev</md-button>
-  <md-button @click="goToNextPage">Next</md-button>
-  <md-input-container style="width:10%;">
+  <md-input-container style="width:10%; text-align:center;">
 <label for="toDisplay">Files per page</label>
-<md-select v-model="nbToDisplay" @change="$store.commit('setNbFilesToDisplay', nbToDisplay)">
+<md-select v-model="nbToDisplay" @change="updateNbFilesToDisplay(nbToDisplay)">
   <md-option :value="5">5</md-option>
   <md-option :value="10">10</md-option>
   <md-option :value="25">25</md-option>
   <md-option :value="50">50</md-option>
 </md-select>
+<span style="min-width:50px">Out of {{ filesCount }}</span>
 </md-input-container>
+
+<md-button v-show="firstCursor !== undefined" @click="goToPreviousPage">Prev</md-button>
+<md-button v-show="firstCursor === undefined" @click="goToPreviousPage" disabled>Prev</md-button>
+<md-button>Page {{ currentPage }}</md-button>
+<md-button v-show="lastCursor !== lastFile" @click="goToNextPage">Next</md-button>
+<md-button v-show="lastCursor === lastFile" @click="goToNextPage" disabled>Next</md-button>
 </div>
 
 <md-table>
@@ -23,9 +28,9 @@
     <md-table-row>
       <md-table-head>Delete</md-table-head>
       <md-table-head>Picture</md-table-head>
-      <md-table-head md-sort-by="filename">Filename</md-table-head>
-      <md-table-head md-sort-by="path">Path</md-table-head>
-      <md-table-head md-sort-by="state">State</md-table-head>
+      <md-table-head>Filename</md-table-head>
+      <md-table-head>Path</md-table-head>
+      <md-table-head>State</md-table-head>
     </md-table-row>
   </md-table-header>
 
@@ -35,7 +40,7 @@
         <md-button class="md-raised md-warn" style="min-width:82px;" @click="deleteFile(row._id)">Delete</md-button>
 </md-table-cell>
 <md-table-cell>
-  <md-image :md-src="`${moderatorURL}/${row._id}`" width="200" height="200"></md-image>
+  <md-image :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
 </md-table-cell>
 <md-table-cell align="left">{{ row.filename }}</md-table-cell>
 <md-table-cell align="left">{{ row.path }}</md-table-cell>
@@ -50,6 +55,10 @@
 </md-table-body>
 </md-table>
 
+<div>
+  <md-button @click="goToPreviousPage">Prev</md-button>
+  <md-button @click="goToNextPage">Next</md-button>
+</div>
 <!--<md-table-pagination v-bind:md-size="nbFilesToDisplay" v-bind:md-total="filesList.length" v-bind:md-page="1" md-label="Files"
   md-separator="of" :md-page-options="[5, 10, 25, 50]"></md-table-pagination>-->
 </md-table-card>
@@ -78,17 +87,26 @@
       filesList() {
         return this.$store.state.filesList
       },
+      filesCount() {
+        return this.$store.state.filesCount
+      },
       nbFilesToDisplay() {
         return this.$store.state.nbFilesToDisplay
       },
-      currentListPage() {
-        return this.$store.state.currentListPage
+      currentPage() {
+        return this.$store.state.currentPage
       },
       firstCursor() {
         return this.$store.state.firstCursor
       },
       lastCursor() {
         return this.$store.state.lastCursor
+      },
+      firstFile() {
+        return this.$store.state.firstFile
+      },
+      lastFile() {
+        return this.$store.state.lastFile
       },
       states() {
         return this.$store.state.states
@@ -132,6 +150,10 @@
             instance.$store.commit('setFiles', res.data)
             instance.$store.commit('setLastCursor', res.lastCursor)
 
+            instance.updateFilesCount()
+            instance.updateFirstFile()
+            instance.updateLastFile()
+
             if (callback && typeof callback === 'function') {
               callback(res)
             }
@@ -141,6 +163,44 @@
             setTimeout(function () {
               instance.getFilesList(limit, cursor, state, callback)
             }, config.listRefreshInterval * 1000);
+          })
+      },
+
+      updateFilesCount() {
+        let instance = this
+        moderatorapi.getFilesCount()
+          .then((res) => {
+            instance.$store.commit('setFilesCount', res)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+
+      updateNbFilesToDisplay(nb) {
+        this.$store.commit('setNbFilesToDisplay', nb)
+        this.getFilesList(this.nbFilesToDisplay, this.firstCursor, this.stateToSearch)
+      },
+
+      updateFirstFile() {
+        let instance = this
+        moderatorapi.getFirstFile()
+          .then((res) => {
+            instance.$store.commit('setFirstFile', res._id)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+
+      updateLastFile() {
+        let instance = this
+        moderatorapi.getLastFile()
+          .then((res) => {
+            instance.$store.commit('setLastFile', res._id)
+          })
+          .catch((err) => {
+            console.log(err)
           })
       },
 
@@ -168,15 +228,21 @@
       },
 
       goToPreviousPage() {
-        let instance = this
-        this.getFilesList(-this.nbFilesToDisplay, this.firstCursor, this.stateToSearch, (res) => {
-          instance.$store.commit('setFirstCursor', res.firstCursor)
-        })
+        if (this.firstCursor !== undefined) {
+          let instance = this
+          this.getFilesList(-this.nbFilesToDisplay, this.firstCursor, this.stateToSearch, (res) => {
+            instance.$store.commit('setFirstCursor', res.firstCursor)
+            instance.$store.commit('setCurrentPage', instance.currentPage - 1)
+          })
+        }
       },
 
       goToNextPage() {
-        this.$store.commit('setFirstCursor', this.lastCursor)
-        this.getFilesList(this.nbFilesToDisplay, this.lastCursor, this.stateToSearch)
+        if (this.lastCursor !== this.lastFile._id) {
+          this.$store.commit('setFirstCursor', this.lastCursor)
+          this.getFilesList(this.nbFilesToDisplay, this.lastCursor, this.stateToSearch)
+          this.$store.commit('setCurrentPage', this.currentPage + 1)
+        }
       }
     }
 

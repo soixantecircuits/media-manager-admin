@@ -6,6 +6,42 @@ let serverDomain = config.moderatorServer || 'localhost:8080'
 let apiRoute = config.apiRoute || '/api/v1/medias'
 
 export default {
+  getFirstFile() {
+    return new Promise((resolve, reject) => {
+      request.get(`http://${serverDomain}${apiRoute}/first`)
+      .end(function (err, res) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(JSON.parse(res.text))
+      })
+    })
+  },
+
+  getLastFile() {
+    return new Promise((resolve, reject) => {
+      request.get(`http://${serverDomain}${apiRoute}/last`)
+      .end(function (err, res) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(JSON.parse(res.text))
+      })
+    })
+  },
+
+  getFilesCount() {
+    return new Promise((resolve, reject) => {
+      request.get(`http://${serverDomain}${apiRoute}/count`)
+      .end(function (err, res) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(JSON.parse(res.text))
+      })
+    })
+  },
+
   getFilesList(limit, cursor, state) {
     return new Promise((resolve, reject) => {
       request.get(`http://${serverDomain}${apiRoute}`)
@@ -30,7 +66,7 @@ export default {
           if (err) {
             return reject(err)
           }
-          resolve()
+          resolve(res)
         })
     })
   },

@@ -5,10 +5,13 @@ Vue.use(Vuex)
 
 var FilesList = {
   files: [],
+  filesCount: 0,
   nbFilesToDisplay: 10,
-  currentListPage: 0,
+  currentPage: 1,
   firstCursor: undefined,
   lastCursor: undefined,
+  firstFile: undefined,
+  lastFile: undefined,
   states: []
 }
 
@@ -22,8 +25,11 @@ const mutations = {
   addFile(state, file) {
     state.filesList.push(file)
   },
-  setCurrentListPage(state, newPage) {
-    state.currentListPage = newPage
+  setFilesCount(state, val) {
+    state.filesCount = val
+  },
+  setCurrentPage(state, newPage) {
+    state.currentPage = newPage
   },
   setNbFilesToDisplay(state, nb) {
     state.nbFilesToDisplay = nb
@@ -36,16 +42,25 @@ const mutations = {
   },
   setLastCursor(state, val) {
     state.lastCursor = val
+  },
+  setFirstFile(state, file) {
+    state.firstFile = file
+  },
+  setLastFile(state, file) {
+    state.lastFile = file
   }
 }
 
 const store = new Vuex.Store({
   state: {
     filesList: FilesList.files,
+    filesCount: FilesList.filesCount,
     nbFilesToDisplay: FilesList.nbFilesToDisplay,
-    currentListPage: FilesList.currentListPage,
+    currentPage: FilesList.currentPage,
     firstCursor: FilesList.firstCursor,
     lastCursor: FilesList.lastCursor,
+    firstFile: FilesList.firstFile,
+    lastFile: FilesList.lastFile,
     states: FilesList.states
   },
 mutations})
