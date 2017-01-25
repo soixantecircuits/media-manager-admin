@@ -16,6 +16,15 @@ var FilesList = {
 }
 
 const mutations = {
+  setStateToSearch(state, val) {
+    state.stateToSearch = val
+  },
+  setFirstCursor(state, val) {
+    state.firstCursor = val
+  },
+  setLastCursor(state, val) {
+    state.lastCursor = val
+  },
   setStates(state, states) {
     state.states = states
   },

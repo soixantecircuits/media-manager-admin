@@ -81,6 +81,9 @@
     },
 
     computed: {
+      stateToSearch() {
+        return this.$store.state.stateToSearch
+      },
       moderatorURL() {
         return `http://${config.moderatorServer}${config.apiRoute}`
       },
