@@ -6,7 +6,7 @@
 
 <div>
   <md-input-container style="width:10%; text-align:center;">
-<label for="toDisplay">Files per page</label>
+<label for="toDisplay">Displayed Files</label>
 <md-select v-model="nbToDisplay" @change="updateNbFilesToDisplay(nbToDisplay)">
   <md-option :value="5">5</md-option>
   <md-option :value="10">10</md-option>
@@ -27,9 +27,9 @@
   <md-table-header>
     <md-table-row>
       <md-table-head>Delete</md-table-head>
-      <md-table-head>Picture</md-table-head>
       <md-table-head>Filename</md-table-head>
       <md-table-head>Path</md-table-head>
+      <md-table-head>Picture</md-table-head>
       <md-table-head>State</md-table-head>
     </md-table-row>
   </md-table-header>
@@ -39,11 +39,12 @@
       <md-table-cell>
         <md-button class="md-raised md-warn" style="min-width:82px;" @click="deleteFile(row._id)">Delete</md-button>
 </md-table-cell>
-<md-table-cell>
-  <md-image :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
-</md-table-cell>
 <md-table-cell align="left">{{ row.filename }}</md-table-cell>
 <md-table-cell align="left">{{ row.path }}</md-table-cell>
+<md-table-cell>
+  <a :href="`${moderatorURL}/${row._id}`" target="_blank"><md-image :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+</a>
+</md-table-cell>
 <md-table-cell align="left">
   <md-input-container>
     <md-select v-model="row.state" @change="updateState(row._id, row.state)">
@@ -56,8 +57,11 @@
 </md-table>
 
 <div>
-  <md-button @click="goToPreviousPage">Prev</md-button>
-  <md-button @click="goToNextPage">Next</md-button>
+  <md-button v-show="firstCursor !== undefined" @click="goToPreviousPage" :href="`#/${currentPage - 1}`">Prev</md-button>
+  <md-button v-show="firstCursor === undefined" @click="goToPreviousPage" disabled>Prev</md-button>
+  <md-button>Page {{ currentPage }}</md-button>
+  <md-button v-show="lastCursor !== lastFile" @click="goToNextPage" :href="`#/${currentPage + 1}`">Next</md-button>
+  <md-button v-show="lastCursor === lastFile" @click="goToNextPage" disabled>Next</md-button>
 </div>
 <!--<md-table-pagination v-bind:md-size="nbFilesToDisplay" v-bind:md-total="filesList.length" v-bind:md-page="1" md-label="Files"
   md-separator="of" :md-page-options="[5, 10, 25, 50]"></md-table-pagination>-->
@@ -117,8 +121,13 @@
     },
 
     created() {
-      this.getFilesList(this.nbToDisplay, undefined, undefined, this.timeoutGetFiles)
       this.getServerConfig()
+        .then((res) => {
+          this.getFilesList(this.nbToDisplay, undefined, undefined, this.timeoutGetFiles)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
 
     mounted() {
@@ -129,6 +138,7 @@
     methods: {
       getServerConfig() {
         let instance = this
+        return new Promise((resolve, reject) => {
         moderatorapi.getConfig()
           .then((res) => {
             instance.$store.commit('setStates', res.states)
@@ -136,6 +146,7 @@
           .catch((err) => {
             console.log(err)
           })
+        })
       },
 
       timeoutGetFiles() {
