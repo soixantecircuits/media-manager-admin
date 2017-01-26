@@ -13,6 +13,10 @@ export default new Router({
       component: Root
     },
     {
+      path: '/:page',
+      component: Root
+    },
+    {
       path: '*',
       component: NotFound
     }

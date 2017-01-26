@@ -144,6 +144,10 @@
     },
 
     created() {
+      if (this.$route.params.page) {
+        this.$store.commit('setCurrentPage', this.$route.params.page)
+      }
+
       if (this.$route.query.state) {
         this.$store.commit('setStateToSearch', this.$route.query.state)
       }
@@ -255,6 +259,7 @@
           let instance = this
           this.getFilesList(this.currentPage - 1, this.nbFilesToDisplay, this.stateToSearch, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage - 1)
+            instance.$router.push(`${instance.currentPage}`)
           })
         }
       },
@@ -264,6 +269,7 @@
           let instance = this
           this.getFilesList(this.currentPage + 1, this.nbFilesToDisplay, this.stateToSearch, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage + 1)
+            instance.$router.push(`${instance.currentPage}`)
           })
         }
       }
