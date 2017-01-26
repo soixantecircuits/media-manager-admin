@@ -77,12 +77,12 @@ export default {
     })
   },
 
-  getFilesList(limit, cursor, state) {
+  getFilesList(page, per_page, state) {
     let instance = this
     return new Promise((resolve, reject) => {
       request.get(`${protocol}://${serverDomain}${apiRoute}`)
-        .query({ limit: limit })
-        .query({ cursor: cursor})
+        .query({ page: page})
+        .query({ per_page: per_page })
         .query({ state: state })
         .end(function (err, res) {
           if (err) {
