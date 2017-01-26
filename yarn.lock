@@ -4143,9 +4143,9 @@ vue-loader@^10.0.2:
     vue-style-loader "^1.0.0"
     vue-template-es2015-compiler "^1.2.2"
 
-vue-material@^0.6.3:
+"vue-material@https://github.com/ybeaufort/vue-material.git":
   version "0.6.3"
-  resolved "https://registry.yarnpkg.com/vue-material/-/vue-material-0.6.3.tgz#28b7131cdba441d484ac5a2b3bc0a6291319fd0b"
+  resolved "https://github.com/ybeaufort/vue-material.git#bad2b34e9d65a13778e9e787a6c53654167c770d"
   dependencies:
     vue "^2.1.8"
 
