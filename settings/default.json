@@ -1,6 +1,6 @@
 {
   "moderatorServer": "localhost:8080",
   "apiRoute": "/api/v1/medias",
-  "filesPerPage" : 10,
-  "listRefreshInterval": 4
+  "listRefreshInterval": 4,
+  "nbDisplayedOptions": [ 5, 10, 25, 50 ]
 }

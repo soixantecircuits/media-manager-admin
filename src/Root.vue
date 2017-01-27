@@ -2,15 +2,15 @@
   <div class="root">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <mylist></mylist>
+    <medialist></medialist>
   </div>
 </template>
 
 <script>
-  import Mylist from './components/Mylist'
+  import MediaList from './components/MediaList'
   export default {
     components: {
-      Mylist
+      medialist: MediaList
     }
   }
 </script>
