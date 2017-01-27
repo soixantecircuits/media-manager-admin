@@ -105,6 +105,29 @@ export default {
     })
   },
 
+  getMediaDetails(id) {
+    return new Promise((resolve, reject) => {
+      request.get(`${protocol}://${serverDomain}${apiRoute}/${id}/details`)
+        .end((err, res) => {
+          if (err) {
+            if (protocol === 'https') {
+              protocol = 'http'
+              return getMediaDetails(id)
+                .then((result) => {
+                  return resolve(result)
+                })
+                .catch((error) => {
+                  return reject(error)
+                })
+            } else {
+              return reject(err)
+            }
+          }
+          return resolve(res)
+        })
+    })
+  },
+
   updateState(id, state) {
     return new Promise((resolve, reject) => {
       request.put(`${protocol}://${serverDomain}${apiRoute}/${id}`)
