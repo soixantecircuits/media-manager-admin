@@ -17,7 +17,7 @@ module.exports = {
     // this causes absolute path in builds, which makes them non-distribuable on an other machine
     // we may not need this in nd at all
     // so let's remove it on august, 22th 2016 if no one complains
-    //publicPath: config.build.assetsPublicPath,
+    publicPath: config.build.assetsPublicPath,
     filename: '[name].js'
   },
   target: program.target || 'web',
