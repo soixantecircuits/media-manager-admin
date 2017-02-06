@@ -11,6 +11,15 @@ var FilesList = {
   states: []
 }
 
+var MediaDetails = {
+  mediaId: '',
+  mediaName: '',
+  mediaState: '',
+  mediaUploadedAt: undefined,
+  mediaInfos: {},
+  mediaMetas: {}
+}
+
 const mutations = {
   setStateToSearch(state, val) {
     state.stateToSearch = val
@@ -36,6 +45,25 @@ const mutations = {
       state.currentListPage = Math.max(Math.floor(state.filesList.length / state.nbFilesToDisplay) - 1, 0)
     }
   },
+
+  setCurrentMediaId(state, id) {
+    state.currentMediaId = id
+  },
+  setCurrentMediaName(state, name) {
+    state.currentMediaName = name
+  },
+  setCurrentMediaState(state, val) {
+    state.currentMediaState = val
+  },
+  setCurrentMediaUploadedAt(state, val) {
+    state.currentMediaUploadedAt = val
+  },
+  setCurrentMediaInfos(state, infos) {
+    state.currentMediaInfos = infos
+  },
+  setCurrentMediaMetas(state, metas) {
+    state.currentMediaMetas = metas
+  }
 }
 
 const store = new Vuex.Store({
@@ -44,7 +72,14 @@ const store = new Vuex.Store({
     filesCount: FilesList.filesCount,
     nbFilesToDisplay: FilesList.nbFilesToDisplay,
     currentPage: FilesList.currentPage,
-    states: FilesList.states
+    states: FilesList.states,
+
+    currentMediaId: MediaDetails.mediaID,
+    currentMediaName: MediaDetails.mediaName,
+    currentMediaState: MediaDetails.mediaState,
+    currentMediaUploadedAt: MediaDetails.mediaUploadedAt,
+    currentMediaInfos: MediaDetails.mediaInfos,
+    currentMediaMetas: MediaDetails.mediaMetas
   },
 mutations})
 

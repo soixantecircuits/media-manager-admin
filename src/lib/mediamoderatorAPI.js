@@ -106,13 +106,14 @@ export default {
   },
 
   getMediaDetails(id) {
+    let instance = this
     return new Promise((resolve, reject) => {
       request.get(`${protocol}://${serverDomain}${apiRoute}/${id}/details`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
               protocol = 'http'
-              return getMediaDetails(id)
+              instance.getMediaDetails(id)
                 .then((result) => {
                   return resolve(result)
                 })
@@ -122,13 +123,40 @@ export default {
             } else {
               return reject(err)
             }
+          } else {
+            return resolve(res.body)
           }
-          return resolve(res)
+        })
+    })
+  },
+
+  getMediaMetas(id) {
+    let instance = this
+    return new Promise((resolve, reject) => {
+      request.get(`${protocol}://${serverDomain}${apiRoute}/${id}/metas`)
+        .end((err, res) => {
+          if (err) {
+            if (protocol === 'https') {
+              protocol = 'http'
+              instance.getMediaMetas(id)
+                .then((result) => {
+                  return resolve(result)
+                })
+                .catch((error) => {
+                  return reject(error)
+                })
+            } else {
+              return reject(err)
+            }
+          } else {
+            return resolve(res)
+          }
         })
     })
   },
 
   updateState(id, state) {
+    let instance = this
     return new Promise((resolve, reject) => {
       request.put(`${protocol}://${serverDomain}${apiRoute}/${id}`)
         .send({ state: state })
@@ -136,7 +164,7 @@ export default {
           if (err) {
             if (protocol === 'https') {
               protocol = 'http'
-              return updateState(id, state)
+              instance.updateState(id, state)
                 .then((result) => {
                   return resolve(result)
                 })
@@ -146,8 +174,9 @@ export default {
             } else {
               return reject(err)
             }
+          } else {
+            return resolve(res)
           }
-          return resolve(res)
         })
     })
   },
