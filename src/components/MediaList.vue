@@ -46,7 +46,8 @@
       <md-table-cell align="left">soon</md-table-cell>
       <md-table-cell>
         <a @click="goToMediaDetails(row._id)" style="cursor: pointer;">
-          <md-image :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+          <b v-if="row.type.search('video') !== -1">View video</b>
+          <md-image v-else :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
         </a>
       </md-table-cell>
       <md-table-cell align="left">
@@ -57,7 +58,7 @@
         </md-input-container>
       </md-table-cell>
     </md-table-row>
-    <md-spinner  v-if="filesList.length <= 0" md-indeterminate align="center"></md-spinner>
+    <md-spinner  v-if="filesList.length <= 0" md-indeterminate style="margin-left: auto; margin-right: auto;"></md-spinner>
   </md-table-body>
 </md-table>
 
@@ -240,7 +241,6 @@
             let itemToDelete = this.filesList.find(item => item._id === id)
             let index = this.filesList.indexOf(itemToDelete)
             this.filesList.splice(index, 1)
-            console.log('Deleted file ' + id)
           })
           .catch((err) => {
             console.log(err)
@@ -252,7 +252,7 @@
           let instance = this
           this.getFilesList(this.currentPage - 1, this.nbFilesToDisplay, this.stateToSearch, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage - 1)
-            let query = `?count=${instance.nbToDisplayer}`
+            let query = `?count=${instance.nbToDisplay}`
             if (instance.stateToSearch) {
               query += '&state=${instance.stateToSearch}'
             }
@@ -266,7 +266,11 @@
           let instance = this
           this.getFilesList(this.currentPage + 1, this.nbFilesToDisplay, this.stateToSearch, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage + 1)
-            instance.$router.push(`/medias/list/${instance.currentPage}`)
+            let query = `?count=${instance.nbToDisplay}`
+            if (instance.stateToSearch) {
+              query += '&state=${instance.stateToSearch}'
+            }
+            instance.$router.push(`/medias/list/${instance.currentPage}${query}`)
           })
         }
       },

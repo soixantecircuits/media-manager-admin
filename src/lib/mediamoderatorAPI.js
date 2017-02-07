@@ -149,7 +149,7 @@ export default {
               return reject(err)
             }
           } else {
-            return resolve(res)
+            return resolve(res.body)
           }
         })
     })

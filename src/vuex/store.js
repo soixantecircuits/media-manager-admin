@@ -16,6 +16,7 @@ var MediaDetails = {
   mediaName: '',
   mediaState: '',
   mediaUploadedAt: undefined,
+  mediaType: '',
   mediaInfos: {},
   mediaMetas: {}
 }
@@ -58,6 +59,9 @@ const mutations = {
   setCurrentMediaUploadedAt(state, val) {
     state.currentMediaUploadedAt = val
   },
+  setCurrentMediaType(state, type) {
+    state.currentMediaType = type
+  },
   setCurrentMediaInfos(state, infos) {
     state.currentMediaInfos = infos
   },
@@ -78,6 +82,7 @@ const store = new Vuex.Store({
     currentMediaName: MediaDetails.mediaName,
     currentMediaState: MediaDetails.mediaState,
     currentMediaUploadedAt: MediaDetails.mediaUploadedAt,
+    currentMediaType: MediaDetails.mediaType,
     currentMediaInfos: MediaDetails.mediaInfos,
     currentMediaMetas: MediaDetails.mediaMetas
   },

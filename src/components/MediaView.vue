@@ -1,37 +1,62 @@
 <template>
   <div>
 
-    <md-toolbar class="md-transparent">
-      <md-button class="md-primary" @click="goBackToList()" style="position: absolute;">Back to list</md-button>
+    <md-toolbar md-theme="grey">
+      <md-button class="md-primary" @click="goBackToList()">Back to list</md-button>
+      <div style="flex: 1;"></div>
+      <md-button @click="deleteFile(mediaId)">Delete this file</md-button>
     </md-toolbar>
 
-    <md-layout md-gutter md-row style="background-color: ghostwhite;">
+    <md-layout>
+
+    <md-layout md-flex="60" md-flex-offset="20" md-row style="border-radius: 8px;">
       <md-layout md-flex>
-        <md-card md-with-hover style="margin-left: auto;">
-          <md-card-media>
-            <md-image :md-src="`${moderatorURL}/${mediaId}`" alt="Media"></md-image>
+        <md-card style="background: black; width: 100%;">
+          <md-card-media style="margin: auto;">
+            <video v-if="mediaType.search('video') !== -1" :src="`${moderatorURL}/${mediaId}`" controls></video>
+            <md-image v-else :md-src="`${moderatorURL}/${mediaId}`" alt="Media"></md-image>
           </md-card-media>
         </md-card>
       </md-layout>
 
-      <md-layout md-gutter="40" md-column>
-        <div style="margin-left: 15%; margin-right: 15%;">
-          <md-layout>
-            <div style="margin-left: auto; margin-right: auto;"><h2 class="md-title">{{ mediaName }}</h2></div>
-          </md-layout>
-          <md-layout>
-            <md-select v-model="currentMediaState" @change="updateState(currentMediaState)">
-              <md-option v-for="state in states" :value="state">{{ state }}</md-option>
-            </md-select>
-          </md-layout>
-          <md-layout>
-            <div class="md-subhead">Uploaded at {{ mediaUploadedAt }}</div>
-          </md-layout>
-          <md-layout>
-            <div>ID: {{ mediaId }}</div>
-          </md-layout>
-        </div>
+      <md-layout md-flex>
+        <md-card style="height: 100%;">
+          <md-card-area md-inset>
+            <md-card-header>
+              <h2 class="md-title">{{ mediaName }}</h2>
+            </md-card-header>
+          </md-card-area>
+
+          <md-card-area md-inset>
+            <md-input-container style="height: 0; padding: 8px 16px; margin: 0;">
+              <label for="state" style="position: relative;"><b>State</b></label>
+              <md-select name="state" v-model="currentMediaState" @change="updateState(currentMediaState)" md-align-trigger>
+                <md-option v-for="state in states" :value="state">{{ state }}</md-option>
+              </md-select>
+            </md-input-container>
+          </md-card-area>
+
+          <md-card-area md-inset>
+            <md-card-content v-if="mediaMetas && Object.keys(mediaMetas).length > 0">
+              <md-table>
+                <md-table-row>
+                  <md-table-cell style="text-align: left;"><b>Uploaded at: </b></md-table-cell><md-table-cell style="text-align: left;">{{ mediaUploadedAt }}</md-table-cell>
+                </md-table-row>
+                <md-table-row>
+                  <md-table-cell style="text-align: left;"><b>ID: </b></md-table-cell><md-table-cell style="text-align: left;">{{ mediaId }}</md-table-cell>
+                </md-table-row>
+
+                <md-table-row v-for="(value, key) in mediaMetas">
+                  <md-table-cell style="text-align: left;"><b>{{ key }}: </b></md-table-cell><md-table-cell style="text-align: left;">{{ value }}</md-table-cell>
+                </md-table-row>
+              </md-table>
+            </md-card-content>
+          </md-card-area>
+
+        </md-card>
       </md-layout>
+    </md-layout>
+
     </md-layout>
 
   </div>
@@ -94,8 +119,20 @@
       mediaUploadedAt() {
         return this.$store.state.currentMediaUploadedAt
       },
+      mediaType() {
+        return this.$store.state.currentMediaType
+      },
       mediaInfos() {
         return this.$store.state.currentMediaInfos
+      },
+      mediaMetas() {
+        return {
+          sharedOnFacebook: 'yes',
+          printed: '5 times',
+          tweeted: '02/13/17, Friday, 23:12:42',
+          url: "www.whatev.er"
+        }
+        return this.$store.state.currentMediaMetas
       }
     },
 
@@ -122,6 +159,7 @@
             instance.currentMediaState = res.state
             let timestamp = new Date(res.uploadedAt)
             instance.$store.commit('setCurrentMediaUploadedAt', timestamp.toLocaleString())
+            instance.$store.commit('setCurrentMediaType', res.type)
             instance.$store.commit('setCurrentMediaInfos', res)
           })
           .catch((err) => {
@@ -133,7 +171,6 @@
         let instance = this
         moderatorapi.getMediaMetas(this.mediaId)
           .then((res) => {
-            console.log(res)
             instance.$store.commit('setCurrentMediaMetas', res)
           })
           .catch((err) => {
@@ -193,6 +230,19 @@
 
       goBackToList() {
         this.$router.push(`/medias/list/${this.currentPage}`)
+      },
+
+      deleteFile(id) {
+        let instance = this
+        moderatorapi.deleteFile(id)
+          .then((res) => {
+            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+              instance.goBackToList()
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     }
   }
@@ -200,4 +250,7 @@
 </script>
 
 <style>
+.md-input-container::after {
+  height: 0px;
+}
 </style>
