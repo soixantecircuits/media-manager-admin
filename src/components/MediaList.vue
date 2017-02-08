@@ -44,7 +44,7 @@
       <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row.filename }}</a></md-table-cell>
       <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
       <md-table-cell align="left">soon</md-table-cell>
-      <md-table-cell>
+      <md-table-cell align="left">
         <a @click="goToMediaDetails(row._id)" style="cursor: pointer;">
           <b v-if="row.type.search('video') !== -1">View video</b>
           <md-image v-else :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>

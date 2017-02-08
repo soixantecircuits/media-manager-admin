@@ -4,6 +4,9 @@
     <md-toolbar md-theme="grey">
       <md-button class="md-primary" @click="goBackToList()">Back to list</md-button>
       <div style="flex: 1;"></div>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaId === mediasList[0]._id" @click="goToPreviousMedia">Previous</md-button>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === nbPages && mediaId === mediasList[mediasList.length - 1]._id" @click="goToNextMedia">Next</md-button>
+      <div style="flex: 1;"></div>
       <md-button @click="deleteFile(mediaId)">Delete this file</md-button>
     </md-toolbar>
 
@@ -83,18 +86,7 @@
     },
 
     mounted() {
-      let instance = this
-      this.$store.commit('setCurrentMediaId', this.$route.params.id)
-
-      this.getServerConfig()
-        .then((res) => {
-          instance.$store.commit('setStates', res.states)
-          this.getMediaDetails()
-          this.getMediaMetas()
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      this.getPageData()
     },
 
     computed: {
@@ -104,8 +96,21 @@
       currentPage() {
         return this.$store.state.currentPage
       },
+      mediasList () {
+        return this.$store.state.filesList
+      },
       states() {
         return this.$store.state.states
+      },
+      mediaListPos() {
+        let instance = this
+        if (this.mediasList.length > 0) {
+          return this.mediasList.findIndex((element) => {
+            return element._id === instance.mediaId
+          })
+        } else {
+          return -1
+        }
       },
       mediaId() {
         return this.$store.state.currentMediaId
@@ -133,10 +138,28 @@
           url: "www.whatev.er"
         }
         return this.$store.state.currentMediaMetas
+      },
+      nbPages() {
+        return Math.floor(this.$store.state.filesCount / this.$store.state.nbFilesToDisplay) + ((this.$store.state.filesCount % this.$store.state.nbFilesToDisplay) !== 0 ? 1 : 0)
       }
     },
 
     methods: {
+      getPageData() {
+        let instance = this
+        this.$store.commit('setCurrentMediaId', this.$route.params.id)
+
+        this.getServerConfig()
+          .then((res) => {
+            instance.$store.commit('setStates', res.states)
+            this.getMediaDetails()
+            this.getMediaMetas()
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+
       getServerConfig() {
         let instance = this
         return new Promise((resolve, reject) => {
@@ -232,11 +255,52 @@
         this.$router.push(`/medias/list/${this.currentPage}`)
       },
 
+      goToPreviousMedia() {
+        let instance = this
+        if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
+          if (this.mediaListPos === 0) {
+            this.$store.commit('setCurrentPage', this.currentPage - 1)
+            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+              instance.$router.push(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
+              instance.getPageData()
+            })
+          } else {
+            this.$router.push(`${this.mediasList[this.mediaListPos - 1]._id}`)
+            this.getPageData()
+          }
+        }
+      },
+
+      goToNextMedia() {
+        let instance = this
+        if (this.mediasList.length > 0 && (this.currentPage === this.nbPages && this.mediaListPos === this.mediasList.length - 1) === false) {
+          if (this.mediaListPos === this.mediasList.length - 1) {
+            this.$store.commit('setCurrentPage', this.currentPage + 1)
+            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+              instance.$router.push(`${instance.mediasList[0]._id}`)
+              instance.getPageData()
+            })
+          } else {
+            this.$router.push(`${this.mediasList[this.mediaListPos + 1]._id}`)
+            this.getPageData()
+          }
+        }
+      },
+
       deleteFile(id) {
         let instance = this
         moderatorapi.deleteFile(id)
           .then((res) => {
             this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+              instance.$store.commit('setCurrentMediaId', '')
+              instance.$store.commit('setCurrentMediaName', '')
+              instance.$store.commit('setCurrentMediaState', '')
+              instance.currentMediaState = ''
+              instance.$store.commit('setCurrentMediaUploadedAt', '')
+              instance.$store.commit('setCurrentMediaType', '')
+              instance.$store.commit('setCurrentMediaInfos', {})
+              instance.$store.commit('setCurrentMediaMetas', {})
+
               instance.goBackToList()
             })
           })
