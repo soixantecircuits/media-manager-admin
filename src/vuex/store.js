@@ -4,11 +4,12 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 var FilesList = {
-  files: [],
-  filesCount: 0,
-  nbFilesToDisplay: 10,
+  statesList: [],
+  mediasList: [],
+  totalFiles: 0,
   currentPage: 1,
-  states: []
+  mediasPerPage: 10,
+  stateFilter: ''
 }
 
 var MediaDetails = {
@@ -22,28 +23,25 @@ var MediaDetails = {
 }
 
 const mutations = {
-  setStateToSearch(state, val) {
-    state.stateToSearch = val
+  setStateFilter(state, val) {
+    state.stateFilter = val
   },
-  setStates(state, states) {
-    state.states = states
+  setStatesList(state, list) {
+    state.statesList = list
   },
-  setFiles(state, files) {
-    state.filesList = files
+  setMediasList(state, list) {
+    state.mediasList = list
   },
-  addFile(state, file) {
-    state.filesList.push(file)
-  },
-  setFilesCount(state, val) {
-    state.filesCount = val
+  setTotalMedias(state, val) {
+    state.totalMedias = val
   },
   setCurrentPage(state, newPage) {
     state.currentPage = newPage
   },
-  setNbFilesToDisplay(state, nb) {
-    state.nbFilesToDisplay = nb
-    if ((state.currentListPage * state.nbFilesToDisplay) >= state.filesList.length) {
-      state.currentListPage = Math.max(Math.floor(state.filesList.length / state.nbFilesToDisplay) - 1, 0)
+  setMediasPerPage(state, val) {
+    state.mediasPerPage = val
+    if ((state.currentListPage * state.mediasPerPage) >= state.mediasList.length) {
+      state.currentListPage = Math.max(Math.floor(state.mediasList.length / state.mediasPerPage) - 1, 0)
     }
   },
 
@@ -72,11 +70,12 @@ const mutations = {
 
 const store = new Vuex.Store({
   state: {
-    filesList: FilesList.files,
-    filesCount: FilesList.filesCount,
-    nbFilesToDisplay: FilesList.nbFilesToDisplay,
+    statesList: FilesList.statesList,
+    mediasList: FilesList.mediasList,
+    totalMedias: FilesList.totalMedias,
     currentPage: FilesList.currentPage,
-    states: FilesList.states,
+    mediasPerPage: FilesList.mediasPerPage,
+    stateFilter:FilesList.stateFilter,
 
     currentMediaId: MediaDetails.mediaID,
     currentMediaName: MediaDetails.mediaName,

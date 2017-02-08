@@ -5,7 +5,7 @@
       <md-button class="md-primary" @click="goBackToList()">Back to list</md-button>
       <div style="flex: 1;"></div>
       <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaId === mediasList[0]._id" @click="goToPreviousMedia">Previous</md-button>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === nbPages && mediaId === mediasList[mediasList.length - 1]._id" @click="goToNextMedia">Next</md-button>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaId === mediasList[mediasList.length - 1]._id" @click="goToNextMedia">Next</md-button>
       <div style="flex: 1;"></div>
       <md-button @click="deleteFile(mediaId)">Delete this file</md-button>
     </md-toolbar>
@@ -33,8 +33,8 @@
           <md-card-area md-inset>
             <md-input-container style="height: 0; padding: 8px 16px; margin: 0;">
               <label for="state" style="position: relative;"><b>State</b></label>
-              <md-select name="state" v-model="currentMediaState" @change="updateState(currentMediaState)" md-align-trigger>
-                <md-option v-for="state in states" :value="state">{{ state }}</md-option>
+              <md-select name="state" v-model="currentMediaState" @change="setState(currentMediaState)" md-align-trigger>
+                <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
               </md-select>
             </md-input-container>
           </md-card-area>
@@ -93,14 +93,20 @@
       moderatorURL() {
         return `http://${config.moderatorServer}${config.apiRoute}`
       },
+      statesList() {
+        return this.$store.state.statesList
+      },
+      mediasList () {
+        return this.$store.state.mediasList
+      },
       currentPage() {
         return this.$store.state.currentPage
       },
-      mediasList () {
-        return this.$store.state.filesList
+      totalMedias() {
+        return this.$store.state.totalMedias
       },
-      states() {
-        return this.$store.state.states
+      mediasPerPage() {
+        return this.$store.state.mediasPerPage
       },
       mediaListPos() {
         let instance = this
@@ -139,8 +145,8 @@
         }
         return this.$store.state.currentMediaMetas
       },
-      nbPages() {
-        return Math.floor(this.$store.state.filesCount / this.$store.state.nbFilesToDisplay) + ((this.$store.state.filesCount % this.$store.state.nbFilesToDisplay) !== 0 ? 1 : 0)
+      totalPages() {
+        return Math.floor(this.totalMedias / this.mediasPerPage) + ((this.totalMedias % this.mediasPerPage) !== 0 ? 1 : 0)
       }
     },
 
@@ -151,7 +157,7 @@
 
         this.getServerConfig()
           .then((res) => {
-            instance.$store.commit('setStates', res.states)
+            instance.$store.commit('setStatesList', res.states)
             this.getMediaDetails()
             this.getMediaMetas()
           })
@@ -201,21 +207,21 @@
           })
       },
 
-      updateState(state) {
+      setState(state) {
         let instance = this
-        moderatorapi.updateState(this.mediaId, state)
+        moderatorapi.setState(this.mediaId, state)
           .then((res) => {
             this.$store.commit('setCurrentMediaState', state)
-            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch)
+            this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter)
           })
           .catch((err) => {
             console.log(err)
           })
       },
 
-      getFilesList(page, per_page, state, callback) {
+      getMediasList(page, perPage, state, callback) {
         let instance = this
-        moderatorapi.getFilesList(page, per_page, state)
+        moderatorapi.getMediasList(page, perPage, state)
           .then((res) => {
 
             res.data.forEach((media) => {
@@ -223,8 +229,8 @@
               media.uploadedAt = timestamp.toLocaleString()
             })
 
-            instance.$store.commit('setFiles', res.data)
-            instance.updateFilesCount()
+            instance.$store.commit('setMediasList', res.data)
+            instance.updateTotalMedias()
 
             if (callback && typeof callback === 'function') {
               callback(res)
@@ -235,13 +241,13 @@
           })
       },
 
-      updateFilesCount() {
+      updateTotalMedias() {
         let instance = this
-        moderatorapi.getFilesCount()
+        moderatorapi.getTotalMedias()
           .then((res) => {
-            instance.$store.commit('setFilesCount', res)
-            if (instance.currentPage > instance.nbPages) {
-              instance.$store.commit('setCurrentPage', instance.nbPages)
+            instance.$store.commit('setTotalMedias', res)
+            if (instance.currentPage > instance.totalPages) {
+              instance.$store.commit('setCurrentPage', instance.totalPages)
             } else if (instance.currentPage < 1) {
               instance.$store.commit('setCurrentPage', 1)
             }
@@ -252,7 +258,11 @@
       },
 
       goBackToList() {
-        this.$router.push(`/medias/list/${this.currentPage}`)
+        let query = `?count=${this.mediasPerPage}`
+        if (this.stateFilter) {
+          query += `&state=${this.stateFilter}`
+        }
+        this.$router.push(`/medias/list/${this.currentPage}${query}`)
       },
 
       goToPreviousMedia() {
@@ -260,7 +270,7 @@
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
           if (this.mediaListPos === 0) {
             this.$store.commit('setCurrentPage', this.currentPage - 1)
-            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+            this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
               instance.$router.push(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
               instance.getPageData()
             })
@@ -273,10 +283,10 @@
 
       goToNextMedia() {
         let instance = this
-        if (this.mediasList.length > 0 && (this.currentPage === this.nbPages && this.mediaListPos === this.mediasList.length - 1) === false) {
+        if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
           if (this.mediaListPos === this.mediasList.length - 1) {
             this.$store.commit('setCurrentPage', this.currentPage + 1)
-            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+            this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
               instance.$router.push(`${instance.mediasList[0]._id}`)
               instance.getPageData()
             })
@@ -291,7 +301,7 @@
         let instance = this
         moderatorapi.deleteFile(id)
           .then((res) => {
-            this.getFilesList(this.$store.state.currentPage, this.$store.state.nbFilesToDisplay, this.$store.state.stateToSearch, function () {
+            this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
               instance.$store.commit('setCurrentMediaId', '')
               instance.$store.commit('setCurrentMediaName', '')
               instance.$store.commit('setCurrentMediaState', '')

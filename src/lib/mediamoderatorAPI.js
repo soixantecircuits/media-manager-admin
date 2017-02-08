@@ -54,14 +54,14 @@ export default {
     })
   },
 
-  getFilesCount() {
+  getTotalMedias() {
     return new Promise((resolve, reject) => {
       request.get(`${protocol}://${serverDomain}${apiRoute}/count`)
         .end(function (err, res) {
           if (err) {
             if (protocol === 'https') {
               protocol = 'http'
-              return getFilesCount()
+              return getTotalMedias()
                 .then((result) => {
                   return resolve(result)
                 })
@@ -77,18 +77,22 @@ export default {
     })
   },
 
-  getFilesList(page, per_page, state) {
+  getMediasList(page, perPage, state) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}`)
+      let moderatorRequest = request.get(`${protocol}://${serverDomain}${apiRoute}`)
         .query({ page: page})
-        .query({ per_page: per_page })
-        .query({ state: state })
-        .end(function (err, res) {
+        .query({ per_page: perPage })
+
+        if (state && state !== '' && state !== 'any') {
+          moderatorRequest.query({ state: state })
+        }
+
+        moderatorRequest.end(function (err, res) {
           if (err) {
             if (protocol === 'https') {
               protocol = 'http'
-              return instance.getFilesList(limit, cursor, state)
+              return instance.getMediasList(page, perPage, state)
                 .then((result) => {
                   return resolve(result)
                 })
@@ -155,7 +159,7 @@ export default {
     })
   },
 
-  updateState(id, state) {
+  setState(id, state) {
     let instance = this
     return new Promise((resolve, reject) => {
       request.put(`${protocol}://${serverDomain}${apiRoute}/${id}`)
@@ -164,7 +168,7 @@ export default {
           if (err) {
             if (protocol === 'https') {
               protocol = 'http'
-              instance.updateState(id, state)
+              instance.setState(id, state)
                 .then((result) => {
                   return resolve(result)
                 })

@@ -4,83 +4,88 @@
       <h1 class="md-title">File Moderation</h1>
     </md-toolbar>
 
-  <div class="md-table-pagination">
-    <span class="md-table-pagination-label">Files per page :</span>
+    <div class="md-table-pagination">
+      <span class="md-table-pagination-label">Filter by state :</span>
+      <md-select v-model="stateToFilter" md-menu-class="md-pagination-select" @change="setStateFilter(stateToFilter)" v-if="statesList">
+        <md-option value="any">Any</md-option>
+        <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
+      </md-select>
 
-    <md-select v-model="nbToDisplay" md-menu-class="md-pagination-select" @change="updateNbFilesToDisplay(nbToDisplay)" v-if="pageOptions">
-      <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
-    </md-select>
+      <span class="md-table-pagination-label">Files per page :</span>
+      <md-select v-model="perPage" md-menu-class="md-pagination-select" @change="setMediasPerPage(perPage)" v-if="pageOptions">
+        <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
+      </md-select>
 
-    <span>Page {{ currentPage }} of {{ nbPages }}</span>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
 
-    <md-button class="md-icon-button md-table-pagination-previous" @click="goToPreviousPage" :disabled="currentPage === 1">
-      <md-icon>keyboard_arrow_left</md-icon>
-    </md-button>
+      <md-button class="md-icon-button md-table-pagination-previous" @click="goToPreviousPage" :disabled="currentPage === 1">
+        <md-icon>keyboard_arrow_left</md-icon>
+      </md-button>
 
-    <md-button class="md-icon-button md-table-pagination-next" @click="goToNextPage" :disabled="currentPage >= nbPages">
-      <md-icon>keyboard_arrow_right</md-icon>
-    </md-button>
-  </div>
+      <md-button class="md-icon-button md-table-pagination-next" @click="goToNextPage" :disabled="currentPage >= totalPages">
+        <md-icon>keyboard_arrow_right</md-icon>
+      </md-button>
+    </div>
 
-<md-table>
-  <md-table-header>
-    <md-table-row>
-      <md-table-head>Delete</md-table-head>
-      <md-table-head>ID</md-table-head>
-      <md-table-head>Filename</md-table-head>
-      <md-table-head>Created at</md-table-head>
-      <md-table-head>Last Update</md-table-head>
-      <md-table-head>Picture</md-table-head>
-      <md-table-head>State</md-table-head>
-    </md-table-row>
-  </md-table-header>
+    <md-table>
+      <md-table-header>
+        <md-table-row>
+          <md-table-head>Delete</md-table-head>
+          <md-table-head>ID</md-table-head>
+          <md-table-head>Filename</md-table-head>
+          <md-table-head>Created at</md-table-head>
+          <md-table-head>Last Update</md-table-head>
+          <md-table-head>Media</md-table-head>
+          <md-table-head>State</md-table-head>
+        </md-table-row>
+      </md-table-header>
 
-  <md-table-body>
-    <md-table-row v-for="(row, rowIndex) in filesList" :key="rowIndex" :md-item="row">
-      <md-table-cell>
-        <md-button class="md-fab md-clean" @click="deleteFile(row._id)"><md-icon>delete</md-icon></md-button>
-      </md-table-cell>
-      <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
-      <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row.filename }}</a></md-table-cell>
-      <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
-      <md-table-cell align="left">soon</md-table-cell>
-      <md-table-cell align="left">
-        <a @click="goToMediaDetails(row._id)" style="cursor: pointer;">
-          <b v-if="row.type.search('video') !== -1">View video</b>
-          <md-image v-else :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
-        </a>
-      </md-table-cell>
-      <md-table-cell align="left">
-        <md-input-container>
-          <md-select v-model="row.state" @change="updateState(row._id, row.state)">
-            <md-option v-for="state in states" :value="state">{{ state }}</md-option>
-          </md-select>
-        </md-input-container>
-      </md-table-cell>
-    </md-table-row>
-    <md-spinner  v-if="filesList.length <= 0" md-indeterminate style="margin-left: auto; margin-right: auto;"></md-spinner>
-  </md-table-body>
-</md-table>
+      <md-table-body>
+        <md-table-row v-for="(row, rowIndex) in mediasList" :key="rowIndex" :md-item="row">
+          <md-table-cell>
+            <md-button class="md-fab md-clean" @click="deleteFile(row._id)"><md-icon>delete</md-icon></md-button>
+          </md-table-cell>
+          <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
+          <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row.filename }}</a></md-table-cell>
+          <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
+          <md-table-cell align="left">soon</md-table-cell>
+          <md-table-cell align="left">
+            <a @click="goToMediaDetails(row._id)" style="cursor: pointer;">
+              <b v-if="row.type.search('video') !== -1">View video</b>
+              <md-image v-else :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+            </a>
+          </md-table-cell>
+          <md-table-cell align="left">
+            <md-input-container>
+              <md-select v-model="row.state" @change="setState(row._id, row.state)">
+                <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
+              </md-select>
+            </md-input-container>
+          </md-table-cell>
+        </md-table-row>
+        <md-spinner  v-if="mediasList.length <= 0" md-indeterminate style="margin-left: auto; margin-right: auto;"></md-spinner>
+      </md-table-body>
+    </md-table>
 
-  <div class="md-table-pagination">
-    <span class="md-table-pagination-label">Files per page :</span>
+    <div class="md-table-pagination">
+      <span class="md-table-pagination-label">Files per page :</span>
 
-    <md-select v-model="nbToDisplay" md-menu-class="md-pagination-select" @change="updateNbFilesToDisplay(nbToDisplay)" v-if="pageOptions">
-      <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
-    </md-select>
+      <md-select v-model="perPage" md-menu-class="md-pagination-select" @change="setMediasPerPage(perPage)" v-if="pageOptions">
+        <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
+      </md-select>
 
-    <span>Page {{ currentPage }} of {{ nbPages }}</span>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
 
-    <md-button class="md-icon-button md-table-pagination-previous" @click="goToPreviousPage" :disabled="currentPage === 1">
-      <md-icon>keyboard_arrow_left</md-icon>
-    </md-button>
+      <md-button class="md-icon-button md-table-pagination-previous" @click="goToPreviousPage" :disabled="currentPage === 1">
+        <md-icon>keyboard_arrow_left</md-icon>
+      </md-button>
 
-    <md-button class="md-icon-button md-table-pagination-next" @click="goToNextPage" :disabled="currentPage >= nbPages">
-      <md-icon>keyboard_arrow_right</md-icon>
-    </md-button>
-  </div>
+      <md-button class="md-icon-button md-table-pagination-next" @click="goToNextPage" :disabled="currentPage >= totalPages">
+        <md-icon>keyboard_arrow_right</md-icon>
+      </md-button>
+    </div>
 
-</md-table-card>
+  </md-table-card>
 </template>
 
 <script>
@@ -93,10 +98,11 @@
   let data = {
     listRefreshInterval: Math.abs(config.listRefreshInterval),
     pageOptions: config.nbDisplayedOptions || [ 10, 25, 50 ],
-    nbToDisplay: 10,
+    perPage: 10,
+    stateToFilter: 'any',
     interval: undefined
   }
-  data.nbToDisplay = data.pageOptions[0]
+  data.perPage = data.pageOptions[0]
 
   export default {
     data() {
@@ -104,29 +110,29 @@
     },
 
     computed: {
-      stateToSearch() {
-        return this.$store.state.stateToSearch
+      stateFilter() {
+        return this.$store.state.stateFilter
       },
       moderatorURL() {
         return `http://${config.moderatorServer}${config.apiRoute}`
       },
-      filesList() {
-        return this.$store.state.filesList
+      mediasList() {
+        return this.$store.state.mediasList
       },
-      filesCount() {
-        return this.$store.state.filesCount
+      totalMedias() {
+        return this.$store.state.totalMedias
       },
-      nbFilesToDisplay() {
-        return this.$store.state.nbFilesToDisplay
+      mediasPerPage() {
+        return this.$store.state.mediasPerPage
       },
       currentPage() {
         return this.$store.state.currentPage
       },
-      nbPages() {
-        return Math.floor(this.$store.state.filesCount / this.$store.state.nbFilesToDisplay) + ((this.$store.state.filesCount % this.$store.state.nbFilesToDisplay) !== 0 ? 1 : 0)
+      totalPages() {
+        return Math.floor(this.totalMedias / this.mediasPerPage) + ((this.totalMedias % this.mediasPerPage) !== 0 ? 1 : 0)
       },
-      states() {
-        return this.$store.state.states
+      statesList() {
+        return this.$store.state.statesList
       }
     },
 
@@ -136,23 +142,24 @@
       }
 
       if (this.$route.query.count) {
-        this.nbToDisplay = this.$route.query.count
-        this.$store.commit('setNbFilesToDisplay', parseInt(this.nbToDisplay, 10))
+        this.perPage = parseInt(this.$route.query.count, 10)
+        this.$store.commit('setMediasPerPage', this.perPage)
       }
 
       if (this.$route.query.state) {
-        this.$store.commit('setStateToSearch', this.$route.query.state)
+        this.stateToFilter = this.$route.query.state
+        this.$store.commit('setStateFilter', this.stateToFilter)
       }
 
       this.getServerConfig()
-        .then((res) => {
-          this.$store.commit('setNbFilesToDisplay', this.nbToDisplay)
-          let waitTime = this.listRefreshInterval * 1000
-          this.interval = setInterval(this.getFilesList(this.currentPage, this.nbFilesToDisplay, this.stateToSearch), waitTime)          
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      .then((res) => {
+        this.$store.commit('setMediasPerPage', this.perPage)
+        let waitTime = this.listRefreshInterval * 1000
+        this.interval = setInterval(this.refreshMediasList, waitTime)          
+      })
+      .catch((err) => {
+        console.log(err)
+      })
     },
 
     mounted() {
@@ -168,7 +175,7 @@
         return new Promise((resolve, reject) => {
           moderatorapi.getConfig()
             .then((res) => {
-              instance.$store.commit('setStates', res.states)
+              instance.$store.commit('setStatesList', res.states)
               resolve(res)
             })
             .catch((err) => {
@@ -177,17 +184,9 @@
         })
       },
 
-      timeoutGetFiles() {
+      getMediasList(page, perPage, state, callback) {
         let instance = this
-        let waitTime = instance.listRefreshInterval * 1000
-        instance.interval = setInterval(function timeoutGetFilesList() {
-          instance.getFilesList(instance.currentPage, instance.nbFilesToDisplay, instance.stateToSearch, instance.timeoutGetFiles)
-        }, waitTime);
-      },
-
-      getFilesList(page, per_page, state, callback) {
-        let instance = this
-        moderatorapi.getFilesList(page, per_page, state)
+        moderatorapi.getMediasList(page, perPage, state)
           .then((res) => {
 
             res.data.forEach((media) => {
@@ -195,8 +194,8 @@
               media.uploadedAt = timestamp.toLocaleString()
             })
 
-            instance.$store.commit('setFiles', res.data)
-            instance.updateFilesCount()
+            instance.$store.commit('setMediasList', res.data)
+            instance.setTotalMedias()
 
             if (callback && typeof callback === 'function') {
               callback(res)
@@ -207,13 +206,17 @@
           })
       },
 
-      updateFilesCount() {
+      refreshMediasList() {
+        this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter)
+      },
+
+      setTotalMedias() {
         let instance = this
-        moderatorapi.getFilesCount()
+        moderatorapi.getTotalMedias()
           .then((res) => {
-            instance.$store.commit('setFilesCount', res)
-            if (instance.currentPage > instance.nbPages) {
-              instance.$store.commit('setCurrentPage', instance.nbPages)
+            instance.$store.commit('setTotalMedias', res)
+            if (instance.currentPage > instance.totalPages) {
+              instance.$store.commit('setCurrentPage', instance.totalPages)
             } else if (instance.currentPage < 1) {
               instance.$store.commit('setCurrentPage', 1)
             }
@@ -223,13 +226,18 @@
           })
       },
 
-      updateNbFilesToDisplay(nb) {
-        this.$store.commit('setNbFilesToDisplay', nb)
-        this.getFilesList(this.currentPage, this.nbFilesToDisplay, this.stateToSearch)
+      setMediasPerPage(nb) {
+        this.$store.commit('setMediasPerPage', nb)
+        this.refreshMediasList()
       },
 
-      updateState(id, state) {
-        moderatorapi.updateState(id, state)
+      setStateFilter(state) {
+        this.$store.commit('setStateFilter', state)
+        this.refreshMediasList()
+      },
+
+      setState(id, state) {
+        moderatorapi.setState(id, state)
           .catch((err) => {
             console.log(err)
           })
@@ -238,9 +246,7 @@
       deleteFile(id) {
         moderatorapi.deleteFile(id)
           .then((res) => {
-            let itemToDelete = this.filesList.find(item => item._id === id)
-            let index = this.filesList.indexOf(itemToDelete)
-            this.filesList.splice(index, 1)
+            this.refreshMediasList()
           })
           .catch((err) => {
             console.log(err)
@@ -250,11 +256,11 @@
       goToPreviousPage() {
         if (this.currentPage > 1) {
           let instance = this
-          this.getFilesList(this.currentPage - 1, this.nbFilesToDisplay, this.stateToSearch, (res) => {
+          this.getMediasList(this.currentPage - 1, this.mediasPerPage, this.stateFilter, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage - 1)
-            let query = `?count=${instance.nbToDisplay}`
-            if (instance.stateToSearch) {
-              query += '&state=${instance.stateToSearch}'
+            let query = `?count=${instance.mediasPerPage}`
+            if (instance.stateFilter) {
+              query += `&state=${instance.stateFilter}`
             }
             instance.$router.push(`${instance.currentPage}${query}`)
           })
@@ -262,13 +268,13 @@
       },
 
       goToNextPage() {
-        if (this.currentPage < this.nbPages) {
+        if (this.currentPage < this.totalPages) {
           let instance = this
-          this.getFilesList(this.currentPage + 1, this.nbFilesToDisplay, this.stateToSearch, (res) => {
+          this.getMediasList(this.currentPage + 1, this.mediasPerPage, this.stateFilter, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage + 1)
-            let query = `?count=${instance.nbToDisplay}`
-            if (instance.stateToSearch) {
-              query += '&state=${instance.stateToSearch}'
+            let query = `?count=${instance.mediasPerPage}`
+            if (instance.stateFilter) {
+              query += `&state=${instance.stateFilter}`
             }
             instance.$router.push(`/medias/list/${instance.currentPage}${query}`)
           })
@@ -284,5 +290,4 @@
 </script>
 
 <style>
-
 </style>
