@@ -4,28 +4,12 @@
       <h1 class="md-title">File Moderation</h1>
     </md-toolbar>
 
-    <div class="md-table-pagination">
-      <span class="md-table-pagination-label">Filter by state :</span>
-      <md-select v-model="stateToFilter" md-menu-class="md-pagination-select" @change="setStateFilter(stateToFilter)" v-if="statesList">
-        <md-option value="any">Any</md-option>
-        <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
-      </md-select>
-
-      <span class="md-table-pagination-label">Files per page :</span>
-      <md-select v-model="perPage" md-menu-class="md-pagination-select" @change="setMediasPerPage(perPage)" v-if="pageOptions">
-        <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
-      </md-select>
-
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-
-      <md-button class="md-icon-button md-table-pagination-previous" @click="goToPreviousPage" :disabled="currentPage === 1">
-        <md-icon>keyboard_arrow_left</md-icon>
-      </md-button>
-
-      <md-button class="md-icon-button md-table-pagination-next" @click="goToNextPage" :disabled="currentPage >= totalPages">
-        <md-icon>keyboard_arrow_right</md-icon>
-      </md-button>
-    </div>
+    <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
+                           :currentPage="currentPage" :totalPages="totalPages"
+                           :stateFilter="stateFilter" :mediasPerPage="mediasPerPage"
+                           @stateFilterChanged="setStateFilter" @mediasPerPageChanged="setMediasPerPage"
+                           @previousPage="goToPreviousPage" @nextPage="goToNextPage">
+    </media-list-pagination>
 
     <md-table>
       <md-table-header>
@@ -67,23 +51,12 @@
       </md-table-body>
     </md-table>
 
-    <div class="md-table-pagination">
-      <span class="md-table-pagination-label">Files per page :</span>
-
-      <md-select v-model="perPage" md-menu-class="md-pagination-select" @change="setMediasPerPage(perPage)" v-if="pageOptions">
-        <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
-      </md-select>
-
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-
-      <md-button class="md-icon-button md-table-pagination-previous" @click="goToPreviousPage" :disabled="currentPage === 1">
-        <md-icon>keyboard_arrow_left</md-icon>
-      </md-button>
-
-      <md-button class="md-icon-button md-table-pagination-next" @click="goToNextPage" :disabled="currentPage >= totalPages">
-        <md-icon>keyboard_arrow_right</md-icon>
-      </md-button>
-    </div>
+    <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
+                           :currentPage="currentPage" :totalPages="totalPages"
+                           :stateFilter="stateFilter" :mediasPerPage="mediasPerPage"
+                           @stateFilterChanged="setStateFilter" @mediasPerPageChanged="setMediasPerPage"
+                           @previousPage="goToPreviousPage" @nextPage="goToNextPage">
+    </media-list-pagination>
 
   </md-table-card>
 </template>
@@ -94,6 +67,8 @@
   import 'vue-material/dist/vue-material.css'
   import config from '../../settings/default.json'
   import moderatorapi from '../lib/mediamoderatorAPI'
+
+  import ListPagination from './MediaListPagination'
 
   let data = {
     listRefreshInterval: Math.abs(config.listRefreshInterval),
@@ -107,6 +82,10 @@
   export default {
     data() {
       return data
+    },
+
+    components: {
+      'media-list-pagination': ListPagination
     },
 
     computed: {
@@ -155,6 +134,8 @@
       .then((res) => {
         this.$store.commit('setMediasPerPage', this.perPage)
         let waitTime = this.listRefreshInterval * 1000
+
+        this.refreshMediasList()
         this.interval = setInterval(this.refreshMediasList, waitTime)          
       })
       .catch((err) => {
@@ -228,11 +209,21 @@
 
       setMediasPerPage(nb) {
         this.$store.commit('setMediasPerPage', nb)
+        let query = `?count=${this.mediasPerPage}`
+        if (this.stateFilter) {
+          query += `&state=${this.stateFilter}`
+        }
+        this.$router.push(`${this.currentPage}${query}`)
         this.refreshMediasList()
       },
 
       setStateFilter(state) {
         this.$store.commit('setStateFilter', state)
+        let query = `?count=${this.mediasPerPage}`
+        if (this.stateFilter) {
+          query += `&state=${this.stateFilter}`
+        }
+        this.$router.push(`${this.currentPage}${query}`)
         this.refreshMediasList()
       },
 

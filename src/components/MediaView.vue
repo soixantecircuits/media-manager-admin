@@ -36,6 +36,12 @@
               <md-select name="state" v-model="currentMediaState" @change="setState(currentMediaState)" md-align-trigger>
                 <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
               </md-select>
+
+              <label for="bucket" style="position: relative;"><b>Bucket</b></label>
+              <md-select name="bucket" md-align-trigger>
+                <md-option value="nespresso">Nespresso</md-option>
+                <md-option value="baboulinet">Baboulinet</md-option>
+              </md-select>
             </md-input-container>
           </md-card-area>
 
