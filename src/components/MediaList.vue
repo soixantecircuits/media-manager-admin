@@ -32,7 +32,7 @@
           <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
           <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row.filename }}</a></md-table-cell>
           <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
-          <md-table-cell align="left">soon</md-table-cell>
+          <md-table-cell align="left">{{ row.updatedAt }}</md-table-cell>
           <md-table-cell align="left">
             <a @click="goToMediaDetails(row._id)" style="cursor: pointer;">
               <b v-if="row.type.search('video') !== -1">View video</b>
@@ -122,18 +122,23 @@
 
       if (this.$route.query.count) {
         this.perPage = parseInt(this.$route.query.count, 10)
-        this.$store.commit('setMediasPerPage', this.perPage)
       }
 
       if (this.$route.query.state) {
         this.stateToFilter = this.$route.query.state
-        this.$store.commit('setStateFilter', this.stateToFilter)
       }
 
       this.getServerConfig()
       .then((res) => {
         this.$store.commit('setMediasPerPage', this.perPage)
+        this.$store.commit('setStateFilter', this.stateToFilter)
         let waitTime = this.listRefreshInterval * 1000
+
+        let query = `?count=${this.mediasPerPage}`
+        if (this.stateFilter) {
+          query += `&state=${this.stateFilter}`
+        }
+        this.$router.push(`${this.currentPage}${query}`)
 
         this.refreshMediasList()
         this.interval = setInterval(this.refreshMediasList, waitTime)          
@@ -173,6 +178,8 @@
             res.data.forEach((media) => {
               let timestamp = new Date(media.uploadedAt)
               media.uploadedAt = timestamp.toLocaleString()
+              timestamp = new Date(media.updatedAt)
+              media.updatedAt = timestamp.toLocaleString()
             })
 
             instance.$store.commit('setMediasList', res.data)
@@ -193,7 +200,7 @@
 
       setTotalMedias() {
         let instance = this
-        moderatorapi.getTotalMedias()
+        moderatorapi.getTotalMedias(instance.stateFilter)
           .then((res) => {
             instance.$store.commit('setTotalMedias', res)
             if (instance.currentPage > instance.totalPages) {

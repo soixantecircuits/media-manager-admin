@@ -54,26 +54,31 @@ export default {
     })
   },
 
-  getTotalMedias() {
+  getTotalMedias(state) {
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}/count`)
-        .end(function (err, res) {
-          if (err) {
-            if (protocol === 'https') {
-              protocol = 'http'
-              return getTotalMedias()
-                .then((result) => {
-                  return resolve(result)
-                })
-                .catch((error) => {
-                  return reject(error)
-                })
-            } else {
-              return reject(err)
-            }
+      let moderatorRequest = request.get(`${protocol}://${serverDomain}${apiRoute}/count`)
+
+      if (state && state !== '' && state !== 'any') {
+        moderatorRequest.query({ state: state })
+      }
+
+      moderatorRequest.end(function (err, res) {
+        if (err) {
+          if (protocol === 'https') {
+            protocol = 'http'
+            return getTotalMedias()
+              .then((result) => {
+                return resolve(result)
+              })
+              .catch((error) => {
+                return reject(error)
+              })
+          } else {
+            return reject(err)
           }
-          return resolve(JSON.parse(res.text))
-        })
+        }
+        return resolve(JSON.parse(res.text))
+      })
     })
   },
 
@@ -84,28 +89,28 @@ export default {
         .query({ page: page})
         .query({ per_page: perPage })
 
-        if (state && state !== '' && state !== 'any') {
-          moderatorRequest.query({ state: state })
-        }
+      if (state && state !== '' && state !== 'any') {
+        moderatorRequest.query({ state: state })
+      }
 
-        moderatorRequest.end(function (err, res) {
-          if (err) {
-            if (protocol === 'https') {
-              protocol = 'http'
-              return instance.getMediasList(page, perPage, state)
-                .then((result) => {
-                  return resolve(result)
-                })
-                .catch((error) => {
-                  return reject(error)
-                })
-            } else {
-              return reject(err)
-            }
+      moderatorRequest.end(function (err, res) {
+        if (err) {
+          if (protocol === 'https') {
+            protocol = 'http'
+            return instance.getMediasList(page, perPage, state)
+              .then((result) => {
+                return resolve(result)
+              })
+              .catch((error) => {
+                return reject(error)
+              })
+          } else {
+            return reject(err)
           }
-          let list = JSON.parse(res.text)
-          return resolve(list)
-        })
+        }
+        let list = JSON.parse(res.text)
+        return resolve(list)
+      })
     })
   },
 
