@@ -11,45 +11,12 @@
                            @previousPage="goToPreviousPage" @nextPage="goToNextPage">
     </media-list-pagination>
 
-    <md-table>
-      <md-table-header>
-        <md-table-row>
-          <md-table-head>Delete</md-table-head>
-          <md-table-head>ID</md-table-head>
-          <md-table-head>Filename</md-table-head>
-          <md-table-head>Created at</md-table-head>
-          <md-table-head>Last Update</md-table-head>
-          <md-table-head>Media</md-table-head>
-          <md-table-head>State</md-table-head>
-        </md-table-row>
-      </md-table-header>
+    <div v-if="mediasList.length <= 0">
+      <md-spinner md-indeterminate></md-spinner>
+    </div>
 
-      <md-table-body>
-        <md-table-row v-for="(row, rowIndex) in mediasList" :key="rowIndex" :md-item="row">
-          <md-table-cell>
-            <md-button class="md-fab md-clean" @click="deleteFile(row._id)"><md-icon>delete</md-icon></md-button>
-          </md-table-cell>
-          <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
-          <md-table-cell align="left"><a @click="goToMediaDetails(row._id)" style="cursor: pointer;">{{ row.filename }}</a></md-table-cell>
-          <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
-          <md-table-cell align="left">{{ row.updatedAt }}</md-table-cell>
-          <md-table-cell align="left">
-            <a @click="goToMediaDetails(row._id)" style="cursor: pointer;">
-              <b v-if="row.type.search('video') !== -1">View video</b>
-              <md-image v-else :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
-            </a>
-          </md-table-cell>
-          <md-table-cell align="left">
-            <md-input-container>
-              <md-select v-model="row.state" @change="setState(row._id, row.state)">
-                <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
-              </md-select>
-            </md-input-container>
-          </md-table-cell>
-        </md-table-row>
-        <md-spinner  v-if="mediasList.length <= 0" md-indeterminate style="margin-left: auto; margin-right: auto;"></md-spinner>
-      </md-table-body>
-    </md-table>
+    <media-list-table :mediasList="mediasList" :statesList="statesList" :moderatorURL="moderatorURL"
+                      @stateChanged="setState" @deleteMedia="deleteMedia" @goToDetails="goToMediaDetails"></media-list-table>
 
     <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
                            :currentPage="currentPage" :totalPages="totalPages"
@@ -69,6 +36,7 @@
   import moderatorapi from '../lib/mediamoderatorAPI'
 
   import ListPagination from './MediaListPagination'
+  import ListTable from './MediaListTable'
 
   let data = {
     listRefreshInterval: Math.abs(config.listRefreshInterval),
@@ -85,7 +53,8 @@
     },
 
     components: {
-      'media-list-pagination': ListPagination
+      'media-list-pagination': ListPagination,
+      'media-list-table': ListTable
     },
 
     computed: {
@@ -117,7 +86,8 @@
 
     created() {
       if (this.$route.params.page) {
-        this.$store.commit('setCurrentPage', parseInt(this.$route.params.page, 10))
+        let currPageParam = parseInt(this.$route.params.page, 10)
+        this.$store.commit('setCurrentPage', currPageParam > 0 ? currPageParam : 1)
       }
 
       if (this.$route.query.count) {
@@ -182,8 +152,10 @@
               media.updatedAt = timestamp.toLocaleString()
             })
 
-            instance.$store.commit('setMediasList', res.data)
-            instance.setTotalMedias()
+            if (instance.isSameList(instance.mediasList, res.data) === false) {
+              instance.$store.commit('setMediasList', res.data)
+              instance.setTotalMedias()
+            }
 
             if (callback && typeof callback === 'function') {
               callback(res)
@@ -204,7 +176,7 @@
           .then((res) => {
             instance.$store.commit('setTotalMedias', res)
             if (instance.currentPage > instance.totalPages) {
-              instance.$store.commit('setCurrentPage', instance.totalPages)
+              instance.$store.commit('setCurrentPage', instance.totalPages > 0 ? instance.totalPages : 1)
             } else if (instance.currentPage < 1) {
               instance.$store.commit('setCurrentPage', 1)
             }
@@ -241,7 +213,7 @@
           })
       },
 
-      deleteFile(id) {
+      deleteMedia(id) {
         moderatorapi.deleteFile(id)
           .then((res) => {
             this.refreshMediasList()
@@ -281,6 +253,27 @@
 
       goToMediaDetails(id) {
         this.$router.push(`/medias/details/${id}`)          
+      },
+
+      isSameList(list1, list2) {
+        if (list1.length !== list2.length) {
+          return false
+        }
+
+        for (let i = 0; i < list1.length; ++i) {
+          let item1 = list1[i]
+          let item2 = list2[i]
+
+          if (item1._id !== item2._id ||
+              item1.filename !== item2.filename ||
+              item1.path !== item2.path ||
+              item1.state !== item2.state ||
+              item1.type !== item2.type ||
+              item1.updatedAt !== item2.updatedAt ||
+              item1.uploadedAt !== item2.uploadedAt)
+              return false
+        }
+        return true
       }
     }
 

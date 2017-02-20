@@ -11,7 +11,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      component: Root
+      redirect: '/medias/list/1'
     },
     {
       path: '/medias/list/:page',

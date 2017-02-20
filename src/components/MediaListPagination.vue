@@ -1,26 +1,25 @@
 <template>
   <div class="md-table-pagination">
     <span class="md-table-pagination-label">Filter by state :</span>
-    <md-select v-model="stateToFilter" md-menu-class="md-pagination-select" @change="$emit('stateFilterChanged', stateToFilter)"
-      v-if="statesList">
-      <md-option value="any">Any</md-option>
-      <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
-      </md-select>
+    <md-select v-if="statesList" v-model="stateToFilter" md-menu-class="md-pagination-select">
+      <md-option value="any" @selected="$emit('stateFilterChanged', 'any')">Any</md-option>
+      <md-option v-for="state in statesList" :value="state" @selected="$emit('stateFilterChanged', state)">{{ state }}</md-option>
+    </md-select>
 
-      <span class="md-table-pagination-label">Files per page :</span>
-      <md-select v-model="perPage" md-menu-class="md-pagination-select" @change="$emit('mediasPerPageChanged', perPage)" v-if="pageOptions">
-        <md-option v-for="amount in pageOptions" :value="amount">{{ amount }}</md-option>
-      </md-select>
+    <span class="md-table-pagination-label">Files per page :</span>
+    <md-select v-if="pageOptions" v-model="perPage" md-menu-class="md-pagination-select">
+      <md-option v-for="amount in pageOptions" :value="amount" @selected="$emit('mediasPerPageChanged', perPage)">{{ amount }}</md-option>
+    </md-select>
 
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
 
-      <md-button class="md-icon-button md-table-pagination-previous" @click="$emit('previousPage')" :disabled="currentPage === 1">
-        <md-icon>keyboard_arrow_left</md-icon>
-      </md-button>
+    <md-button class="md-icon-button md-table-pagination-previous" @click="$emit('previousPage')" :disabled="currentPage === 1">
+      <md-icon>keyboard_arrow_left</md-icon>
+    </md-button>
 
-      <md-button class="md-icon-button md-table-pagination-next" @click="$emit('nextPage')" :disabled="currentPage >= totalPages">
-        <md-icon>keyboard_arrow_right</md-icon>
-      </md-button>
+    <md-button class="md-icon-button md-table-pagination-next" @click="$emit('nextPage')" :disabled="currentPage >= totalPages">
+      <md-icon>keyboard_arrow_right</md-icon>
+    </md-button>
   </div>
 </template>
 
