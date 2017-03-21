@@ -3,13 +3,36 @@ let request = require('superagent/superagent')
 const config = require('../../settings/default.json')
 
 let protocol = 'https'
-let serverDomain = config.moderatorServer || 'localhost:8080'
-let apiRoute = config.apiRoute || '/api/v1/medias'
+let server = config.mediaManager.server || 'localhost:8080'
+let apiRoute = config.mediaManager.apiRoute || '/api/v1'
 
 export default {
+  getBuckets() {
+    return new Promise((resolve, reject) => {
+      request.get(`${protocol}://${server}${apiRoute}/buckets`)
+      .end(function (err, res) {
+        if (err) {
+          if (protocol === 'https') {
+            return getBuckets()
+            .then(res => {
+              return resolve(res)
+            })
+            .catch(err => {
+              return reject(err)
+            })
+          } else {
+            return reject(err)
+          }
+        } else {
+          return resolve(JSON.parse(res.text).data)
+        }
+      })
+    })
+  },
+
   getFirstFile() {
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}/first`)
+      request.get(`${protocol}://${server}${apiRoute}/medias/first`)
         .end(function (err, res) {
           if (err) {
             if (protocol === 'https') {
@@ -33,7 +56,7 @@ export default {
 
   getLastFile() {
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}/last`)
+      request.get(`${protocol}://${server}${apiRoute}/medias/last`)
         .end(function (err, res) {
           if (err) {
             if (protocol === 'https') {
@@ -56,7 +79,7 @@ export default {
 
   getTotalMedias(state) {
     return new Promise((resolve, reject) => {
-      let moderatorRequest = request.get(`${protocol}://${serverDomain}${apiRoute}/count`)
+      let moderatorRequest = request.get(`${protocol}://${server}${apiRoute}/medias/count`)
 
       if (state && state !== '' && state !== 'any') {
         moderatorRequest.query({ state: state })
@@ -85,7 +108,7 @@ export default {
   getMediasList(page, perPage, state) {
     let instance = this
     return new Promise((resolve, reject) => {
-      let moderatorRequest = request.get(`${protocol}://${serverDomain}${apiRoute}`)
+      let moderatorRequest = request.get(`${protocol}://${server}${apiRoute}/medias`)
         .query({ page: page})
         .query({ per_page: perPage })
 
@@ -114,15 +137,15 @@ export default {
     })
   },
 
-  getMediaDetails(id) {
+  getMediaInfos(id) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}/${id}/details`)
+      request.get(`${protocol}://${server}${apiRoute}/medias/${id}`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
               protocol = 'http'
-              instance.getMediaDetails(id)
+              instance.getMediaInfos(id)
                 .then((result) => {
                   return resolve(result)
                 })
@@ -142,7 +165,7 @@ export default {
   getMediaMetas(id) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}/${id}/metas`)
+      request.get(`${protocol}://${server}${apiRoute}/medias/${id}/metas`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
@@ -167,7 +190,7 @@ export default {
   setState(id, state) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.put(`${protocol}://${serverDomain}${apiRoute}/${id}`)
+      request.put(`${protocol}://${server}${apiRoute}/medias/${id}`)
         .send({ state: state })
         .end((err, res) => {
           if (err) {
@@ -192,7 +215,7 @@ export default {
 
   deleteFile(id) {
     return new Promise((resolve, reject) => {
-      request.delete(`${protocol}://${serverDomain}${apiRoute}/${id}`)
+      request.delete(`${protocol}://${server}${apiRoute}/medias/${id}`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
@@ -216,7 +239,7 @@ export default {
   getConfig() {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${serverDomain}${apiRoute}/config`)
+      request.get(`${protocol}://${server}${apiRoute}/medias/settings`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {

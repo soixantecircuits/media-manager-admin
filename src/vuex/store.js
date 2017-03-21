@@ -3,8 +3,12 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+var bucketsList = []
+var statesList = []
+var currentMediaID = ''
+var currentMedia = {}
+
 var FilesList = {
-  statesList: [],
   mediasList: [],
   totalFiles: 0,
   currentPage: 1,
@@ -12,19 +16,13 @@ var FilesList = {
   stateFilter: ''
 }
 
-var MediaDetails = {
-  mediaId: '',
-  mediaName: '',
-  mediaState: '',
-  mediaUploadedAt: undefined,
-  mediaType: '',
-  mediaInfos: {},
-  mediaMetas: {}
-}
 
 const mutations = {
   setStateFilter(state, val) {
     state.stateFilter = val
+  },
+  setBucketsList(state, list) {
+    state.bucketsList = list
   },
   setStatesList(state, list) {
     state.statesList = list
@@ -45,45 +43,34 @@ const mutations = {
     }
   },
 
-  setCurrentMediaId(state, id) {
-    state.currentMediaId = id
+  setCurrentMediaID(state, id) {
+    state.currentMediaID = id
   },
-  setCurrentMediaName(state, name) {
-    state.currentMediaName = name
-  },
-  setCurrentMediaState(state, val) {
-    state.currentMediaState = val
-  },
-  setCurrentMediaUploadedAt(state, val) {
-    state.currentMediaUploadedAt = val
-  },
-  setCurrentMediaType(state, type) {
-    state.currentMediaType = type
-  },
-  setCurrentMediaInfos(state, infos) {
-    state.currentMediaInfos = infos
-  },
-  setCurrentMediaMetas(state, metas) {
-    state.currentMediaMetas = metas
+  setCurrentMedia(state, media) {
+    state.currentMedia = media
   }
 }
 
 const store = new Vuex.Store({
   state: {
-    statesList: FilesList.statesList,
+    bucketsList: bucketsList,
+    statesList: statesList,
     mediasList: FilesList.mediasList,
     totalMedias: FilesList.totalMedias,
     currentPage: FilesList.currentPage,
     mediasPerPage: FilesList.mediasPerPage,
     stateFilter:FilesList.stateFilter,
 
-    currentMediaId: MediaDetails.mediaID,
-    currentMediaName: MediaDetails.mediaName,
-    currentMediaState: MediaDetails.mediaState,
-    currentMediaUploadedAt: MediaDetails.mediaUploadedAt,
-    currentMediaType: MediaDetails.mediaType,
-    currentMediaInfos: MediaDetails.mediaInfos,
-    currentMediaMetas: MediaDetails.mediaMetas
+    currentMediaID: currentMediaID,
+    currentMedia: currentMedia
+  },
+  getters: {
+    getCurrentMediaID: (state, getters) => {
+      return state.currentMediaID
+    },
+    getCurrentMedia: (state, getters) => {
+      return state.currentMedia
+    }
   },
 mutations})
 

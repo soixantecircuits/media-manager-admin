@@ -1,13 +1,13 @@
-# media-moderator-client
+# media-manager-admin
 
-Web interface for [media-moderator](https://github.com/soixantecircuits/media-moderator)
+Web interface for [media-manager](https://github.com/soixantecircuits/media-manager)
 
 ## Build Setup
 
 ``` bash
-git clone git@github.com:ybeaufort/media-moderator-web.git
-cd media-moderator-web
-npm install
+git clone git@github.com:soixantecircuits/media-manager-admin.git
+cd media-manager-admin
+yarn
 ```
 
 ## Configuration
@@ -15,21 +15,23 @@ npm install
 You can configure `setting/default.json`:
 ```json
 {
-  "moderatorServer": "localhost:8080",
-  "apiRoute": "/api/v1/medias",
+  "mediaManager": {
+    "server": "localhost:8080",
+    "apiRoute": "/api/v1"
+  },
   "listRefreshInterval": 4,
   "nbDisplayedOptions": [ 5, 10, 25, 50 ]
 }
 ```
 
-`moderatorServer` is the media-moderator server's domain to send the requests to.
-`apiRoute` is the base route to media-moderator's endpoints.
+`mediaManager.server` is the media-manager server's adress.
+`mediaManager.apiRoute` is the base route to media-manager's endpoints.
 `listRefreshInterval` is the interval at which the list view is updated.
 `nbDisplayedOptions` is an array of possible number of medias displayed in one page.
 
 If you want to change the port to listen to, you can do so by modifying the port in `config/index.js`. The default port is `4242`.
 
-media-moderator-client requires [media-moderator](https://github.com/soixantecircuits/media-moderator) to be running in order to use the application
+media-manager-admin requires [media-manager](https://github.com/soixantecircuits/media-manager) to be running in order to use the application
 
 ## Run
 

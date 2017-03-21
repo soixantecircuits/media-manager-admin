@@ -4,10 +4,10 @@
     <md-toolbar md-theme="grey">
       <md-button class="md-primary" @click="goBackToList()">Back to list</md-button>
       <div style="flex: 1;"></div>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaId === mediasList[0]._id" @click="goToPreviousMedia">Previous</md-button>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaId === mediasList[mediasList.length - 1]._id" @click="goToNextMedia">Next</md-button>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaID === mediasList[0]._id" @click="goToPreviousMedia">Previous</md-button>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaID === mediasList[mediasList.length - 1]._id" @click="goToNextMedia">Next</md-button>
       <div style="flex: 1;"></div>
-      <md-button @click="deleteFile(mediaId)">Delete this file</md-button>
+      <md-button @click="deleteFile(mediaID)">Delete this file</md-button>
     </md-toolbar>
 
     <md-layout>
@@ -16,8 +16,8 @@
       <md-layout md-flex>
         <md-card style="background: black; width: 100%;">
           <md-card-media style="margin: auto;">
-            <video v-if="mediaType.search('video') !== -1" :src="`${moderatorURL}/${mediaId}`" controls></video>
-            <md-image v-else :md-src="`${moderatorURL}/${mediaId}`" alt="Media"></md-image>
+            <video v-if="media.type && media.type.search('video') !== -1" :src="media.source" muted autoplay controls></video>
+            <md-image v-else :md-src="media.source" alt="Media"></md-image>
           </md-card-media>
         </md-card>
       </md-layout>
@@ -26,36 +26,35 @@
         <md-card style="height: 100%;">
           <md-card-area md-inset>
             <md-card-header>
-              <h2 class="md-title">{{ mediaName }}</h2>
+              <h2 class="md-title">{{ media.file }}</h2>
             </md-card-header>
           </md-card-area>
 
           <md-card-area md-inset>
             <md-input-container style="height: 0; padding: 8px 16px; margin: 0;">
               <label for="state" style="position: relative;"><b>State</b></label>
-              <md-select name="state" v-model="currentMediaState" @change="setState(currentMediaState)" md-align-trigger>
+              <md-select name="state" v-model="media.state" @change="setState(media.state)" md-align-trigger>
                 <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
               </md-select>
 
               <label for="bucket" style="position: relative;"><b>Bucket</b></label>
               <md-select name="bucket" md-align-trigger>
-                <md-option value="nespresso">Nespresso</md-option>
-                <md-option value="baboulinet">Baboulinet</md-option>
+                <md-option v-for="bucket in bucketsList" :value="bucket.name">{{ bucket.name }}</md-option>
               </md-select>
             </md-input-container>
           </md-card-area>
 
           <md-card-area md-inset>
-            <md-card-content v-if="mediaMetas && Object.keys(mediaMetas).length > 0">
+            <md-card-content>
               <md-table>
                 <md-table-row>
-                  <md-table-cell style="text-align: left;"><b>Uploaded at: </b></md-table-cell><md-table-cell style="text-align: left;">{{ mediaUploadedAt }}</md-table-cell>
+                  <md-table-cell style="text-align: left;"><b>Uploaded at: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media.uploadedAt }}</md-table-cell>
                 </md-table-row>
                 <md-table-row>
-                  <md-table-cell style="text-align: left;"><b>ID: </b></md-table-cell><md-table-cell style="text-align: left;">{{ mediaId }}</md-table-cell>
+                  <md-table-cell style="text-align: left;"><b>ID: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media._id }}</md-table-cell>
                 </md-table-row>
 
-                <md-table-row v-for="(value, key) in mediaMetas">
+                <md-table-row v-if="media.metas" v-for="(value, key) in media.metas">
                   <md-table-cell style="text-align: left;"><b>{{ key }}: </b></md-table-cell><md-table-cell style="text-align: left;">{{ value }}</md-table-cell>
                 </md-table-row>
               </md-table>
@@ -74,10 +73,11 @@
 <script>
 
   import Vue from 'vue'
+  import { mapGetters } from 'vuex'
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
   import config from '../../settings/default.json'
-  import moderatorapi from '../lib/mediamoderatorAPI'
+  import moderatorapi from '../lib/mediamanagerAPI'
 
   let data = {
     currentMediaState: '',
@@ -88,16 +88,20 @@
       return data
     },
 
-    created() {
-    },
-
     mounted() {
       this.getPageData()
     },
 
     computed: {
+      ...mapGetters({
+        media: 'getCurrentMedia',
+        mediaID: 'getCurrentMediaID'
+      }),
       moderatorURL() {
-        return `http://${config.moderatorServer}${config.apiRoute}`
+        return `http://${config.mediaManager.server}${config.mediaManager.apiRoute}`
+      },
+      bucketsList() {
+        return this.$store.state.bucketsList
       },
       statesList() {
         return this.$store.state.statesList
@@ -118,38 +122,11 @@
         let instance = this
         if (this.mediasList.length > 0) {
           return this.mediasList.findIndex((element) => {
-            return element._id === instance.mediaId
+            return element._id === instance.mediaID
           })
         } else {
           return -1
         }
-      },
-      mediaId() {
-        return this.$store.state.currentMediaId
-      },
-      mediaName() {
-        return this.$store.state.currentMediaName
-      },
-      mediaState() {
-        return this.$store.state.currentMediaState
-      },
-      mediaUploadedAt() {
-        return this.$store.state.currentMediaUploadedAt
-      },
-      mediaType() {
-        return this.$store.state.currentMediaType
-      },
-      mediaInfos() {
-        return this.$store.state.currentMediaInfos
-      },
-      mediaMetas() {
-        return {
-          sharedOnFacebook: 'yes',
-          printed: '5 times',
-          tweeted: '02/13/17, Friday, 23:12:42',
-          url: "www.whatev.er"
-        }
-        return this.$store.state.currentMediaMetas
       },
       totalPages() {
         return Math.floor(this.totalMedias / this.mediasPerPage) + ((this.totalMedias % this.mediasPerPage) !== 0 ? 1 : 0)
@@ -159,13 +136,13 @@
     methods: {
       getPageData() {
         let instance = this
-        this.$store.commit('setCurrentMediaId', this.$route.params.id)
+        this.$store.commit('setCurrentMediaID', this.$route.params.id)
 
         this.getServerConfig()
           .then((res) => {
             instance.$store.commit('setStatesList', res.states)
-            this.getMediaDetails()
-            this.getMediaMetas()
+            this.getBuckets()
+            this.getMediaInfos()
           })
           .catch((err) => {
             console.log(err)
@@ -185,28 +162,25 @@
         })
       },
 
-      getMediaDetails() {
-        let instance = this
-        moderatorapi.getMediaDetails(this.mediaId)
-          .then((res) => {
-            instance.$store.commit('setCurrentMediaName', res.filename)
-            instance.$store.commit('setCurrentMediaState', res.state)
-            instance.currentMediaState = res.state
-            let timestamp = new Date(res.uploadedAt)
-            instance.$store.commit('setCurrentMediaUploadedAt', timestamp.toLocaleString())
-            instance.$store.commit('setCurrentMediaType', res.type)
-            instance.$store.commit('setCurrentMediaInfos', res)
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+      getBuckets() {
+        const instance = this
+        moderatorapi.getBuckets()
+        .then(res => {
+          instance.$store.commit('setBucketsList', res)
+        })
+        .catch(err => {
+          console.error(err)
+        })
       },
 
-      getMediaMetas() {
+      getMediaInfos() {
         let instance = this
-        moderatorapi.getMediaMetas(this.mediaId)
+        moderatorapi.getMediaInfos(this.mediaID)
           .then((res) => {
-            instance.$store.commit('setCurrentMediaMetas', res)
+            instance.$store.commit('setCurrentMedia', res)
+            instance.media.state = res.state
+            let timestamp = new Date(res.uploadedAt)
+            instance.media.uploadedAt = timestamp.toLocaleString()
           })
           .catch((err) => {
             console.log(err)
@@ -215,9 +189,9 @@
 
       setState(state) {
         let instance = this
-        moderatorapi.setState(this.mediaId, state)
+        moderatorapi.setState(this.media._id, state)
           .then((res) => {
-            this.$store.commit('setCurrentMediaState', state)
+            this.media.state = state
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter)
           })
           .catch((err) => {
@@ -268,7 +242,7 @@
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
         }
-        this.$router.push(`/medias/list/${this.currentPage}${query}`)
+        this.$router.push(`/media/list/${this.currentPage}${query}`)
       },
 
       goToPreviousMedia() {
@@ -308,14 +282,9 @@
         moderatorapi.deleteFile(id)
           .then((res) => {
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.$store.commit('setCurrentMediaId', '')
-              instance.$store.commit('setCurrentMediaName', '')
-              instance.$store.commit('setCurrentMediaState', '')
+              instance.$store.commit('', '')
+              instance.$store.commit('setCurrentMedia', {})
               instance.currentMediaState = ''
-              instance.$store.commit('setCurrentMediaUploadedAt', '')
-              instance.$store.commit('setCurrentMediaType', '')
-              instance.$store.commit('setCurrentMediaInfos', {})
-              instance.$store.commit('setCurrentMediaMetas', {})
 
               instance.goBackToList()
             })

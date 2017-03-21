@@ -27,7 +27,7 @@
   import Vue from 'vue'
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
-  import moderatorapi from '../lib/mediamoderatorAPI'
+  import moderatorapi from '../lib/mediamanagerAPI'
 
   let data = {
     stateToFilter: 'any',

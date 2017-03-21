@@ -33,7 +33,7 @@
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
   import config from '../../settings/default.json'
-  import moderatorapi from '../lib/mediamoderatorAPI'
+  import moderatorapi from '../lib/mediamanagerAPI'
 
   import ListPagination from './MediaListPagination'
   import ListTable from './MediaListTable'
@@ -62,7 +62,7 @@
         return this.$store.state.stateFilter
       },
       moderatorURL() {
-        return `http://${config.moderatorServer}${config.apiRoute}`
+        return `http://${config.mediaManager.server}${config.mediaManager.apiRoute}`
       },
       mediasList() {
         return this.$store.state.mediasList
@@ -85,6 +85,8 @@
     },
 
     created() {
+      const instance = this
+
       if (this.$route.params.page) {
         let currPageParam = parseInt(this.$route.params.page, 10)
         this.$store.commit('setCurrentPage', currPageParam > 0 ? currPageParam : 1)
@@ -100,6 +102,7 @@
 
       this.getServerConfig()
       .then((res) => {
+        this.getBuckets()
         this.$store.commit('setMediasPerPage', this.perPage)
         this.$store.commit('setStateFilter', this.stateToFilter)
         let waitTime = this.listRefreshInterval * 1000
@@ -118,9 +121,6 @@
       })
     },
 
-    mounted() {
-    },
-
     beforeDestroy () {
       clearInterval(this.interval)
     },
@@ -137,6 +137,17 @@
             .catch((err) => {
               reject(err)
             })
+        })
+      },
+
+      getBuckets() {
+        const instance = this
+        moderatorapi.getBuckets()
+        .then(res => {
+          instance.$store.commit('setBucketsList', res)
+        })
+        .catch(err => {
+          console.error(err)
         })
       },
 
@@ -246,13 +257,13 @@
             if (instance.stateFilter) {
               query += `&state=${instance.stateFilter}`
             }
-            instance.$router.push(`/medias/list/${instance.currentPage}${query}`)
+            instance.$router.push(`/media/list/${instance.currentPage}${query}`)
           })
         }
       },
 
       goToMediaDetails(id) {
-        this.$router.push(`/medias/details/${id}`)          
+        this.$router.push(`/media/details/${id}`)          
       },
 
       isSameList(list1, list2) {

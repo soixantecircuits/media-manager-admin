@@ -11,14 +11,14 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/medias/list/1'
+      redirect: '/media/list/1'
     },
     {
-      path: '/medias/list/:page',
+      path: '/media/list/:page',
       component: Root
     },
     {
-      path: '/medias/details/:id',
+      path: '/media/details/:id',
       component: Media
     },
     {

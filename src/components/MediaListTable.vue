@@ -18,13 +18,13 @@
             <md-button class="md-fab md-clean" @click="$emit('deleteMedia', row._id)"><md-icon>delete</md-icon></md-button>
           </md-table-cell>
           <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
-          <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row.filename }}</a></md-table-cell>
+          <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row.file }}</a></md-table-cell>
           <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
           <md-table-cell align="left">{{ row.updatedAt }}</md-table-cell>
           <md-table-cell align="left">
             <a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">
-              <b v-if="row.type.search('video') !== -1">View video</b>
-              <md-image v-else :md-src="`${moderatorURL}/${row._id}`" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+              <md-image v-if="row.type.search('video') !== -1" :md-src="row.details.thumbnail.source" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+              <md-image v-else :md-src="row.source" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
             </a>
           </md-table-cell>
           <md-table-cell align="left">
@@ -43,7 +43,7 @@
   import Vue from 'vue'
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
-  import moderatorapi from '../lib/mediamoderatorAPI'
+  import moderatorapi from '../lib/mediamanagerAPI'
 
   export default {
     props: ['mediasList', 'statesList', 'moderatorURL'],
