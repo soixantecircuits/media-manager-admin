@@ -54,7 +54,7 @@
                   <md-table-cell style="text-align: left;"><b>ID: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media._id }}</md-table-cell>
                 </md-table-row>
 
-                <md-table-row v-if="media.metas" v-for="(value, key) in media.metas">
+                <md-table-row v-if="media.meta" v-for="(value, key) in media.meta">
                   <md-table-cell style="text-align: left;"><b>{{ key }}: </b></md-table-cell><md-table-cell style="text-align: left;">{{ value }}</md-table-cell>
                 </md-table-row>
               </md-table>
