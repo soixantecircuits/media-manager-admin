@@ -32,11 +32,12 @@
   import Vue from 'vue'
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
-  import config from '../../settings/default.json'
   import moderatorapi from '../lib/mediamanagerAPI'
 
   import ListPagination from './MediaListPagination'
   import ListTable from './MediaListTable'
+
+  const config = SETTINGS
 
   let data = {
     listRefreshInterval: Math.abs(config.listRefreshInterval),
@@ -62,7 +63,7 @@
         return this.$store.state.stateFilter
       },
       moderatorURL() {
-        return `http://${config.mediaManager.server}${config.mediaManager.apiRoute}`
+        return `http://${config.service.mediaManager.server}${config.service.mediaManager.apiRoute}`
       },
       mediasList() {
         return this.$store.state.mediasList

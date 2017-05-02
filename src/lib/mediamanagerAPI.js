@@ -1,15 +1,16 @@
 'use strict'
 let request = require('superagent/superagent')
-const config = require('../../settings/default.json')
+const config = SETTINGS
 
 let protocol = 'https'
-let server = config.mediaManager.server || 'localhost:8080'
-let apiRoute = config.mediaManager.apiRoute || '/api/v1'
+let server = config.service.mediaManager.server || 'localhost'
+let port = config.service.mediaManager.port || 8080
+let apiRoute = config.service.mediaManager.apiRoute || '/api/v1'
 
 export default {
   getBuckets() {
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${server}${apiRoute}/buckets`)
+      request.get(`${protocol}://${server}:${port}${apiRoute}/buckets`)
       .end(function (err, res) {
         if (err) {
           if (protocol === 'https') {
@@ -32,7 +33,7 @@ export default {
 
   getFirstFile() {
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${server}${apiRoute}/medias/first`)
+      request.get(`${protocol}://${server}:${port}${apiRoute}/medias/first`)
         .end(function (err, res) {
           if (err) {
             if (protocol === 'https') {
@@ -56,7 +57,7 @@ export default {
 
   getLastFile() {
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${server}${apiRoute}/medias/last`)
+      request.get(`${protocol}://${server}:${port}${apiRoute}/medias/last`)
         .end(function (err, res) {
           if (err) {
             if (protocol === 'https') {
@@ -79,7 +80,7 @@ export default {
 
   getTotalMedias(state) {
     return new Promise((resolve, reject) => {
-      let moderatorRequest = request.get(`${protocol}://${server}${apiRoute}/medias/count`)
+      let moderatorRequest = request.get(`${protocol}://${server}:${port}${apiRoute}/medias/count`)
 
       if (state && state !== '' && state !== 'any') {
         moderatorRequest.query({ state: state })
@@ -108,7 +109,7 @@ export default {
   getMediasList(page, perPage, state) {
     let instance = this
     return new Promise((resolve, reject) => {
-      let moderatorRequest = request.get(`${protocol}://${server}${apiRoute}/medias`)
+      let moderatorRequest = request.get(`${protocol}://${server}:${port}${apiRoute}/medias`)
         .query({ page: page})
         .query({ per_page: perPage })
 
@@ -140,7 +141,7 @@ export default {
   getMediaInfos(id) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${server}${apiRoute}/medias/${id}`)
+      request.get(`${protocol}://${server}:${port}${apiRoute}/medias/${id}`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
@@ -165,7 +166,7 @@ export default {
   getMediaMetas(id) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${server}${apiRoute}/medias/${id}/metas`)
+      request.get(`${protocol}://${server}:${port}${apiRoute}/medias/${id}/metas`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
@@ -190,7 +191,7 @@ export default {
   setState(id, state) {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.put(`${protocol}://${server}${apiRoute}/medias/${id}`)
+      request.put(`${protocol}://${server}:${port}${apiRoute}/medias/${id}`)
         .send({ state: state })
         .end((err, res) => {
           if (err) {
@@ -215,7 +216,7 @@ export default {
 
   deleteFile(id) {
     return new Promise((resolve, reject) => {
-      request.delete(`${protocol}://${server}${apiRoute}/medias/${id}`)
+      request.delete(`${protocol}://${server}:${port}${apiRoute}/medias/${id}`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {
@@ -239,7 +240,7 @@ export default {
   getConfig() {
     let instance = this
     return new Promise((resolve, reject) => {
-      request.get(`${protocol}://${server}${apiRoute}/medias/settings`)
+      request.get(`${protocol}://${server}:${port}${apiRoute}/medias/settings`)
         .end((err, res) => {
           if (err) {
             if (protocol === 'https') {

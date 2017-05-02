@@ -2,6 +2,9 @@
 var path = require('path')
 var package = require('../package.json')
 
+const standardSettings = require('standard-settings')
+const settings = require('nconf').get()
+
 module.exports = {
   build: {
     env: require('./prod.env'),
@@ -13,7 +16,7 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 4242,
+    port: settings.server && settings.server.port ? settings.server.port : 4242,
     proxyTable: {}
   }
 }

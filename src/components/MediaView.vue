@@ -76,8 +76,8 @@
   import { mapGetters } from 'vuex'
   import VueMaterial from 'vue-material'
   import 'vue-material/dist/vue-material.css'
-  import config from '../../settings/default.json'
   import moderatorapi from '../lib/mediamanagerAPI'
+  const config = SETTINGS
 
   let data = {
     currentMediaState: '',
@@ -98,7 +98,7 @@
         mediaID: 'getCurrentMediaID'
       }),
       moderatorURL() {
-        return `http://${config.mediaManager.server}${config.mediaManager.apiRoute}`
+        return `http://${config.mediaManager.server}:${config.mediaManager.port}${config.mediaManager.apiRoute}`
       },
       bucketsList() {
         return this.$store.state.bucketsList

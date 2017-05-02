@@ -1,8 +1,0 @@
-{
-  "mediaManager": {
-    "server": "localhost:8080",
-    "apiRoute": "/api/v1"
-  },
-  "listRefreshInterval": 4,
-  "nbDisplayedOptions": [ 5, 10, 25, 50 ]
-}

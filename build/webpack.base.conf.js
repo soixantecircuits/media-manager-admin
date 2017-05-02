@@ -1,14 +1,16 @@
 var path = require('path')
 var config = require('../config/index')
+var webpack = require('webpack')
 var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
 
-var program = require('commander')
-program
-  .option('-t, --target [value]', 'bundle target.')
-  .parse(process.argv)
+var standardSettings = require('standard-settings')
+var settings = require('nconf').get()
 
 module.exports = {
+  plugins: [
+    new webpack.DefinePlugin({ SETTINGS: JSON.stringify(settings) })
+  ],
   entry: {
     app: './src/main.js'
   },
@@ -20,7 +22,7 @@ module.exports = {
     publicPath: config.build.assetsPublicPath,
     filename: '[name].js'
   },
-  target: program.target || 'web',
+  target: settings.target || 'web',
   resolve: {
     extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, '../node_modules')],
