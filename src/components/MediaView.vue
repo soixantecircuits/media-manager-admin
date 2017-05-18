@@ -16,8 +16,8 @@
       <md-layout md-flex>
         <md-card style="background: black; width: 100%;">
           <md-card-media style="margin: auto;">
-            <video v-if="media.type && media.type.search('video') !== -1" :src="media.source" muted autoplay controls></video>
-            <md-image v-else :md-src="media.source" alt="Media"></md-image>
+            <video v-if="media.type && media.type.search('video') !== -1" :src="media.url" muted autoplay controls></video>
+            <md-image v-else :md-src="media.url" alt="Media"></md-image>
           </md-card-media>
         </md-card>
       </md-layout>

@@ -23,8 +23,8 @@
           <md-table-cell align="left">{{ row.updatedAt }}</md-table-cell>
           <md-table-cell align="left">
             <a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">
-              <md-image v-if="row.type.search('video') !== -1" :md-src="row.details.thumbnail.source" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
-              <md-image v-else :md-src="row.source" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+              <md-image v-if="row.details && row.details.thumbnail" :md-src="row.details.thumbnail.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+              <md-image v-else :md-src="row.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
             </a>
           </md-table-cell>
           <md-table-cell align="left">
