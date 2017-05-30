@@ -15,7 +15,7 @@
       <md-table-body>
         <md-table-row v-for="(row, rowIndex) in mediasList" :key="rowIndex" :md-item="row">
           <md-table-cell>
-            <md-button class="md-fab md-clean" @click="$emit('deleteMedia', row._id)"><md-icon>delete</md-icon></md-button>
+            <md-button class="md-fab md-clean" @click.native="$emit('deleteMedia', row._id)"><md-icon>delete</md-icon></md-button>
           </md-table-cell>
           <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
           <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row.file }}</a></md-table-cell>
@@ -40,9 +40,6 @@
 </template>
 
 <script>
-  import Vue from 'vue'
-  import VueMaterial from 'vue-material'
-  import 'vue-material/dist/vue-material.css'
   import moderatorapi from '../lib/mediamanagerAPI'
 
   export default {

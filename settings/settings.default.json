@@ -7,6 +7,7 @@
   "nbDisplayedOptions": [ 5, 10, 25, 50 ],
   "service": {
     "mediaManager": {
+      "protocol": "http",
       "server": "localhost",
       "port": 8080,
       "apiRoute": "/api/v1"

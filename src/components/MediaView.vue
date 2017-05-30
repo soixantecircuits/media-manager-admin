@@ -2,12 +2,12 @@
   <div>
 
     <md-toolbar md-theme="grey">
-      <md-button class="md-primary" @click="goBackToList()">Back to list</md-button>
+      <md-button class="md-primary" @click.native="goBackToList()">Back to list</md-button>
       <div style="flex: 1;"></div>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaID === mediasList[0]._id" @click="goToPreviousMedia">Previous</md-button>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaID === mediasList[mediasList.length - 1]._id" @click="goToNextMedia">Next</md-button>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaID === mediasList[0]._id" @click.native="goToPreviousMedia">Previous</md-button>
+      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaID === mediasList[mediasList.length - 1]._id" @click.native="goToNextMedia">Next</md-button>
       <div style="flex: 1;"></div>
-      <md-button @click="deleteFile(mediaID)">Delete this file</md-button>
+      <md-button @click.native="deleteFile(mediaID)">Delete this file</md-button>
     </md-toolbar>
 
     <md-layout>
@@ -71,11 +71,7 @@
 </template>
 
 <script>
-
-  import Vue from 'vue'
   import { mapGetters } from 'vuex'
-  import VueMaterial from 'vue-material'
-  import 'vue-material/dist/vue-material.css'
   import moderatorapi from '../lib/mediamanagerAPI'
   const config = SETTINGS
 
@@ -282,7 +278,6 @@
         moderatorapi.deleteFile(id)
           .then((res) => {
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.$store.commit('', '')
               instance.$store.commit('setCurrentMedia', {})
               instance.currentMediaState = ''
 
@@ -301,5 +296,9 @@
 <style>
 .md-input-container::after {
   height: 0px;
+}
+
+.md-input-container > label {
+  top: 7px;
 }
 </style>

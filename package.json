@@ -1,7 +1,7 @@
 {
-  "name": "moderation",
+  "name": "media-manager-admin",
   "version": "1.0.0",
-  "description": "A Neodymium project",
+  "description": "An interface to manage media-manager.",
   "author": "yael <yael@soixantecircuits.fr>",
   "private": true,
   "scripts": {
@@ -21,7 +21,7 @@
     "standard-settings": "^1.1.0",
     "superagent": "^3.3.2",
     "vue": "^2.1.4",
-    "vue-material": "https://github.com/ybeaufort/vue-material.git",
+    "vue-material": "^0.7.1",
     "vue-router": "^2.1.0",
     "vuex": "^2.0.0"
   },

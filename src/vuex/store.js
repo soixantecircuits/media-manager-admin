@@ -72,6 +72,7 @@ const store = new Vuex.Store({
       return state.currentMedia
     }
   },
-mutations})
+  mutations
+})
 
 export default store

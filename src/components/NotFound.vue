@@ -1,8 +1,8 @@
 <template>
-<div class="notfound">
-  <p>404 NOT FOUND</p></br>
-  <a href="./">BACK TO SAFETY</a>
-</div>
+  <div class="notfound">
+    <p>404 NOT FOUND</p></br>
+    <a href="./">BACK TO SAFETY</a>
+  </div>
 </template>
 
 <style>

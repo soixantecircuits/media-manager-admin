@@ -6,7 +6,6 @@
 
     <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
                            :currentPage="currentPage" :totalPages="totalPages"
-                           :stateFilter="stateFilter" :mediasPerPage="mediasPerPage"
                            @stateFilterChanged="setStateFilter" @mediasPerPageChanged="setMediasPerPage"
                            @previousPage="goToPreviousPage" @nextPage="goToNextPage">
     </media-list-pagination>
@@ -20,7 +19,6 @@
 
     <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
                            :currentPage="currentPage" :totalPages="totalPages"
-                           :stateFilter="stateFilter" :mediasPerPage="mediasPerPage"
                            @stateFilterChanged="setStateFilter" @mediasPerPageChanged="setMediasPerPage"
                            @previousPage="goToPreviousPage" @nextPage="goToNextPage">
     </media-list-pagination>
@@ -29,9 +27,6 @@
 </template>
 
 <script>
-  import Vue from 'vue'
-  import VueMaterial from 'vue-material'
-  import 'vue-material/dist/vue-material.css'
   import moderatorapi from '../lib/mediamanagerAPI'
 
   import ListPagination from './MediaListPagination'
@@ -238,6 +233,7 @@
       goToPreviousPage() {
         if (this.currentPage > 1) {
           let instance = this
+
           this.getMediasList(this.currentPage - 1, this.mediasPerPage, this.stateFilter, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage - 1)
             let query = `?count=${instance.mediasPerPage}`
@@ -252,6 +248,7 @@
       goToNextPage() {
         if (this.currentPage < this.totalPages) {
           let instance = this
+
           this.getMediasList(this.currentPage + 1, this.mediasPerPage, this.stateFilter, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage + 1)
             let query = `?count=${instance.mediasPerPage}`
@@ -293,4 +290,9 @@
 </script>
 
 <style>
+.md-button.md-fab .md-icon
+{
+  top: 9px;
+  left: 9px;
+}
 </style>
