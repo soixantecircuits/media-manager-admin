@@ -175,6 +175,7 @@
 
       refreshMediasList() {
         this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter)
+        this.setTotalMedias()
       },
 
       setTotalMedias() {

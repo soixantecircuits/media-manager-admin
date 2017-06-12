@@ -11,6 +11,8 @@
       <md-option v-for="amount in pageOptions" :value="amount" @selected="$emit('mediasPerPageChanged', perPage)">{{ amount }}</md-option>
     </md-select>
 
+    <span class="md-table-pagination-label" style="margin-right:32px;">{{ totalMedia }} Media found</span>
+
     <span>Page {{ currentPage }} of {{ totalPages }}</span>
 
     <md-button class="md-icon-button md-table-pagination-previous" @click.native="$emit('previousPage')" :disabled="currentPage === 1">
@@ -48,6 +50,9 @@
         set (value) {
           this.$store.commit('setMediasPerPage', value)
         }
+      },
+      totalMedia () {
+        return this.$store.state.totalMedias
       }
     }
   }
