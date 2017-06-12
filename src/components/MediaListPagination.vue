@@ -8,7 +8,7 @@
 
     <span class="md-table-pagination-label">Files per page :</span>
     <md-select v-if="pageOptions" v-model="mediasPerPage" md-menu-class="md-pagination-select">
-      <md-option v-for="amount in pageOptions" :value="amount" @selected="$emit('mediasPerPageChanged', perPage)">{{ amount }}</md-option>
+      <md-option v-for="amount in pageOptions" :value="amount" @selected="$emit('mediasPerPageChanged', mediasPerPage)">{{ amount }}</md-option>
     </md-select>
 
     <span class="md-table-pagination-label" style="margin-right:32px;">{{ totalMedia }} Media found</span>
