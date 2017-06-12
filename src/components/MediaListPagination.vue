@@ -13,7 +13,7 @@
 
     <span class="md-table-pagination-label" style="margin-right:32px;">{{ totalMedia }} Media found</span>
 
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <span>Page {{ Number.isNaN(currentPage) ? '-' : currentPage }} of {{ Number.isNaN(totalPages) ? '-' : totalPages }}</span>
 
     <md-button class="md-icon-button md-table-pagination-previous" @click.native="$emit('previousPage')" :disabled="currentPage === 1">
       <md-icon>keyboard_arrow_left</md-icon>
