@@ -8,8 +8,8 @@
   "service": {
     "mediaManager": {
       "protocol": "http",
-      "server": "localhost",
-      "port": 8080,
+      "server": "faune.estu.la",
+      "port": 36200,
       "apiRoute": "/api/v1"
     }
   }

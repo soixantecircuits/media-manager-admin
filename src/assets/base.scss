@@ -31,3 +31,15 @@ div.md-toolbar.md-theme-grey.topbar {
     color: #858585;
   }
 }
+.md-table-card .md-table-pagination {
+  background: #cccccc;
+  .md-table-pagination-label, .md-select .md-menu, .md-select .md-select-value {
+    font-size: 14px;
+  }
+  .md-table-pagination-label {
+    font-weight: bold;
+  }
+}
+.md-theme-default.md-select-content .md-menu-item.md-selected, .md-theme-default.md-select-content .md-menu-item.md-checked {
+  color: #ff5858 !important;
+}

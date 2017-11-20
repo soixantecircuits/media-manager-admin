@@ -291,8 +291,6 @@
 </script>
 
 <style lang="scss">
-  @import '../assets/base.scss';
-
   .md-button.md-fab .md-icon {
     top: 9px;
     left: 9px;
