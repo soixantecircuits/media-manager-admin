@@ -1,6 +1,6 @@
 <template>
   <md-table-card>
-    <md-toolbar>
+    <md-toolbar class="title">
       <h1 class="md-title">File Moderation</h1>
     </md-toolbar>
 
@@ -290,10 +290,9 @@
   }
 </script>
 
-<style>
-.md-button.md-fab .md-icon
-{
-  top: 9px;
-  left: 9px;
-}
+<style lang="scss">
+  .md-button.md-fab .md-icon {
+    top: 9px;
+    left: 9px;
+  }
 </style>
