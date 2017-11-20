@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <md-toolbar md-theme="grey">
+    <md-toolbar md-theme="grey topbar">
       <md-button class="md-primary" @click.native="goBackToList()">Back to list</md-button>
       <div style="flex: 1;"></div>
       <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaID === mediasList[0]._id" @click.native="goToPreviousMedia">Previous</md-button>

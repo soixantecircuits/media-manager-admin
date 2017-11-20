@@ -10,3 +10,24 @@ div.md-toolbar.title.md-theme-default {
     font-weight: bold;
   }
 }
+div.md-toolbar.md-theme-grey.topbar {
+  background: #333;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 16px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+
+  .md-button {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  a {
+    color: #fff;
+  }
+
+  .md-button[disabled] {
+    color: #858585;
+  }
+}
