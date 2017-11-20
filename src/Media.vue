@@ -27,7 +27,7 @@ html {
 }
 
 #app a {
-  color: #42b983;
+  color: #ff5858;
   text-decoration: none;
 }
 #app p {
