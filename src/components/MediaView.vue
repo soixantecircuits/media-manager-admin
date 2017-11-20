@@ -1,78 +1,34 @@
 <template>
   <div>
 
-    <md-toolbar md-theme="grey topbar">
-      <md-button class="md-primary" @click.native="goBackToList()">Back to list</md-button>
-      <div style="flex: 1;"></div>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaID === mediasList[0]._id" @click.native="goToPreviousMedia">Previous</md-button>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaID === mediasList[mediasList.length - 1]._id" @click.native="goToNextMedia">Next</md-button>
-      <div style="flex: 1;"></div>
-      <md-button @click.native="deleteFile(mediaID)">Delete this file</md-button>
-    </md-toolbar>
-
-    <md-layout>
-
-    <md-layout md-flex="60" md-flex-offset="20" md-row style="border-radius: 8px;">
-      <md-layout md-flex>
-        <md-card style="background: black; width: 100%;">
-          <md-card-media style="margin: auto;">
-            <video v-if="media.type && media.type.search('video') !== -1" :src="media.url" muted autoplay controls></video>
-            <md-image v-else :md-src="media.url" alt="Media"></md-image>
-          </md-card-media>
-        </md-card>
-      </md-layout>
-
-      <md-layout md-flex>
-        <md-card style="height: 100%;">
-          <md-card-area md-inset>
-            <md-card-header>
-              <h2 class="md-title">{{ media.file }}</h2>
-            </md-card-header>
-          </md-card-area>
-
-          <md-card-area md-inset>
-            <md-input-container style="height: 0; padding: 8px 16px; margin: 0;">
-              <label for="state" style="position: relative;"><b>State</b></label>
-              <md-select name="state" v-model="media.state" @change="setState(media.state)" md-align-trigger>
-                <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
-              </md-select>
-
-              <label for="bucket" style="position: relative;"><b>Bucket</b></label>
-              <md-select name="bucket" md-align-trigger>
-                <md-option v-for="bucket in bucketsList" :value="bucket.name">{{ bucket.name }}</md-option>
-              </md-select>
-            </md-input-container>
-          </md-card-area>
-
-          <md-card-area md-inset>
-            <md-card-content>
-              <md-table>
-                <md-table-row>
-                  <md-table-cell style="text-align: left;"><b>Uploaded at: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media.uploadedAt }}</md-table-cell>
-                </md-table-row>
-                <md-table-row>
-                  <md-table-cell style="text-align: left;"><b>ID: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media._id }}</md-table-cell>
-                </md-table-row>
-
-                <md-table-row v-if="media.meta" v-for="(value, key) in media.meta">
-                  <md-table-cell style="text-align: left;"><b>{{ key }}: </b></md-table-cell><md-table-cell style="text-align: left;">{{ value }}</md-table-cell>
-                </md-table-row>
-              </md-table>
-            </md-card-content>
-          </md-card-area>
-
-        </md-card>
-      </md-layout>
-    </md-layout>
-
-    </md-layout>
-
+    <div class="grid">
+      <div class="row">
+        <media-view-toolbar
+            @back="goBackToList"
+            @previous="goToPreviousMedia"
+            @next="goToNextMedia"
+            @delete="deleteFile(mediaID)"
+            :show-navigation="mediasList.length > 0"
+            :allow-previous="currentPage !== 1 || currentPage === 1 && mediaID !== mediasList[0]._id"
+            :allow-next="currentPage !== totalPages || currentPage === totalPages && mediaID !== mediasList[mediasList.length - 1]._id">
+        </media-view-toolbar>
+      </div>
+      <div class="col-6 section">
+        <media-preview :media="media"></media-preview>
+        <media-info :media="media" @state-changed="setState"></media-info>
+      </div>
+      <div class="col-6">
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   import { mapGetters } from 'vuex'
   import moderatorapi from '../lib/mediamanagerAPI'
+  import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
+  import MediaPreview from './MediaView/MediaPreview.vue'
+  import MediaInfo from './MediaView/MediaInfo.vue'
   const config = SETTINGS
 
   let data = {
@@ -80,6 +36,10 @@
   }
 
   export default {
+    components: {
+      MediaInfo,
+      MediaPreview,
+      MediaViewToolbar},
     data() {
       return data
     },
@@ -293,12 +253,16 @@
 
 </script>
 
-<style>
-.md-input-container::after {
-  height: 0px;
-}
+<style lang="scss" scoped>
+  .md-input-container::after {
+    height: 0px;
+  }
 
-.md-input-container > label {
-  top: 7px;
-}
+  .md-input-container > label {
+    top: 7px;
+  }
+
+  .section {
+    padding: 10px;
+  }
 </style>

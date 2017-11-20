@@ -60,3 +60,23 @@ div.md-toolbar.md-theme-grey.topbar {
     color: #333;
   }
 }
+
+.grid {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  & * {
+    box-sizing: border-box;
+  }
+
+  .col-6 {
+    flex: 1 0 50%;
+    width: 50%;
+  }
+  .row {
+    flex: 0 1 100%;
+  }
+}
