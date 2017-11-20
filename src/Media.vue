@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="../../../Downloads/transfonter.org-20171120-092653/stylesheet.css">
 <template>
   <div class="media">
     <mediaview></mediaview>
