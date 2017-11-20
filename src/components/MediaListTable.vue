@@ -28,7 +28,7 @@
             </a>
           </md-table-cell>
           <md-table-cell align="left">
-            <md-input-container>
+            <md-input-container class="status-update">
               <md-select v-model="row.state">
                 <md-option v-for="state in statesList" :value="state" @selected="$emit('stateChanged', row._id, state)">{{ state }}</md-option>
               </md-select>

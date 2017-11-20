@@ -50,3 +50,13 @@ div.md-toolbar.md-theme-grey.topbar {
   font-size: 14px;
   color: #333;
 }
+.md-input-container.status-update {
+  &:after {
+    background: none;
+  }
+  .md-select-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+}
