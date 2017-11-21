@@ -5,7 +5,8 @@
       <div class="empty-list" v-if="!hasEditableParts">
         This video doesn't contain any editable parts.
       </div>
-      <media-edit-part-item v-if="hasEditableParts" v-for="(part, i) in editableParts" :part="part" :index="i"></media-edit-part-item>
+      <media-edit-part-item v-if="hasEditableParts" v-for="(part, i) in editableParts" :part="part" :index="i"
+                            :selected="part.selected" @click.native="select(i)"></media-edit-part-item>
     </div>
   </div>
 </template>
@@ -16,11 +17,28 @@
   export default {
     components: {MediaEditPartItem},
     name: 'media-edit-parts',
-    mixins: [ mediaEditor ],
+    mixins: [mediaEditor],
     props: {
       media: {
         type: Object,
         required: true
+      }
+    },
+    methods: {
+      unselectAll () {
+        for (let i = 0; i < this.editableParts.length; i++) {
+          this.editableParts[i].selected = false
+        }
+      },
+      select (i) {
+        if (this.editableParts[i].selected) {
+          return
+        }
+
+        this.unselectAll()
+        this.editableParts[i].selected = true
+        this.$forceUpdate()
+        this.$emit('selected', this.editableParts[i])
       }
     },
     mounted () {
