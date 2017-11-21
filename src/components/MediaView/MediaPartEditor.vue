@@ -7,6 +7,14 @@
           <div class="video-preview">
             <video :src="mediaUrl" muted controls></video>
           </div>
+          <div class="controls">
+            <div class="left">
+              <button>cancel</button>
+            </div>
+            <div class="right">
+              <button>update</button>
+            </div>
+          </div>
         </div>
         <div class="update-composition">
           <md-progress :md-progress="progressValue"></md-progress>
@@ -57,7 +65,6 @@
       background: #333;
       border: 1px solid #fd4f4f;
       text-align: left;
-      padding-bottom: 20px;
 
       .video-preview {
         width: 100%;
@@ -71,6 +78,34 @@
         font-weight: bold;
         font-size: 16px;
         color: #fff;
+      }
+    }
+    .controls {
+      display: table;
+      width: 100%;
+
+      .left, .right {
+        display: table-cell;
+        width: 50%;
+        padding: 20px;
+      }
+      .right {
+        text-align: right;
+      }
+      button {
+        border: 1px solid #fff;
+        font-weight: bold;
+        background-color: transparent;
+        font-size: 14px;
+        text-transform: lowercase;
+        border-radius: 30px;
+        color: #fff;
+        padding: 6px 15px;
+
+        &:active {
+          color: #333;
+          background: #fff;
+        }
       }
     }
 
