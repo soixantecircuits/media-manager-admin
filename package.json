@@ -16,7 +16,9 @@
     ]
   },
   "dependencies": {
+    "assignment": "^2.2.1",
     "babel-runtime": "^6.0.0",
+    "cheerio": "^1.0.0-rc.2",
     "gsap": "^1.18.5",
     "standard-settings": "^1.1.0",
     "superagent": "^3.3.2",
