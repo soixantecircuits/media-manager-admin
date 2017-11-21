@@ -5,13 +5,18 @@
       <div class="empty-list" v-if="!hasEditableParts">
         This video doesn't contain any editable parts.
       </div>
+      <div v-if="hasEditableParts" v-for="(part, i) in editableParts">
+        <media-edit-part-item :part="part" :index="i"></media-edit-part-item>
+      </div>
     </div>
   </div>
 </template>
 <script>
   import mediaEditor from '../../lib/mediaEditor'
+  import MediaEditPartItem from './MediaEditPartItem.vue'
 
   export default {
+    components: {MediaEditPartItem},
     name: 'media-edit-parts',
     mixins: [ mediaEditor ],
     props: {

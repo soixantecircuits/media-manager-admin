@@ -1,3 +1,4 @@
+import Vue from 'vue'
 var cheerio = require('cheerio')
 
 let editableParts = []
@@ -78,7 +79,7 @@ let getEditableParts = (melt) => {
 export default {
   computed: {
     hasEditableParts () {
-      return this.editableParts && this.editableParts.length > 0
+      return this.editableParts && Object.keys(this.editableParts).length > 0
     }
   },
   methods: {
@@ -94,8 +95,7 @@ export default {
           editableParts = getEditableParts(media.meta.melt.scriptString)
         }
 
-        this.editableParts = editableParts
-        console.log(this.editableParts)
+        this.$set(this, 'editableParts', editableParts)
       }
 
       currentId = media._id
