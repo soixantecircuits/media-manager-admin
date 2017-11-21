@@ -4,7 +4,7 @@
       <img :src="part.thumbnail" v-if="part.thumbnail != ''">
     </div>
     <div class="data">
-      <span class="label">{{ editLabel }}</span>
+      <span class="label">{{ part.index }}</span>
       <span class="name">{{ part.producer.title }}</span>
     </div>
     <div class="data">
@@ -24,10 +24,6 @@
   export default {
     name: 'media-edit-part-item',
     props: {
-      index: {
-        type: Number,
-        required: true
-      },
       part: {
         type: Object,
         required: true
@@ -35,12 +31,6 @@
       selected: {
         type: Boolean,
         default: false
-      }
-    },
-    computed: {
-      editLabel () {
-        let index = this.index + 1
-        return 'Edit ' + (index > 10 ? '' : '0') + index.toString()
       }
     }
   }

@@ -13,10 +13,10 @@
       <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-        <media-edit-parts :media="media" v-if="media && ready"></media-edit-parts>
+        <media-edit-parts :media="media" v-if="media && ready" @selected="partSelected"></media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
-        <media-part-editor :is-editable="hasEditableParts" v-if="ready"></media-part-editor>
+        <media-part-editor :is-editable="hasEditableParts" :mediaUrl="media.meta.etnaInput.url" :selected-part="selectedPart" v-if="ready && media.meta && media.meta.etnaInput"></media-part-editor>
       </md-layout>
     </md-layout>
   </div>
@@ -36,7 +36,8 @@
 
   let data = {
     currentMediaState: '',
-    ready: false
+    ready: false,
+    selectedPart: {}
   }
 
   export default {
@@ -51,11 +52,9 @@
     data () {
       return data
     },
-
     mounted () {
       this.getPageData()
     },
-
     computed: {
       ...mapGetters({
         media: 'getCurrentMedia',
@@ -110,8 +109,10 @@
         return Math.floor(this.totalMedias / this.mediasPerPage) + ((this.totalMedias % this.mediasPerPage) !== 0 ? 1 : 0)
       }
     },
-
     methods: {
+      partSelected (part) {
+        this.selectedPart = Object.assign({}, this.selectedPart, part)
+      },
       getPageData () {
         let instance = this
         this.$store.commit('setCurrentMediaID', this.$route.params.id)

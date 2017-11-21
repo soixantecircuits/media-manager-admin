@@ -36,6 +36,11 @@ let extractEntries = ($, $playlists, producers, thumbnail) => {
     return false
   }
 
+  let formatIndex = (index) => {
+    return 'Edit ' + (index > 10 ? '' : '0') + index.toString()
+  }
+
+  let index = 0
   $playlists.each((i, playlist) => {
     if ($(playlist).children().length > 0) {
       $(playlist).find('entry').each((j, entry) => {
@@ -46,7 +51,9 @@ let extractEntries = ($, $playlists, producers, thumbnail) => {
             return
           }
 
+          index++
           entries.push({
+            index: formatIndex(index),
             in: $(entry).attr('in'),
             out: $(entry).attr('out'),
             thumbnail: thumbnail,
