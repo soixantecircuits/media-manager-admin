@@ -21,6 +21,12 @@
   .media-preview {
     .preview {
       background: #1a1a1a;
+      text-align: center;
+
+      video, .md-image {
+        margin: auto;
+        max-height: 300px;
+      }
     }
   }
 </style>

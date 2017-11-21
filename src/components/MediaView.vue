@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="grid">
       <div class="row">
         <media-view-toolbar
