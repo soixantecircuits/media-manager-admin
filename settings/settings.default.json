@@ -3,6 +3,7 @@
     "host": "localhost",
     "port": 4242
   },
+  "mediaPreviewShowDebugInfo": true,
   "listRefreshInterval": 4,
   "nbDisplayedOptions": [ 5, 10, 25, 50 ],
   "service": {

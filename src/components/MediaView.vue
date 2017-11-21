@@ -1,25 +1,24 @@
 <template>
   <div>
-
-    <div class="grid">
-      <div class="row">
-        <media-view-toolbar
-            @back="goBackToList"
-            @previous="goToPreviousMedia"
-            @next="goToNextMedia"
-            @delete="deleteFile(mediaID)"
-            :show-navigation="mediasList.length > 0"
-            :allow-previous="currentPage !== 1 || currentPage === 1 && mediaID !== mediasList[0]._id"
-            :allow-next="currentPage !== totalPages || currentPage === totalPages && mediaID !== mediasList[mediasList.length - 1]._id">
-        </media-view-toolbar>
-      </div>
-      <div class="col-6 section">
+    <media-view-toolbar
+        @back="goBackToList"
+        @previous="goToPreviousMedia"
+        @next="goToNextMedia"
+        @delete="deleteFile(mediaID)"
+        :show-navigation="mediasList.length > 0"
+        :allow-previous="allowPrevious"
+        :allow-next="allowNext">
+    </media-view-toolbar>
+    <md-layout md-row>
+      <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-      </div>
-      <div class="col-6">
-      </div>
-    </div>
+        <media-edit-parts :media="media" v-if="media && ready" @selected="partSelected"></media-edit-parts>
+      </md-layout>
+      <md-layout :md-flex="50">
+        <media-part-editor :is-editable="hasEditableParts" :mediaUrl="media.meta.etnaInput.url" :selected-part="selectedPart" v-if="ready && media.meta && media.meta.etnaInput"></media-part-editor>
+      </md-layout>
+    </md-layout>
   </div>
 </template>
 
@@ -29,52 +28,74 @@
   import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
   import MediaPreview from './MediaView/MediaPreview.vue'
   import MediaInfo from './MediaView/MediaInfo.vue'
+  import MediaEditParts from './MediaView/MediaEditParts.vue'
+  import MediaPartEditor from './MediaView/MediaPartEditor.vue'
+  import mediaEditor from '../lib/mediaEditor'
+
   const config = SETTINGS
 
   let data = {
     currentMediaState: '',
+    ready: false,
+    selectedPart: {}
   }
 
   export default {
     components: {
+      MediaPartEditor,
+      MediaEditParts,
       MediaInfo,
       MediaPreview,
-      MediaViewToolbar},
-    data() {
+      MediaViewToolbar
+    },
+    mixins: [mediaEditor],
+    data () {
       return data
     },
-
-    mounted() {
+    mounted () {
       this.getPageData()
     },
-
     computed: {
       ...mapGetters({
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
-      moderatorURL() {
+      allowPrevious () {
+        if (!this.mediasList || !this.mediasList.length) {
+          return false
+        }
+
+        return this.currentPage !== 1 || this.currentPage === 1 && this.mediaID !== this.mediasList[0]._id
+      },
+      allowNext () {
+        if (!this.mediasList || !this.mediasList.length) {
+          return false
+        }
+
+        return this.currentPage !== this.totalPages || this.currentPage === this.totalPages && this.mediaID !== this.mediasList[mediasList.length - 1]._id
+      },
+      moderatorURL () {
         return `http://${config.mediaManager.server}:${config.mediaManager.port}${config.mediaManager.apiRoute}`
       },
-      bucketsList() {
+      bucketsList () {
         return this.$store.state.bucketsList
       },
-      statesList() {
+      statesList () {
         return this.$store.state.statesList
       },
       mediasList () {
         return this.$store.state.mediasList
       },
-      currentPage() {
+      currentPage () {
         return this.$store.state.currentPage
       },
-      totalMedias() {
+      totalMedias () {
         return this.$store.state.totalMedias
       },
-      mediasPerPage() {
+      mediasPerPage () {
         return this.$store.state.mediasPerPage
       },
-      mediaListPos() {
+      mediaListPos () {
         let instance = this
         if (this.mediasList.length > 0) {
           return this.mediasList.findIndex((element) => {
@@ -84,13 +105,15 @@
           return -1
         }
       },
-      totalPages() {
+      totalPages () {
         return Math.floor(this.totalMedias / this.mediasPerPage) + ((this.totalMedias % this.mediasPerPage) !== 0 ? 1 : 0)
       }
     },
-
     methods: {
-      getPageData() {
+      partSelected (part) {
+        this.selectedPart = Object.assign({}, this.selectedPart, part)
+      },
+      getPageData () {
         let instance = this
         this.$store.commit('setCurrentMediaID', this.$route.params.id)
 
@@ -105,7 +128,7 @@
           })
       },
 
-      getServerConfig() {
+      getServerConfig () {
         let instance = this
         return new Promise((resolve, reject) => {
           moderatorapi.getConfig()
@@ -118,18 +141,18 @@
         })
       },
 
-      getBuckets() {
+      getBuckets () {
         const instance = this
         moderatorapi.getBuckets()
-        .then(res => {
-          instance.$store.commit('setBucketsList', res)
-        })
-        .catch(err => {
-          console.error(err)
-        })
+          .then(res => {
+            instance.$store.commit('setBucketsList', res)
+          })
+          .catch(err => {
+            console.error(err)
+          })
       },
 
-      getMediaInfos() {
+      getMediaInfos () {
         let instance = this
         moderatorapi.getMediaInfos(this.mediaID)
           .then((res) => {
@@ -137,13 +160,16 @@
             instance.media.state = res.state
             let timestamp = new Date(res.uploadedAt)
             instance.media.uploadedAt = timestamp.toLocaleString()
+
+            instance.initMediaEditor()
+            instance.ready = true
           })
           .catch((err) => {
             console.log(err)
           })
       },
 
-      setState(state) {
+      setState (state) {
         let instance = this
         moderatorapi.setState(this.media._id, state)
           .then((res) => {
@@ -155,7 +181,7 @@
           })
       },
 
-      getMediasList(page, perPage, state, callback) {
+      getMediasList (page, perPage, state, callback) {
         let instance = this
         moderatorapi.getMediasList(page, perPage, state)
           .then((res) => {
@@ -177,7 +203,7 @@
           })
       },
 
-      updateTotalMedias() {
+      updateTotalMedias () {
         let instance = this
         moderatorapi.getTotalMedias()
           .then((res) => {
@@ -193,7 +219,7 @@
           })
       },
 
-      goBackToList() {
+      goBackToList () {
         let query = `?count=${this.mediasPerPage}`
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
@@ -201,7 +227,7 @@
         this.$router.push(`/media/list/${this.currentPage}${query}`)
       },
 
-      goToPreviousMedia() {
+      goToPreviousMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
           if (this.mediaListPos === 0) {
@@ -217,7 +243,7 @@
         }
       },
 
-      goToNextMedia() {
+      goToNextMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
           if (this.mediaListPos === this.mediasList.length - 1) {
@@ -233,7 +259,7 @@
         }
       },
 
-      deleteFile(id) {
+      deleteFile (id) {
         let instance = this
         moderatorapi.deleteFile(id)
           .then((res) => {
@@ -264,5 +290,6 @@
 
   .section {
     padding: 10px;
+    text-align: left;
   }
 </style>
