@@ -5,9 +5,7 @@
       <div class="empty-list" v-if="!hasEditableParts">
         This video doesn't contain any editable parts.
       </div>
-      <div v-if="hasEditableParts" v-for="(part, i) in editableParts">
-        <media-edit-part-item :part="part" :index="i"></media-edit-part-item>
-      </div>
+      <media-edit-part-item v-if="hasEditableParts" v-for="(part, i) in editableParts" :part="part" :index="i"></media-edit-part-item>
     </div>
   </div>
 </template>
@@ -48,7 +46,7 @@
       color: #d1d1d1;
       width: 100%;
       box-sizing: border-box;
-      max-height: 300px;
+      max-height: 310px;
       overflow: hidden;
       overflow-y: auto;
 
@@ -58,6 +56,26 @@
         font-weight: 300;
         font-size: 22px;
         color: #ccc;
+      }
+
+      .media-edit-part-item {
+        border-bottom: 1px solid #000;
+
+        &:last-child {
+          border-bottom: none;
+        }
+        &:nth-child(even) {
+          background: #333333;
+        }
+        &:nth-child(odd) {
+          background: #1a1a1a;
+        }
+        &:hover:nth-child(even) {
+          background: #3f3f3f;
+        }
+        &:hover:nth-child(odd) {
+          background: #1f1f1f;
+        }
       }
     }
     &.disabled {
