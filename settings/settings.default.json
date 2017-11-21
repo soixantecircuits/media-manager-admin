@@ -3,12 +3,13 @@
     "host": "localhost",
     "port": 4242
   },
+  "mediaPreviewShowDebugInfo": true,
   "listRefreshInterval": 4,
   "nbDisplayedOptions": [ 5, 10, 25, 50 ],
   "service": {
     "mediaManager": {
       "protocol": "http",
-      "server": "faune.estu.la",
+      "server": "car-studio-02.estu.la",
       "port": 36200,
       "apiRoute": "/api/v1"
     }

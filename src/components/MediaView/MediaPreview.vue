@@ -25,7 +25,9 @@
 
       video, .md-image {
         margin: auto;
-        max-height: 300px;
+        width: auto;
+        max-width: 100%;
+        height: 300px;
       }
     }
   }

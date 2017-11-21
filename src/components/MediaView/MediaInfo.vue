@@ -5,18 +5,18 @@
     </div>
     <div class="item">
       <md-layout md-row md-sm-columns>
-        <md-layout md-column>
+        <md-layout :md-flex="50">
           <div>
-            <label for="state">State : </label>
-            <md-select id="state" name="state" v-model="media.state" @change="setState(media.state)" md-align-trigger>
+            <label>State : </label>
+            <md-select name="state" v-model="media.state" @change="setState(media.state)" md-align-trigger>
               <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
             </md-select>
           </div>
         </md-layout>
-        <md-layout md-column>
+        <md-layout :md-flex="50">
           <div v-if="bucketsList.length > 0">
-            <label for="bucket">Bucket : </label>
-            <md-select id="bucket" name="bucket" md-align-trigger>
+            <label>Bucket : </label>
+            <md-select name="bucket" md-align-trigger>
               <md-option v-for="bucket in bucketsList" :value="bucket.name">{{ bucket.name }}</md-option>
             </md-select>
           </div>
@@ -25,31 +25,36 @@
       </md-layout>
     </div>
     <div class="item">
-      <div class="meta-data">
-        <div class="data-row">
-          <div class="param">Uploaded at:</div>
-          <div class="value">{{ media.uploadedAt }}</div>
-        </div>
-        <div class="data-row">
-          <div class="param">ID:</div>
-          <div class="value">{{ media._id }}</div>
-        </div>
-        <div class="data-row" v-if="media.meta" v-for="(value, key) in media.meta">
-          <div class="param">{{ key }}:</div>
-          <div class="value">{{ value }}</div>
-        </div>
-      </div>
+      <md-layout md-row>
+        <md-layout :md-flex="30">Uploaded at: <strong>{{ media.uploadedAt }}</strong></md-layout>
+        <md-layout :md-flex="30">ID: <strong>{{ media._id }}</strong></md-layout>
+        <md-layout :md-flex="15">_from: <strong>{{ !media._from ? 'N/A': media._from }}</strong></md-layout>
+        <md-layout :md-flex="15">_to: <strong>{{ !media._to ? 'N/A': media._to }}</strong></md-layout>
+        <md-layout :md-flex="10" v-if="mediaPreviewShowDebugInfo"><a href="#" @click.prevent="expandDebugInfo=!expandDebugInfo">Debug</a></md-layout>
+      </md-layout>
+    </div>
+    <div class="item" v-if="mediaPreviewShowDebugInfo && expandDebugInfo">
+      <md-layout md-row v-if="media.meta" v-for="(value, key) in media.meta">
+        <md-layout :md-flex="25">{{ key }}:</md-layout>
+        <md-layout :md-flex="75">{{ value }}</md-layout>
+      </md-layout>
     </div>
   </div>
 </template>
 <script>
+  import settings from '../../lib/settings'
+
   export default {
+    mixins: [ settings ],
     name: 'media-info',
     computed: {
-      bucketsList() {
+      mediaPreviewShowDebugInfo () {
+        return this.getSettings().mediaPreviewShowDebugInfo
+      },
+      bucketsList () {
         return this.$store.state.bucketsList
       },
-      statesList() {
+      statesList () {
         return this.$store.state.statesList
       }
     },
@@ -63,13 +68,23 @@
         type: Object,
         required: true
       }
+    },
+    data () {
+      return {
+        expandDebugInfo: false
+      }
     }
   }
 </script>
 <style lang="scss" scoped>
   .media-info {
     background: #fff;
-    
+
+    strong {
+      display: inline-block;
+      padding-left: 4px;
+    }
+
     .item {
       display: block;
       border-bottom: 1px solid #ccc;
@@ -100,7 +115,6 @@
       padding-right: 5px;
       z-index: 1;
       position: relative;
-      top: -10px;
     }
     label + .md-select {
       width: 200px;

@@ -1,24 +1,21 @@
 <template>
   <div>
-    <div class="grid">
-      <div class="row">
-        <media-view-toolbar
-            @back="goBackToList"
-            @previous="goToPreviousMedia"
-            @next="goToNextMedia"
-            @delete="deleteFile(mediaID)"
-            :show-navigation="mediasList.length > 0"
-            :allow-previous="currentPage !== 1 || currentPage === 1 && mediaID !== mediasList[0]._id"
-            :allow-next="currentPage !== totalPages || currentPage === totalPages && mediaID !== mediasList[mediasList.length - 1]._id">
-        </media-view-toolbar>
-      </div>
-      <div class="col-6 section">
+    <media-view-toolbar
+        @back="goBackToList"
+        @previous="goToPreviousMedia"
+        @next="goToNextMedia"
+        @delete="deleteFile(mediaID)"
+        :show-navigation="mediasList.length > 0"
+        :allow-previous="currentPage !== 1 || currentPage === 1 && mediaID !== mediasList[0]._id"
+        :allow-next="currentPage !== totalPages || currentPage === totalPages && mediaID !== mediasList[mediasList.length - 1]._id">
+    </media-view-toolbar>
+    <md-layout md-row>
+      <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-      </div>
-      <div class="col-6">
-      </div>
-    </div>
+      </md-layout>
+      <md-layout :md-flex="50"></md-layout>
+    </md-layout>
   </div>
 </template>
 
@@ -263,5 +260,6 @@
 
   .section {
     padding: 10px;
+    text-align: left;
   }
 </style>
