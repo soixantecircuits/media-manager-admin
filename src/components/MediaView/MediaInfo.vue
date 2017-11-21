@@ -36,7 +36,7 @@
     <div class="item" v-if="mediaPreviewShowDebugInfo && expandDebugInfo">
       <md-layout md-row v-if="media.meta" v-for="(value, key) in media.meta">
         <md-layout :md-flex="25">{{ key }}:</md-layout>
-        <md-layout :md-flex="75">{{ value }}</md-layout>
+        <md-layout :md-flex="75"><div class="debug-value">{{ value }}</div></md-layout>
       </md-layout>
     </div>
   </div>
@@ -173,6 +173,10 @@
         width: 75%;
         font-weight: bold;
       }
+    }
+    .debug-value {
+      max-height: 300px;
+      overflow: auto;
     }
   }
 </style>
