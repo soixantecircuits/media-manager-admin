@@ -15,7 +15,9 @@
         <media-info :media="media" @state-changed="setState"></media-info>
         <media-edit-parts :media="media"></media-edit-parts>
       </md-layout>
-      <md-layout :md-flex="50"></md-layout>
+      <md-layout :md-flex="50">
+        <media-part-editor :is-editable="hasEditableParts"></media-part-editor>
+      </md-layout>
     </md-layout>
   </div>
 </template>
@@ -27,6 +29,9 @@
   import MediaPreview from './MediaView/MediaPreview.vue'
   import MediaInfo from './MediaView/MediaInfo.vue'
   import MediaEditParts from './MediaView/MediaEditParts.vue'
+  import MediaPartEditor from './MediaView/MediaPartEditor.vue'
+  import mediaEditor from '../lib/mediaEditor'
+
   const config = SETTINGS
 
   let data = {
@@ -35,11 +40,13 @@
 
   export default {
     components: {
+      MediaPartEditor,
       MediaEditParts,
       MediaInfo,
       MediaPreview,
       MediaViewToolbar
     },
+    mixins: [ mediaEditor ],
     data() {
       return data
     },
@@ -137,6 +144,7 @@
             instance.media.state = res.state
             let timestamp = new Date(res.uploadedAt)
             instance.media.uploadedAt = timestamp.toLocaleString()
+            instance.initMediaEditor()
           })
           .catch((err) => {
             console.log(err)

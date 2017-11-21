@@ -49,7 +49,7 @@
 
       .empty-list {
         text-align: center;
-        padding: 100px 30px;
+        padding: 120px 30px;
         font-weight: 300;
         font-size: 22px;
         color: #ccc;
