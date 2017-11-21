@@ -26,10 +26,10 @@
     </div>
     <div class="item">
       <md-layout md-row>
-        <md-layout :md-flex="30">Uploaded at: <strong>{{ media.uploadedAt }}</strong></md-layout>
-        <md-layout :md-flex="30">ID: <strong>{{ media._id }}</strong></md-layout>
-        <md-layout :md-flex="15">_from: <strong>{{ !media._from ? 'N/A': media._from }}</strong></md-layout>
-        <md-layout :md-flex="15">_to: <strong>{{ !media._to ? 'N/A': media._to }}</strong></md-layout>
+        <md-layout :md-flex="30">Uploaded at: <span class="value">{{ media.uploadedAt }}</span></md-layout>
+        <md-layout :md-flex="30">ID: <span class="value">{{ media._id }}</span></md-layout>
+        <md-layout :md-flex="15">From: <span class="value">{{ etnaFrom }}</span></md-layout>
+        <md-layout :md-flex="15">To: <span class="value">{{ etnaTo }}</span></md-layout>
         <md-layout :md-flex="10" v-if="mediaPreviewShowDebugInfo"><a href="#" @click.prevent="expandDebugInfo=!expandDebugInfo">Debug</a></md-layout>
       </md-layout>
     </div>
@@ -48,6 +48,20 @@
     mixins: [ settings ],
     name: 'media-info',
     computed: {
+      etnaFrom () {
+        if(this.media.meta && this.media.meta.etnaInput && this.media.meta.etnaInput._from) {
+          return this.media.meta.etnaInput._from
+        }
+
+        return 'N/A'
+      },
+      etnaTo () {
+        if(this.media.meta && this.media.meta.etnaInput && this.media.meta.etnaInput._to) {
+          return this.media.meta.etnaInput._to
+        }
+
+        return 'N/A'
+      },
       mediaPreviewShowDebugInfo () {
         return this.getSettings().mediaPreviewShowDebugInfo
       },
@@ -80,15 +94,19 @@
   .media-info {
     background: #fff;
 
-    strong {
-      display: inline-block;
-      padding-left: 4px;
-    }
-
     .item {
       display: block;
       border-bottom: 1px solid #ccc;
       padding: 19px 30px;
+
+      span.value {
+        display: block;
+        width: 100%;
+        font-weight: bold;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        padding-right: 5px;
+      }
     }
     .item:last-child {
       border-bottom: none;
@@ -114,6 +132,7 @@
       display: inline-block;
       padding-right: 5px;
       z-index: 1;
+      top: -10px;
       position: relative;
     }
     label + .md-select {

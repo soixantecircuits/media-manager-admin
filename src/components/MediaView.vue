@@ -13,6 +13,7 @@
       <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
+        <media-edit-parts :media="media"></media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50"></md-layout>
     </md-layout>
@@ -25,6 +26,7 @@
   import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
   import MediaPreview from './MediaView/MediaPreview.vue'
   import MediaInfo from './MediaView/MediaInfo.vue'
+  import MediaEditParts from './MediaView/MediaEditParts.vue'
   const config = SETTINGS
 
   let data = {
@@ -33,9 +35,11 @@
 
   export default {
     components: {
+      MediaEditParts,
       MediaInfo,
       MediaPreview,
-      MediaViewToolbar},
+      MediaViewToolbar
+    },
     data() {
       return data
     },

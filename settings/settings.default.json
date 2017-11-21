@@ -9,7 +9,7 @@
   "service": {
     "mediaManager": {
       "protocol": "http",
-      "server": "car-studio-02.estu.la",
+      "server": "faune.estu.la",
       "port": 36200,
       "apiRoute": "/api/v1"
     }
