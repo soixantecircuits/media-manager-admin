@@ -23,7 +23,7 @@ let extractProducers = ($, $producers) => {
   return producers
 }
 
-let extractEntries = ($, $playlists, producers) => {
+let extractEntries = ($, $playlists, producers, thumbnail) => {
   let entries = []
 
   let findProducerById = (producerId) => {
@@ -49,6 +49,7 @@ let extractEntries = ($, $playlists, producers) => {
           entries.push({
             in: $(entry).attr('in'),
             out: $(entry).attr('out'),
+            thumbnail: thumbnail,
             producer: producer
           })
         }
@@ -61,11 +62,15 @@ let extractEntries = ($, $playlists, producers) => {
 
 /**
  * Get a list of editable parts from melt XML
- * @param melt
+ * @param media
  * @returns {Array}
  */
-let getEditableParts = (melt) => {
-  let $ = cheerio.load(melt, {xmlMode: true})
+let getEditableParts = (media) => {
+  if (!media.meta || !media.meta.etnaInput || !media.meta.melt || !media.meta.melt.scriptString) {
+    return []
+  }
+
+  let $ = cheerio.load(media.meta.melt.scriptString, {xmlMode: true})
   let $playlists = $('playlist#playlist1', 'mlt')
   let $producers = $('producer', 'mlt')
 
@@ -73,7 +78,13 @@ let getEditableParts = (melt) => {
     return []
   }
 
-  return extractEntries($, $playlists, extractProducers($, $producers))
+  // TODO: Most likely this should be removed and a thumbnail should be taken for each video fragment in the future
+  let thumbnail = ''
+  if (media.meta && media.meta.etnaInput && media.meta.etnaInput.details && media.meta.etnaInput.details.thumbnail) {
+    thumbnail = media.meta.etnaInput.details.thumbnail.url
+  }
+
+  return extractEntries($, $playlists, extractProducers($, $producers), thumbnail)
 }
 
 export default {
@@ -92,7 +103,7 @@ export default {
       media = this.media
       if (media.meta && media.meta.etnaInput && media.meta.melt && media.meta.melt.scriptString) {
         if (currentId !== media._id) {
-          editableParts = getEditableParts(media.meta.melt.scriptString)
+          editableParts = getEditableParts(media)
         }
 
         this.$set(this, 'editableParts', editableParts)

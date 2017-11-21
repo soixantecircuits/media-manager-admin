@@ -1,6 +1,7 @@
 <template>
   <div class="media-edit-part-item" :class="{ selected: selected }">
     <div class="picture">
+      <img :src="part.thumbnail" v-if="part.thumbnail != ''">
     </div>
     <div class="data">
       <span class="label">{{ editLabel }}</span>
@@ -57,6 +58,13 @@
     .picture {
       width: 15%;
       background: rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      vertical-align: middle;
+
+      img {
+        width: 100%;
+        height: auto;
+      }
     }
 
     & > div {
