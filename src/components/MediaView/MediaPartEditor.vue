@@ -69,6 +69,10 @@
       .video-preview {
         width: 100%;
         overflow: hidden;
+
+        video {
+          width: 100%;
+        }
       }
 
       .title {

@@ -72,7 +72,7 @@
           return false
         }
 
-        return this.currentPage !== this.totalPages || this.currentPage === this.totalPages && this.mediaID !== this.mediasList[mediasList.length - 1]._id
+        return this.currentPage !== this.totalPages || this.currentPage === this.totalPages && this.mediaID !== this.mediasList[this.mediasList.length - 1]._id
       },
       moderatorURL () {
         return `http://${config.mediaManager.server}:${config.mediaManager.port}${config.mediaManager.apiRoute}`

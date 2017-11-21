@@ -108,14 +108,13 @@ export default {
       }
 
       media = this.media
-      if (media.meta && media.meta.etnaInput && media.meta.melt && media.meta.melt.scriptString) {
-        if (currentId !== media._id) {
-          editableParts = getEditableParts(media)
-        }
+      editableParts = []
 
-        this.$set(this, 'editableParts', editableParts)
+      if (media.meta && media.meta.etnaInput && media.meta.melt && media.meta.melt.scriptString) {
+        editableParts = getEditableParts(media)
       }
 
+      this.$set(this, 'editableParts', editableParts)
       currentId = media._id
     }
   },
