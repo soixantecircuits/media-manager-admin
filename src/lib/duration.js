@@ -3,14 +3,11 @@
 /**
  * Add a leading zero to a number and return a string value
  * @param number
+ * @param zeroNumbers
  * @returns {string}
  */
-let leadingZero = (number) => {
-  if (number >= 10) {
-    return number.toString()
-  }
-
-  return '0' + number.toString()
+let leadingZero = (number, zeroNumbers = 2) => {
+  return number.toString().padStart(zeroNumbers, '0')
 }
 
 /**
@@ -22,7 +19,7 @@ let leadingZero = (number) => {
  * @returns {string}
  */
 let formatDuration = (hours, minutes, seconds, ms) => {
-  return leadingZero(hours) + ':' + leadingZero(minutes) + ':' + leadingZero(seconds) + ',' + leadingZero(ms)
+  return leadingZero(hours) + ':' + leadingZero(minutes) + ':' + leadingZero(seconds) + ',' + leadingZero(ms, 3)
 }
 
 /**
