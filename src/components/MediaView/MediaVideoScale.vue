@@ -25,24 +25,7 @@
         fragment: null
       }
     },
-    watch: {
-      fragmentIn () {
-        this.fgIn = this.fragmentIn
-        this.timeUpdated(true)
-      },
-      fragmentOut () {
-        this.fgOut = this.fragmentOut
-        this.timeUpdated(true)
-      }
-    },
     methods: {
-      timeUpdated (silent) {
-        this.updateFragmentSize()
-
-        if (!silent) {
-          this.$emit('change', this.fgIn, this.fgOut)
-        }
-      },
       inputTime () {
         let val = document.getElementById('current-time-input').value
         let delta = this.fragmentDuration

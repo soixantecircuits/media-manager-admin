@@ -15,6 +15,16 @@ export default {
       required: true
     }
   },
+  watch: {
+    fragmentIn () {
+      this.fgIn = this.fragmentIn
+      this.timeUpdated(true)
+    },
+    fragmentOut () {
+      this.fgOut = this.fragmentOut
+      this.timeUpdated(true)
+    }
+  },
   data () {
     return {
       fgIn: 0,
@@ -33,6 +43,13 @@ export default {
     },
   },
   methods: {
+    timeUpdated (silent) {
+      this.updateFragmentSize()
+
+      if (!silent) {
+        this.$emit('change', this.fgIn, this.fgOut)
+      }
+    },
     formatDuration (value) {
       return duration.toDuration(value)
     }
