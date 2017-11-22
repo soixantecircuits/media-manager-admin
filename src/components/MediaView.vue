@@ -21,7 +21,8 @@
                            :media-url="media.meta.etnaInput.url"
                            :parts="editableParts"
                            :total-seconds="media.meta.duration"
-                           :selected-part="selectedPart">
+                           :selected-part="selectedPart"
+                           @update="updateComposition">
         </media-part-editor>
       </md-layout>
     </md-layout>
@@ -123,6 +124,13 @@
       }
     },
     methods: {
+      updateComposition (newIn, newOut) {
+        if (!this.selectedPart) {
+          return
+        }
+
+        // TODO: Update composition in a row
+      },
       partSelected (part) {
         this.selectedPart = Object.assign({}, this.selectedPart, part)
       },

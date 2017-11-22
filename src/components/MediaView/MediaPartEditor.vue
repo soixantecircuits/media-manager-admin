@@ -77,6 +77,21 @@
     },
     methods: {
       updateComposition () {
+        // Fake progress
+        // Replace with posting to spacebro
+        let vm = this
+        let interval = setInterval(() => {
+          vm.progressValue += 10
+
+          if(vm.progressValue >= 100) {
+            vm.progressValue = 0
+            clearInterval(interval)
+
+            vm.initFragmentIn = vm.fragmentIn
+            vm.initFragmentOut = vm.fragmentOut
+            vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
+          }
+        }, 100)
       },
       cancelEdits () {
         this.fragmentOut = this.initFragmentOut
