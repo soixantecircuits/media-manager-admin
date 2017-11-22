@@ -8,6 +8,7 @@
             <video :src="mediaUrl" muted controls></video>
           </div>
           <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
+          <media-video-fragment :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
           <div class="controls">
             <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
             <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
@@ -23,9 +24,11 @@
   import MediaUpdateProgress from './MediaUpdateProgress'
   import MediaVideoScale from './MediaVideoScale.vue'
   import duration from '../../lib/duration'
+  import MediaVideoFragment from './MediaVideoFragment.vue'
 
   export default {
     components: {
+      MediaVideoFragment,
       MediaVideoScale,
       MediaUpdateProgress },
     name: 'media-part-editor',

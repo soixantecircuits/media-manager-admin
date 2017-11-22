@@ -13,39 +13,16 @@
   import duration from '../../lib/duration'
   import timeline from '../../lib/timeline'
   import fragment from '../../lib/fragment'
+  import timelineBase from '../../lib/timelneBase'
   import { fabric } from 'fabric'
 
   export default {
     name: 'media-video-scale',
-    mixins: [timeline, fragment],
-    props: {
-      fragmentIn: {
-        type: Number,
-        required: true
-      },
-      fragmentOut: {
-        type: Number,
-        required: true
-      },
-      total: {
-        type: Number,
-        required: true
-      }
-    },
-    computed: {
-      formattedIn () {
-        return this.formatDuration(this.fgIn)
-      },
-      fragmentDuration () {
-        return this.fgOut - this.fgIn
-      },
-    },
+    mixins: [timeline, fragment, timelineBase],
     data () {
       return {
         canvas: null,
-        fragment: null,
-        fgIn: 0,
-        fgOut: 0
+        fragment: null
       }
     },
     watch: {
@@ -62,7 +39,7 @@
       timeUpdated (silent) {
         this.updateFragmentSize()
 
-        if(!silent) {
+        if (!silent) {
           this.$emit('change', this.fgIn, this.fgOut)
         }
       },
@@ -89,7 +66,7 @@
       },
       getIncrementalValue () {
         let hms = duration.getHms(this.total)
-        if(hms.hours > 0 || hms.minutes > 0 || hms.seconds > 1) {
+        if (hms.hours > 0 || hms.minutes > 0 || hms.seconds > 1) {
           return 1000
         }
 
@@ -113,15 +90,9 @@
         let size = this.getCanvasSize()
         this.canvas.setWidth(size.width)
         this.canvas.setHeight(size.height)
-      },
-      formatDuration (value) {
-        return duration.toDuration(value)
       }
     },
     mounted () {
-      this.fgIn = this.fragmentIn
-      this.fgOut = this.fragmentOut
-
       this.initCanvas()
       this.drawObjects()
     }
