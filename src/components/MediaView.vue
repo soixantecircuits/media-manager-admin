@@ -53,6 +53,7 @@
       return data
     },
     mounted () {
+      this.ready = false
       this.getPageData()
     },
     computed: {
@@ -218,13 +219,16 @@
             console.log(err)
           })
       },
-
+      navigate (url) {
+        this.ready = false
+        this.$router.push(url)
+      },
       goBackToList () {
         let query = `?count=${this.mediasPerPage}`
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
         }
-        this.$router.push(`/media/list/${this.currentPage}${query}`)
+        this.navigate(`/media/list/${this.currentPage}${query}`)
       },
 
       goToPreviousMedia () {
@@ -233,11 +237,11 @@
           if (this.mediaListPos === 0) {
             this.$store.commit('setCurrentPage', this.currentPage - 1)
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.$router.push(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
+              instance.navigate(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
               instance.getPageData()
             })
           } else {
-            this.$router.push(`${this.mediasList[this.mediaListPos - 1]._id}`)
+            this.navigate(`${this.mediasList[this.mediaListPos - 1]._id}`)
             this.getPageData()
           }
         }
@@ -249,11 +253,11 @@
           if (this.mediaListPos === this.mediasList.length - 1) {
             this.$store.commit('setCurrentPage', this.currentPage + 1)
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.$router.push(`${instance.mediasList[0]._id}`)
+              instance.navigate(`${instance.mediasList[0]._id}`)
               instance.getPageData()
             })
           } else {
-            this.$router.push(`${this.mediasList[this.mediaListPos + 1]._id}`)
+            this.navigate(`${this.mediasList[this.mediaListPos + 1]._id}`)
             this.getPageData()
           }
         }
