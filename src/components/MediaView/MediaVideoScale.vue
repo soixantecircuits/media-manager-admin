@@ -1,7 +1,7 @@
 <template>
   <div class="media-video-scale">
     <div class="current-time">
-      <input type="text" v-model="formattedIn">
+      <input type="text" v-model="formattedIn" id="current-time-input" @keyup.up="increaseTime" @keyup.down="decreaseTime" @keyup.enter="inputTime">
       <span class="hint">(press Enter to apply, &uarr; &darr; to increment / decrement)</span>
     </div>
     <div id="timeline-container">
@@ -35,7 +35,10 @@
     computed: {
       formattedIn () {
         return this.formatDuration(this.fgIn)
-      }
+      },
+      fragmentDuration () {
+        return this.fgOut - this.fgIn
+      },
     },
     data () {
       return {
@@ -56,6 +59,35 @@
       }
     },
     methods: {
+      inputTime () {
+        let val = document.getElementById('current-time-input').value
+        let delta = this.fragmentDuration
+        let ms = duration.toMilliseconds(val)
+
+        this.fgIn = ms
+        this.fgOut = ms + delta
+        this.updateFragmentSize()
+      },
+      increaseTime () {
+        let incVal = this.getIncrementalValue()
+        this.fgIn += incVal
+        this.fgOut += incVal
+        this.updateFragmentSize()
+      },
+      decreaseTime () {
+        let incVal = this.getIncrementalValue()
+        this.fgIn -= incVal
+        this.fgOut -= incVal
+        this.updateFragmentSize()
+      },
+      getIncrementalValue () {
+        let hms = duration.getHms(this.total)
+        if(hms.hours > 0 || hms.minutes > 0 || hms.seconds > 1) {
+          return 1000
+        }
+
+        return 100
+      },
       getCanvasSize () {
         let canvasContainer = document.getElementById('timeline-container')
         return {
