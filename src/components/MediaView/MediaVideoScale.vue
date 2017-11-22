@@ -121,8 +121,6 @@
         ctx.canvas.width = size.width
         ctx.canvas.height = size.height
 
-        totalDuration = 129000
-
         // Draw timeline
         let hours = duration.getHours(totalDuration)
         let minutes = duration.getMinutes(totalDuration)
