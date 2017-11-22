@@ -1,6 +1,9 @@
 <template>
   <div class="media-video-scale">
-    <div class="current-time">{{ formatDuration(fgIn) }}</div>
+    <div class="current-time">
+      <input type="text" v-model="formattedIn">
+      <span class="hint">(press Enter to apply, &uarr; &darr; to increment / decrement)</span>
+    </div>
     <div id="timeline-container">
       <canvas id="timeline"></canvas>
     </div>
@@ -27,6 +30,11 @@
       total: {
         type: Number,
         required: true
+      }
+    },
+    computed: {
+      formattedIn () {
+        return this.formatDuration(this.fgIn)
       }
     },
     data () {
@@ -88,6 +96,33 @@
       font-weight: bold;
       font-size: 16px;
       margin-bottom: 10px;
+      position: relative;
+
+      input {
+        background-color: transparent;
+        color: #fff;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        padding: 0;
+        font-weight: bold;
+
+        &:focus {
+          border-bottom: 1px solid #fd4f4f;
+        }
+      }
+      .hint {
+        font-size: 12px;
+        font-weight: normal;
+        position: absolute;
+        top: 0px;
+        padding-left: 10px;
+        color: #888;
+        display: none;
+      }
+      input:focus + .hint {
+        display: inline-block;
+      }
     }
 
     #timeline-container {
