@@ -13,10 +13,17 @@
       <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-        <media-edit-parts :media="media" v-if="media && ready" @selected="partSelected"></media-edit-parts>
+        <media-edit-parts :media="media" v-if="displayEditableParts" @selected="partSelected"></media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
-        <media-part-editor :is-editable="hasEditableParts" :mediaUrl="media.meta.etnaInput.url" :selected-part="selectedPart" v-if="ready && media.meta && media.meta.etnaInput"></media-part-editor>
+        <media-part-editor v-if="displayPartEditor"
+                           :is-editable="hasEditableParts"
+                           :media-url="media.meta.etnaInput.url"
+                           :parts="editableParts"
+                           :total-seconds="media.meta.duration"
+                           :selected-part="selectedPart"
+                           @update="updateComposition">
+        </media-part-editor>
       </md-layout>
     </md-layout>
   </div>
@@ -61,6 +68,12 @@
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
+      displayEditableParts () {
+        return this.media && this.ready
+      },
+      displayPartEditor () {
+        return this.ready && this.media.meta && this.media.meta.etnaInput
+      },
       allowPrevious () {
         if (!this.mediasList || !this.mediasList.length) {
           return false
@@ -111,6 +124,13 @@
       }
     },
     methods: {
+      updateComposition (newIn, newOut) {
+        if (!this.selectedPart) {
+          return
+        }
+
+        // TODO: Update composition in a row
+      },
       partSelected (part) {
         this.selectedPart = Object.assign({}, this.selectedPart, part)
       },

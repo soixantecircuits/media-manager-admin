@@ -1,12 +1,12 @@
 <template>
-  <div class="media-update-composition" :class="{ 'progress-visible': displayProgressBar }">
+  <div class="media-update-progress" :class="{ 'progress-visible': displayProgressBar }">
     <md-progress :md-progress="progressValue" v-show="displayProgressBar"></md-progress>
-    <md-button @click.native="$emit('update')">Update Composition</md-button>
+    <div class="text">Update Composition</div>
   </div>
 </template>
 <script>
   export default {
-    name: 'media-update-composition',
+    name: 'media-update-progress',
     computed: {
       displayProgressBar () {
         return this.progressValue > 0
@@ -21,7 +21,7 @@
   }
 </script>
 <style lang="scss">
-  .media-update-composition {
+  .media-update-progress {
     background: #333;
     padding-top: 4px;
     padding-bottom: 6px;
@@ -36,7 +36,8 @@
     .md-theme-default.md-progress .md-progress-track {
       background: #3fb34f !important;
     }
-    .md-button {
+    .text {
+      padding: 10px;
       color: #ffffff;
       font-weight: bold;
       font-size: 16px;

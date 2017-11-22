@@ -5,32 +5,42 @@
         <div class="editor">
           <div class="title">{{ selectedPart.index }}</div>
           <div class="video-preview">
-            <video :src="mediaUrl" muted controls></video>
+            <video :src="mediaUrl" id="video" controls></video>
           </div>
+          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
+          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
           <div class="controls">
-            <div class="left">
-              <button>cancel</button>
-            </div>
-            <div class="right">
-              <button>update</button>
-            </div>
+            <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
+            <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
           </div>
         </div>
-        <media-update-composition :progress-value="progressValue"></media-update-composition>
+        <media-update-progress :progress-value="progressValue"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
   </div>
 </template>
 <script>
-  import MediaUpdateComposition from './MediaUpdateComposition.vue'
+  import MediaUpdateProgress from './MediaUpdateProgress'
+  import MediaVideoScale from './MediaVideoScale.vue'
+  import duration from '../../lib/duration'
+  import MediaVideoFragment from './MediaVideoFragment.vue'
 
   export default {
-    components: {MediaUpdateComposition},
+    components: {
+      MediaVideoFragment,
+      MediaVideoScale,
+      MediaUpdateProgress },
     name: 'media-part-editor',
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
+      },
+      compositionChanged () {
+        return this.initFragmentIn !== this.fragmentIn || this.initFragmentOut !== this.fragmentOut
+      },
+      totalMilliseconds () {
+        return this.totalSeconds * 1000
       }
     },
     props: {
@@ -42,13 +52,63 @@
         type: String,
         required: true
       },
+      parts: {
+        type: Array,
+        required: true
+      },
       selectedPart: {
         type: Object
+      },
+      totalSeconds: {
+        type: Number,
+        required: true
+      }
+    },
+    watch: {
+      selectedPart (part) {
+        let start = duration.toMilliseconds(part.in)
+        let end = duration.toMilliseconds(part.out)
+
+        this.fragmentIn = start
+        this.fragmentOut = end
+        this.initFragmentIn = start
+        this.initFragmentOut = end
+      }
+    },
+    methods: {
+      updateComposition () {
+        // Fake progress
+        // Replace with posting to spacebro
+        let vm = this
+        let interval = setInterval(() => {
+          vm.progressValue += 10
+
+          if(vm.progressValue >= 100) {
+            vm.progressValue = 0
+            clearInterval(interval)
+
+            vm.initFragmentIn = vm.fragmentIn
+            vm.initFragmentOut = vm.fragmentOut
+            vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
+          }
+        }, 100)
+      },
+      cancelEdits () {
+        this.fragmentOut = this.initFragmentOut
+        this.fragmentIn = this.initFragmentIn
+      },
+      fragmentChanged (newIn, newOut) {
+        this.fragmentIn = newIn
+        this.fragmentOut = newOut
       }
     },
     data () {
       return {
-        progressValue: 0
+        progressValue: 0,
+        fragmentIn: 0,
+        fragmentOut: 0,
+        initFragmentIn: 0,
+        initFragmentOut: 0
       }
     }
   }
@@ -60,6 +120,13 @@
     min-height: 90%;
     box-sizing: border-box;
     position: relative;
+    color: #fff;
+
+    #video-back {
+      position: absolute;
+      left: -1000px;
+      top: -1000px;
+    }
 
     .editor {
       background: #333;
@@ -87,6 +154,8 @@
     .controls {
       display: table;
       width: 100%;
+      position: relative;
+      z-index: 100;
 
       .left, .right {
         display: table-cell;
@@ -106,13 +175,16 @@
         color: #fff;
         padding: 6px 15px;
 
+        &:disabled {
+          opacity: 0.5;
+        }
         &:active {
           color: #333;
           background: #fff;
         }
       }
     }
-    .media-update-composition {
+    .media-update-progress {
       margin-top: 10px;
     }
     &.disabled {
