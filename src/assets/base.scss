@@ -1,0 +1,82 @@
+div.md-toolbar.title.md-theme-default {
+  background: #333;
+  color: #fff;
+  padding-top: 25px;
+  padding-bottom: 25px;
+
+  h1 {
+    text-transform: uppercase;
+    font-size: 30px;
+    font-weight: bold;
+  }
+}
+div.md-toolbar.md-theme-grey.topbar {
+  background: #333;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 16px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+
+  .md-button {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  a {
+    color: #fff;
+  }
+
+  .md-button[disabled] {
+    color: #858585;
+  }
+}
+.md-table-card .md-table-pagination {
+  background: #cccccc;
+  .md-table-pagination-label, .md-select .md-menu, .md-select .md-select-value {
+    font-size: 14px;
+  }
+  .md-table-pagination-label {
+    font-weight: bold;
+  }
+}
+.md-theme-default.md-select-content .md-menu-item.md-selected, .md-theme-default.md-select-content .md-menu-item.md-checked {
+  color: #ff5858 !important;
+}
+.md-table-card .md-table-pagination .md-select .md-select-value {
+  padding-right: 10px;
+}
+.md-table .md-table-head-text {
+  font-size: 14px;
+  color: #333;
+}
+.md-input-container.status-update {
+  &:after {
+    background: none;
+  }
+  .md-select-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+.grid {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  & * {
+    box-sizing: border-box;
+  }
+
+  .col-6 {
+    flex: 1 0 50%;
+    width: 50%;
+  }
+  .row {
+    flex: 0 1 100%;
+  }
+}

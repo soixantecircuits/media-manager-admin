@@ -12,33 +12,34 @@
     }
   }
 </script>
+<style lang="scss">
+  @import './assets/base.scss';
 
-<style>
+  html {
+    height: 100%;
+  }
 
-html {
-  height: 100%;
-}
+  #app {
+    color: #2c3e50;
+    max-width: 600px;
+    font-family: "Source Sans Pro", sans-serif;
+    text-align: center;
+  }
 
-#app {
-  color: #2c3e50;
-  max-width: 600px;
-  font-family: Source Sans Pro, Helvetica, sans-serif;
-  text-align: center;
-}
+  #app a {
+    color: #ff5858;
+    text-decoration: none;
+  }
 
-#app a {
-  color: #42b983;
-  text-decoration: none;
-}
-#app p {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 600px;
-}
+  #app p {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 600px;
+  }
 
-#app > div {
-  position: absolute;
-  width: 100%;
-}
+  #app > div {
+    position: absolute;
+    width: 100%;
+  }
 
 </style>

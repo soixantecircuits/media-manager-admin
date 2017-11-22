@@ -1,120 +1,115 @@
 <template>
   <div>
-
-    <md-toolbar md-theme="grey">
-      <md-button class="md-primary" @click.native="goBackToList()">Back to list</md-button>
-      <div style="flex: 1;"></div>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === 1 && mediaID === mediasList[0]._id" @click.native="goToPreviousMedia">Previous</md-button>
-      <md-button v-if="mediasList.length > 0" :disabled="currentPage === totalPages && mediaID === mediasList[mediasList.length - 1]._id" @click.native="goToNextMedia">Next</md-button>
-      <div style="flex: 1;"></div>
-      <md-button @click.native="deleteFile(mediaID)">Delete this file</md-button>
-    </md-toolbar>
-
-    <md-layout>
-
-    <md-layout md-flex="60" md-flex-offset="20" md-row style="border-radius: 8px;">
-      <md-layout md-flex>
-        <md-card style="background: black; width: 100%;">
-          <md-card-media style="margin: auto;">
-            <video v-if="media.type && media.type.search('video') !== -1" :src="media.url" muted autoplay controls></video>
-            <md-image v-else :md-src="media.url" alt="Media"></md-image>
-          </md-card-media>
-        </md-card>
+    <media-view-toolbar
+        @back="goBackToList"
+        @previous="goToPreviousMedia"
+        @next="goToNextMedia"
+        @delete="deleteFile(mediaID)"
+        :show-navigation="mediasList.length > 0"
+        :allow-previous="allowPrevious"
+        :allow-next="allowNext">
+    </media-view-toolbar>
+    <md-layout md-row>
+      <md-layout md-column :md-flex="50" class="section">
+        <media-preview :media="media"></media-preview>
+        <media-info :media="media" @state-changed="setState"></media-info>
+        <media-edit-parts :media="media" v-if="displayEditableParts" @selected="partSelected"></media-edit-parts>
       </md-layout>
-
-      <md-layout md-flex>
-        <md-card style="height: 100%;">
-          <md-card-area md-inset>
-            <md-card-header>
-              <h2 class="md-title">{{ media.file }}</h2>
-            </md-card-header>
-          </md-card-area>
-
-          <md-card-area md-inset>
-            <md-input-container style="height: 0; padding: 8px 16px; margin: 0;">
-              <label for="state" style="position: relative;"><b>State</b></label>
-              <md-select name="state" v-model="media.state" @change="setState(media.state)" md-align-trigger>
-                <md-option v-for="state in statesList" :value="state">{{ state }}</md-option>
-              </md-select>
-
-              <label for="bucket" style="position: relative;"><b>Bucket</b></label>
-              <md-select name="bucket" md-align-trigger>
-                <md-option v-for="bucket in bucketsList" :value="bucket.name">{{ bucket.name }}</md-option>
-              </md-select>
-            </md-input-container>
-          </md-card-area>
-
-          <md-card-area md-inset>
-            <md-card-content>
-              <md-table>
-                <md-table-row>
-                  <md-table-cell style="text-align: left;"><b>Uploaded at: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media.uploadedAt }}</md-table-cell>
-                </md-table-row>
-                <md-table-row>
-                  <md-table-cell style="text-align: left;"><b>ID: </b></md-table-cell><md-table-cell style="text-align: left;">{{ media._id }}</md-table-cell>
-                </md-table-row>
-
-                <md-table-row v-if="media.meta" v-for="(value, key) in media.meta">
-                  <md-table-cell style="text-align: left;"><b>{{ key }}: </b></md-table-cell><md-table-cell style="text-align: left;">{{ value }}</md-table-cell>
-                </md-table-row>
-              </md-table>
-            </md-card-content>
-          </md-card-area>
-
-        </md-card>
+      <md-layout :md-flex="50">
+        <media-part-editor v-if="displayPartEditor"
+                           :is-editable="hasEditableParts"
+                           :media-url="media.meta.etnaInput.url"
+                           :parts="editableParts"
+                           :total-seconds="media.meta.duration"
+                           :selected-part="selectedPart"
+                           @update="updateComposition">
+        </media-part-editor>
       </md-layout>
     </md-layout>
-
-    </md-layout>
-
   </div>
 </template>
 
 <script>
   import { mapGetters } from 'vuex'
   import moderatorapi from '../lib/mediamanagerAPI'
+  import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
+  import MediaPreview from './MediaView/MediaPreview.vue'
+  import MediaInfo from './MediaView/MediaInfo.vue'
+  import MediaEditParts from './MediaView/MediaEditParts.vue'
+  import MediaPartEditor from './MediaView/MediaPartEditor.vue'
+  import mediaEditor from '../lib/mediaEditor'
+
   const config = SETTINGS
 
   let data = {
     currentMediaState: '',
+    ready: false,
+    selectedPart: {}
   }
 
   export default {
-    data() {
+    components: {
+      MediaPartEditor,
+      MediaEditParts,
+      MediaInfo,
+      MediaPreview,
+      MediaViewToolbar
+    },
+    mixins: [mediaEditor],
+    data () {
       return data
     },
-
-    mounted() {
+    mounted () {
+      this.ready = false
       this.getPageData()
     },
-
     computed: {
       ...mapGetters({
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
-      moderatorURL() {
+      displayEditableParts () {
+        return this.media && this.ready
+      },
+      displayPartEditor () {
+        return this.ready && this.media.meta && this.media.meta.etnaInput
+      },
+      allowPrevious () {
+        if (!this.mediasList || !this.mediasList.length) {
+          return false
+        }
+
+        return this.currentPage !== 1 || this.currentPage === 1 && this.mediaID !== this.mediasList[0]._id
+      },
+      allowNext () {
+        if (!this.mediasList || !this.mediasList.length) {
+          return false
+        }
+
+        return this.currentPage !== this.totalPages || this.currentPage === this.totalPages && this.mediaID !== this.mediasList[this.mediasList.length - 1]._id
+      },
+      moderatorURL () {
         return `http://${config.mediaManager.server}:${config.mediaManager.port}${config.mediaManager.apiRoute}`
       },
-      bucketsList() {
+      bucketsList () {
         return this.$store.state.bucketsList
       },
-      statesList() {
+      statesList () {
         return this.$store.state.statesList
       },
       mediasList () {
         return this.$store.state.mediasList
       },
-      currentPage() {
+      currentPage () {
         return this.$store.state.currentPage
       },
-      totalMedias() {
+      totalMedias () {
         return this.$store.state.totalMedias
       },
-      mediasPerPage() {
+      mediasPerPage () {
         return this.$store.state.mediasPerPage
       },
-      mediaListPos() {
+      mediaListPos () {
         let instance = this
         if (this.mediasList.length > 0) {
           return this.mediasList.findIndex((element) => {
@@ -124,13 +119,22 @@
           return -1
         }
       },
-      totalPages() {
+      totalPages () {
         return Math.floor(this.totalMedias / this.mediasPerPage) + ((this.totalMedias % this.mediasPerPage) !== 0 ? 1 : 0)
       }
     },
-
     methods: {
-      getPageData() {
+      updateComposition (newIn, newOut) {
+        if (!this.selectedPart) {
+          return
+        }
+
+        // TODO: Update composition in a row
+      },
+      partSelected (part) {
+        this.selectedPart = Object.assign({}, this.selectedPart, part)
+      },
+      getPageData () {
         let instance = this
         this.$store.commit('setCurrentMediaID', this.$route.params.id)
 
@@ -145,7 +149,7 @@
           })
       },
 
-      getServerConfig() {
+      getServerConfig () {
         let instance = this
         return new Promise((resolve, reject) => {
           moderatorapi.getConfig()
@@ -158,18 +162,18 @@
         })
       },
 
-      getBuckets() {
+      getBuckets () {
         const instance = this
         moderatorapi.getBuckets()
-        .then(res => {
-          instance.$store.commit('setBucketsList', res)
-        })
-        .catch(err => {
-          console.error(err)
-        })
+          .then(res => {
+            instance.$store.commit('setBucketsList', res)
+          })
+          .catch(err => {
+            console.error(err)
+          })
       },
 
-      getMediaInfos() {
+      getMediaInfos () {
         let instance = this
         moderatorapi.getMediaInfos(this.mediaID)
           .then((res) => {
@@ -177,13 +181,16 @@
             instance.media.state = res.state
             let timestamp = new Date(res.uploadedAt)
             instance.media.uploadedAt = timestamp.toLocaleString()
+
+            instance.initMediaEditor()
+            instance.ready = true
           })
           .catch((err) => {
             console.log(err)
           })
       },
 
-      setState(state) {
+      setState (state) {
         let instance = this
         moderatorapi.setState(this.media._id, state)
           .then((res) => {
@@ -195,7 +202,7 @@
           })
       },
 
-      getMediasList(page, perPage, state, callback) {
+      getMediasList (page, perPage, state, callback) {
         let instance = this
         moderatorapi.getMediasList(page, perPage, state)
           .then((res) => {
@@ -217,7 +224,7 @@
           })
       },
 
-      updateTotalMedias() {
+      updateTotalMedias () {
         let instance = this
         moderatorapi.getTotalMedias()
           .then((res) => {
@@ -232,48 +239,52 @@
             console.log(err)
           })
       },
-
-      goBackToList() {
+      navigate (url) {
+        this.ready = false
+        this.selectedPart = {}
+        this.$router.push(url)
+      },
+      goBackToList () {
         let query = `?count=${this.mediasPerPage}`
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
         }
-        this.$router.push(`/media/list/${this.currentPage}${query}`)
+        this.navigate(`/media/list/${this.currentPage}${query}`)
       },
 
-      goToPreviousMedia() {
+      goToPreviousMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
           if (this.mediaListPos === 0) {
             this.$store.commit('setCurrentPage', this.currentPage - 1)
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.$router.push(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
+              instance.navigate(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
               instance.getPageData()
             })
           } else {
-            this.$router.push(`${this.mediasList[this.mediaListPos - 1]._id}`)
+            this.navigate(`${this.mediasList[this.mediaListPos - 1]._id}`)
             this.getPageData()
           }
         }
       },
 
-      goToNextMedia() {
+      goToNextMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
           if (this.mediaListPos === this.mediasList.length - 1) {
             this.$store.commit('setCurrentPage', this.currentPage + 1)
             this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.$router.push(`${instance.mediasList[0]._id}`)
+              instance.navigate(`${instance.mediasList[0]._id}`)
               instance.getPageData()
             })
           } else {
-            this.$router.push(`${this.mediasList[this.mediaListPos + 1]._id}`)
+            this.navigate(`${this.mediasList[this.mediaListPos + 1]._id}`)
             this.getPageData()
           }
         }
       },
 
-      deleteFile(id) {
+      deleteFile (id) {
         let instance = this
         moderatorapi.deleteFile(id)
           .then((res) => {
@@ -293,12 +304,17 @@
 
 </script>
 
-<style>
-.md-input-container::after {
-  height: 0px;
-}
+<style lang="scss" scoped>
+  .md-input-container::after {
+    height: 0px;
+  }
 
-.md-input-container > label {
-  top: 7px;
-}
+  .md-input-container > label {
+    top: 7px;
+  }
+
+  .section {
+    padding: 10px;
+    text-align: left;
+  }
 </style>

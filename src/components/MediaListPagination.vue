@@ -8,10 +8,12 @@
 
     <span class="md-table-pagination-label">Files per page :</span>
     <md-select v-if="pageOptions" v-model="mediasPerPage" md-menu-class="md-pagination-select">
-      <md-option v-for="amount in pageOptions" :value="amount" @selected="$emit('mediasPerPageChanged', perPage)">{{ amount }}</md-option>
+      <md-option v-for="amount in pageOptions" :value="amount" @selected="$emit('mediasPerPageChanged', mediasPerPage)">{{ amount }}</md-option>
     </md-select>
 
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <span class="md-table-pagination-label" style="margin-right:32px;">{{ totalMedia }} Media found</span>
+
+    <span>Page {{ Number.isNaN(currentPage) ? '-' : currentPage }} of {{ Number.isNaN(totalPages) ? '-' : totalPages }}</span>
 
     <md-button class="md-icon-button md-table-pagination-previous" @click.native="$emit('previousPage')" :disabled="currentPage === 1">
       <md-icon>keyboard_arrow_left</md-icon>
@@ -48,6 +50,9 @@
         set (value) {
           this.$store.commit('setMediasPerPage', value)
         }
+      },
+      totalMedia () {
+        return this.$store.state.totalMedias
       }
     }
   }
