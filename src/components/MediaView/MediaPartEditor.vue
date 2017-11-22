@@ -8,29 +8,30 @@
             <video :src="mediaUrl" muted controls></video>
           </div>
           <div class="controls">
-            <div class="left">
-              <button>cancel</button>
-            </div>
+            <div class="left"><button>cancel</button></div>
             <div class="right">
-              <button>update</button>
+              <button @click="updateComposition">update</button>
             </div>
           </div>
         </div>
-        <media-update-composition :progress-value="progressValue"></media-update-composition>
+        <media-update-progress :progress-value="progressValue"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
   </div>
 </template>
 <script>
-  import MediaUpdateComposition from './MediaUpdateComposition.vue'
+  import MediaUpdateProgress from './MediaUpdateProgress'
 
   export default {
-    components: {MediaUpdateComposition},
+    components: { MediaUpdateProgress },
     name: 'media-part-editor',
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
+      },
+      compositionChanged () {
+
       }
     },
     props: {
@@ -42,8 +43,21 @@
         type: String,
         required: true
       },
+      parts: {
+        type: Array,
+        required: true
+      },
       selectedPart: {
         type: Object
+      }
+    },
+    watch: {
+      selectedPart () {
+      }
+    },
+    methods: {
+      updateComposition () {
+        // TODO: Implement updating of the composition
       }
     },
     data () {
@@ -112,7 +126,7 @@
         }
       }
     }
-    .media-update-composition {
+    .media-update-progress {
       margin-top: 10px;
     }
     &.disabled {

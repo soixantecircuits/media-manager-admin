@@ -16,7 +16,12 @@
         <media-edit-parts :media="media" v-if="displayEditableParts" @selected="partSelected"></media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
-        <media-part-editor :is-editable="hasEditableParts" :mediaUrl="media.meta.etnaInput.url" :selected-part="selectedPart" v-if="displayPartEditor"></media-part-editor>
+        <media-part-editor v-if="displayPartEditor"
+                           :is-editable="hasEditableParts"
+                           :media-url="media.meta.etnaInput.url"
+                           :parts="editableParts"
+                           :selected-part="selectedPart">
+        </media-part-editor>
       </md-layout>
     </md-layout>
   </div>
