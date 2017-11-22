@@ -33,7 +33,7 @@ module.exports = {
     }
 
     let matches = duration.match(/(\d+)\:(\d+)\:(\d+),(\d+)/)
-    if (matches.length !== 5) {
+    if (!matches || matches.length !== 5) {
       return 0
     }
 
