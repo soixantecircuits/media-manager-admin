@@ -16,17 +16,17 @@
             </div>
           </div>
         </div>
-        <div class="update-composition">
-          <md-progress :md-progress="progressValue"></md-progress>
-          <md-button>Update Composition</md-button>
-        </div>
+        <media-update-composition :progress-value="progressValue"></media-update-composition>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
   </div>
 </template>
 <script>
+  import MediaUpdateComposition from './MediaUpdateComposition.vue'
+
   export default {
+    components: {MediaUpdateComposition},
     name: 'media-part-editor',
     computed: {
       hasSelectedPart () {
@@ -112,25 +112,9 @@
         }
       }
     }
-
-    .update-composition {
+    .media-update-composition {
       margin-top: 10px;
-      background: #333;
-
-      .md-theme-default.md-progress {
-        background: #014e0c;
-      }
-      .md-theme-default.md-progress .md-progress-track {
-        background: #3fb34f !important;
-      }
-      .md-button {
-        color: #ffffff;
-        font-weight: bold;
-        font-size: 16px;
-        text-transform: lowercase;
-      }
     }
-
     &.disabled {
       background: #111 repeating-linear-gradient(45deg, #141414, #141414 3px, #111 3px, #111 10px);
     }
