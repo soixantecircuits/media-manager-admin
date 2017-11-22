@@ -57,6 +57,15 @@ module.exports = {
     return milliseconds / 1000
   },
 
+  getHms (milliseconds) {
+    return {
+      hours: this.getHours(milliseconds),
+      minutes: this.getMinutes(milliseconds),
+      seconds: this.getSeconds(milliseconds),
+      ms: milliseconds
+    }
+  },
+
   toDuration (milliseconds) {
     let hours = Math.floor(milliseconds / 3600000)
     let minutes = Math.floor(milliseconds / 60000) - hours * 60

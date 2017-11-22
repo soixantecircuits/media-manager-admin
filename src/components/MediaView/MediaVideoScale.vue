@@ -49,17 +49,17 @@
           this.canvas.add(line)
         }
       },
-      drawHours (size, hours, minutes) {
-        let step = size.width / hours
+      drawHours (size, hms) {
+        let step = size.width / hms.hours
         let draw5Minutes = false
 
         // Draw hours
         this.drawLines(step, size, size.height)
 
-        step = size.width / minutes
+        step = size.width / hms.minutes
         if (step < 10) {
           // Step is too small to be displayed properly on timeline so scale it to 10 minutes
-          step = size.width / minutes * 10
+          step = size.width / hms.minutes * 10
           draw5Minutes = true
         }
 
@@ -68,7 +68,7 @@
 
         if (draw5Minutes) {
           // Calculate step to draw 5 minutes for better visibility
-          step = size.width / minutes * 5
+          step = size.width / hms.minutes * 5
 
           // Check if five minutes step can be showed on the timeline without looking bad
           if (step >= 10) {
@@ -76,20 +76,20 @@
           }
         }
       },
-      drawMinutes (size, minutes, seconds) {
-        let step = size.width / minutes
+      drawMinutes (size, hms) {
+        let step = size.width / hms.minutes
         if (step < 10) {
           // Step size is too small to be rendered properly, so scale it to 10 minutes range
-          step = size.width / minutes * 10
+          step = size.width / hms.minutes * 10
         }
 
         // Draw minutes
         this.drawLines(step, size, size.height)
 
-        step = size.width / seconds
+        step = size.width / hms.seconds
         if (step < 10) {
-          step = size.width / seconds * 10
-          if (step < 10) {
+          step = size.width / hms.seconds * 10
+          if (step < 5) {
             // Step is too small, step === 0 won't be rendered
             step = 0
           }
@@ -98,11 +98,11 @@
         // Draw seconds
         this.drawLines(step, size, size.height / 3.3)
       },
-      drawSeconds (size, seconds, milliseconds) {
-        let step = size.width / seconds
+      drawSeconds (size, hms) {
+        let step = size.width / hms.seconds
         this.drawLines(step, size, size.height)
 
-        step = size.width / milliseconds
+        step = size.width / hms.ms
         if (!step) {
           return
         }
@@ -128,18 +128,15 @@
       drawTimeLine () {
         let totalDuration = this.total
         let size = this.getCanvasSize()
+        let hms = duration.getHms(totalDuration)
 
-        // Draw timeline
-        let hours = duration.getHours(totalDuration)
-        let minutes = duration.getMinutes(totalDuration)
-        let seconds = duration.getSeconds(totalDuration)
-
-        if (hours > 1) {
-          this.drawHours(size, hours, minutes)
-        } else if (minutes > 1) {
-          this.drawMinutes(size, minutes, seconds)
-        } else if (seconds > 1) {
-          this.drawSeconds(size, seconds, totalDuration)
+        // Draw time-line
+        if (hms.hours > 1) {
+          this.drawHours(size, hms)
+        } else if (hms.minutes > 1) {
+          this.drawMinutes(size, hms)
+        } else if (hms.seconds > 1) {
+          this.drawSeconds(size, hms)
         } else {
           this.drawMilliseconds(size, totalDuration)
         }
@@ -151,11 +148,34 @@
           height: canvasContainer.offsetHeight
         }
       },
-      drawFragment () {
+      getFragmentSizeAndPosition () {
+        const fragmentHeight = 8
+        const fragmentMinWidth = 16
+
         let size = this.getCanvasSize()
-        let fragmentHeight = 8
+        let fragmentDuration = this.fragmentOut - this.fragmentIn
+        let width = (fragmentDuration * 100 / this.total) * size.width / 100
+        let left = (this.fragmentIn * 100 / this.total) * size.width / 100
+
+        if (fragmentDuration <= 0) {
+          fragmentDuration = 1
+        }
+
+        return {
+          left: left,
+          top: size.height - fragmentHeight,
+          width: width < fragmentMinWidth ? fragmentMinWidth : width,
+          height: fragmentHeight
+        }
+      },
+      drawFragment () {
+        let fragmentSize = this.getFragmentSizeAndPosition()
         let fragment = new fabric.Rect({
-          fill: '#fd4f4f', left: 0, top: size.height - fragmentHeight, width: 100, height: fragmentHeight
+          fill: '#fd4f4f',
+          left: fragmentSize.left,
+          top: fragmentSize.top,
+          width: fragmentSize.width,
+          height: fragmentSize.height
         })
 
         fragment.selectable = true
