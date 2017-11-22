@@ -20,6 +20,7 @@
                            :is-editable="hasEditableParts"
                            :media-url="media.meta.etnaInput.url"
                            :parts="editableParts"
+                           :total-seconds="media.meta.duration"
                            :selected-part="selectedPart">
         </media-part-editor>
       </md-layout>

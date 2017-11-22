@@ -7,6 +7,7 @@
           <div class="video-preview">
             <video :src="mediaUrl" muted controls></video>
           </div>
+          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds"></media-video-scale>
           <div class="controls">
             <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
             <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
@@ -20,17 +21,23 @@
 </template>
 <script>
   import MediaUpdateProgress from './MediaUpdateProgress'
-  import Duration from '../../lib/duration'
+  import MediaVideoScale from './MediaVideoScale.vue'
+  import duration from '../../lib/duration'
 
   export default {
-    components: { MediaUpdateProgress },
+    components: {
+      MediaVideoScale,
+      MediaUpdateProgress },
     name: 'media-part-editor',
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
       },
       compositionChanged () {
-        return this.initialStartDuration !== this.startDuration || this.initialEndDuration !== this.endDuration
+        return this.initFragmentIn !== this.fragmentIn || this.initFragmentOut !== this.fragmentOut
+      },
+      totalMilliseconds () {
+        return this.totalSeconds * 1000
       }
     },
     props: {
@@ -48,17 +55,21 @@
       },
       selectedPart: {
         type: Object
+      },
+      totalSeconds: {
+        type: Number,
+        required: true
       }
     },
     watch: {
       selectedPart (part) {
-        let start = Duration.toMilliseconds(part.in)
-        let end = Duration.toMilliseconds(part.out)
+        let start = duration.toMilliseconds(part.in)
+        let end = duration.toMilliseconds(part.out)
 
-        this.startDuration = start
-        this.endDuration = end
-        this.initialStartDuration = start
-        this.initialEndDuration = end
+        this.fragmentIn = start
+        this.fragmentOut = end
+        this.initFragmentIn = start
+        this.initFragmentOut = end
       }
     },
     methods: {
@@ -70,10 +81,10 @@
     data () {
       return {
         progressValue: 0,
-        startDuration: 0,
-        endDuration: 0,
-        initialStartDuration: 0,
-        initialEndDuration: 0,
+        fragmentIn: 0,
+        fragmentOut: 0,
+        initFragmentIn: 0,
+        initFragmentOut: 0,
       }
     }
   }
@@ -85,6 +96,7 @@
     min-height: 90%;
     box-sizing: border-box;
     position: relative;
+    color: #fff;
 
     .editor {
       background: #333;

@@ -24,7 +24,7 @@ let formatDuration = (hours, minutes, seconds, ms) => {
 
 /**
  * Duration
- * @type {{toMilliseconds: (function(*=)), toDuration: (function(*))}}
+ * @type {{toMilliseconds: (function(*=)), getHours: (function(*)), getMinutes: (function(*)), getSeconds: (function(*)), toDuration: (function(*))}}
  */
 module.exports = {
   toMilliseconds (duration) {
@@ -43,6 +43,18 @@ module.exports = {
     let ms = parseInt(matches[4])
 
     return ms + seconds * 1000 + minutes * 60000 + hours * 3600000
+  },
+
+  getHours (milliseconds) {
+    return milliseconds / 3600000
+  },
+
+  getMinutes (milliseconds) {
+    return milliseconds / 60000
+  },
+
+  getSeconds (milliseconds) {
+    return milliseconds / 1000
   },
 
   toDuration (milliseconds) {
