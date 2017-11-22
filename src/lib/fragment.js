@@ -6,8 +6,8 @@ export default {
 
       let size = this.getCanvasSize()
       let fragmentDuration = this.fgOut - this.fgIn
-      let width = (fragmentDuration * 100 / this.total) * size.width / 100
-      let left = (this.fgIn * 100 / this.total) * size.width / 100
+      let width = (fragmentDuration / this.total) * size.width
+      let left = (this.fgIn / this.total) * size.width
 
       if (fragmentDuration <= 0) {
         fragmentDuration = 1

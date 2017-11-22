@@ -36,8 +36,8 @@
 
         let fragmentDuration = this.fgOut - this.fgIn
         let size = this.getCanvasSize()
-        let left = (this.fgIn * 100 / this.total) * size.width / 100
-        let width = (fragmentDuration * 100 / this.total) * size.width / 100
+        let left = (this.fgIn / this.total) * size.width
+        let width = (fragmentDuration / this.total) * size.width
         let height = size.height
 
         if (width < minWidth) {
