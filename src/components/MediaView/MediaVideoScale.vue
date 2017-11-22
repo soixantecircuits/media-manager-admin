@@ -51,17 +51,20 @@
     watch: {
       fragmentIn () {
         this.fgIn = this.fragmentIn
-        this.timeUpdated()
+        this.timeUpdated(true)
       },
       fragmentOut () {
         this.fgOut = this.fragmentOut
-        this.timeUpdated()
+        this.timeUpdated(true)
       }
     },
     methods: {
-      timeUpdated () {
+      timeUpdated (silent) {
         this.updateFragmentSize()
-        this.$emit('change', this.fgIn, this.fgOut)
+
+        if(!silent) {
+          this.$emit('change', this.fgIn, this.fgOut)
+        }
       },
       inputTime () {
         let val = document.getElementById('current-time-input').value

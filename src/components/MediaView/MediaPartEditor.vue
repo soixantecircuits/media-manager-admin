@@ -76,6 +76,8 @@
       updateComposition () {
       },
       cancelEdits () {
+        this.fragmentOut = this.initFragmentOut
+        this.fragmentIn = this.initFragmentIn
       },
       fragmentChanged (newIn, newOut) {
         this.fragmentIn = newIn
