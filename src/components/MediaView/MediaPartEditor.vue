@@ -8,10 +8,8 @@
             <video :src="mediaUrl" muted controls></video>
           </div>
           <div class="controls">
-            <div class="left"><button>cancel</button></div>
-            <div class="right">
-              <button @click="updateComposition">update</button>
-            </div>
+            <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
+            <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
           </div>
         </div>
         <media-update-progress :progress-value="progressValue"></media-update-progress>
@@ -22,6 +20,7 @@
 </template>
 <script>
   import MediaUpdateProgress from './MediaUpdateProgress'
+  import Duration from '../../lib/duration'
 
   export default {
     components: { MediaUpdateProgress },
@@ -31,7 +30,7 @@
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
       },
       compositionChanged () {
-
+        return this.initialStartDuration !== this.startDuration || this.initialEndDuration !== this.endDuration
       }
     },
     props: {
@@ -52,17 +51,29 @@
       }
     },
     watch: {
-      selectedPart () {
+      selectedPart (part) {
+        let start = Duration.toMilliseconds(part.in)
+        let end = Duration.toMilliseconds(part.out)
+
+        this.startDuration = start
+        this.endDuration = end
+        this.initialStartDuration = start
+        this.initialEndDuration = end
       }
     },
     methods: {
       updateComposition () {
-        // TODO: Implement updating of the composition
+      },
+      cancelEdits () {
       }
     },
     data () {
       return {
-        progressValue: 0
+        progressValue: 0,
+        startDuration: 0,
+        endDuration: 0,
+        initialStartDuration: 0,
+        initialEndDuration: 0,
       }
     }
   }
@@ -120,6 +131,9 @@
         color: #fff;
         padding: 6px 15px;
 
+        &:disabled {
+          opacity: 0.5;
+        }
         &:active {
           color: #333;
           background: #fff;

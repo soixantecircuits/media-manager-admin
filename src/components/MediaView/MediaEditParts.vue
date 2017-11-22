@@ -5,8 +5,12 @@
       <div class="empty-list" v-if="!hasEditableParts">
         This video doesn't contain any editable parts.
       </div>
-      <media-edit-part-item v-if="hasEditableParts" v-for="(part, i) in editableParts" :part="part" :index="i"
-                            :selected="part.selected" @click.native="select(i)"></media-edit-part-item>
+      <media-edit-part-item v-if="hasEditableParts"
+                            v-for="(part, i) in editableParts"
+                            :part="part" :index="i"
+                            :selected="part.selected"
+                            @click.native="select(i)">
+      </media-edit-part-item>
     </div>
   </div>
 </template>
