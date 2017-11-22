@@ -13,7 +13,7 @@
 
   export default {
     name: 'media-video-scale',
-    mixins: [ timeline ],
+    mixins: [timeline],
     props: {
       fragmentIn: {
         type: Number,
@@ -30,7 +30,16 @@
     },
     data () {
       return {
-        canvas: null
+        canvas: null,
+        fragment: null
+      }
+    },
+    watch: {
+      fragmentIn () {
+        this.updateFragmentSize()
+      },
+      fragmentOut () {
+        this.updateFragmentSize()
       }
     },
     methods: {
@@ -61,22 +70,28 @@
           height: fragmentHeight
         }
       },
+      updateFragmentSize () {
+        let fragmentSize = this.getFragmentSizeAndPosition()
+
+        this.fragment.set('left', fragmentSize.left)
+        this.fragment.set('width', fragmentSize.width).setCoords()
+        this.canvas.requestRenderAll()
+      },
       drawFragment () {
         let fragmentSize = this.getFragmentSizeAndPosition()
-        let fragment = new fabric.Rect({
+        this.fragment = new fabric.Rect({
           fill: '#fd4f4f',
           left: fragmentSize.left,
           top: fragmentSize.top,
           width: fragmentSize.width,
-          height: fragmentSize.height
+          height: fragmentSize.height,
+          selectable: true,
+          hasBorders: false,
+          hasControls: false,
+          lockMovementY: true
         })
 
-        fragment.selectable = true
-        fragment.hasBorders = false
-        fragment.hasControls = false
-        fragment.lockMovementY = true
-
-        this.canvas.add(fragment)
+        this.canvas.add(this.fragment)
       },
       drawObjects () {
         this.drawFragment()
