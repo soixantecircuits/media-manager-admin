@@ -17,8 +17,7 @@
         type: Number,
         required: true
       }
-    },
-    components: {}
+    }
   }
 </script>
 <style lang="scss">
