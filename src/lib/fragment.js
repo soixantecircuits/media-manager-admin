@@ -36,6 +36,7 @@ export default {
 
       this.fgIn = newIn
       this.fgOut = newIn + delta
+      this.timeUpdated()
     },
     drawFragment () {
       let fragmentSize = this.getFragmentSizeAndPosition()

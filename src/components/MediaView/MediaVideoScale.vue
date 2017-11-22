@@ -51,14 +51,18 @@
     watch: {
       fragmentIn () {
         this.fgIn = this.fragmentIn
-        this.updateFragmentSize()
+        this.timeUpdated()
       },
       fragmentOut () {
         this.fgOut = this.fragmentOut
-        this.updateFragmentSize()
+        this.timeUpdated()
       }
     },
     methods: {
+      timeUpdated () {
+        this.updateFragmentSize()
+        this.$emit('change', this.fgIn, this.fgOut)
+      },
       inputTime () {
         let val = document.getElementById('current-time-input').value
         let delta = this.fragmentDuration
@@ -66,19 +70,19 @@
 
         this.fgIn = ms
         this.fgOut = ms + delta
-        this.updateFragmentSize()
+        this.timeUpdated()
       },
       increaseTime () {
         let incVal = this.getIncrementalValue()
         this.fgIn += incVal
         this.fgOut += incVal
-        this.updateFragmentSize()
+        this.timeUpdated()
       },
       decreaseTime () {
         let incVal = this.getIncrementalValue()
         this.fgIn -= incVal
         this.fgOut -= incVal
-        this.updateFragmentSize()
+        this.timeUpdated()
       },
       getIncrementalValue () {
         let hms = duration.getHms(this.total)

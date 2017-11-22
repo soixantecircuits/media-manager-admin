@@ -7,7 +7,7 @@
           <div class="video-preview">
             <video :src="mediaUrl" muted controls></video>
           </div>
-          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds"></media-video-scale>
+          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
           <div class="controls">
             <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
             <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
@@ -76,6 +76,10 @@
       updateComposition () {
       },
       cancelEdits () {
+      },
+      fragmentChanged (newIn, newOut) {
+        this.fragmentIn = newIn
+        this.fragmentOut = newOut
       }
     },
     data () {
