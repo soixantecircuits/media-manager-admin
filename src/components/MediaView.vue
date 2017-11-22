@@ -221,6 +221,7 @@
       },
       navigate (url) {
         this.ready = false
+        this.selectedPart = {}
         this.$router.push(url)
       },
       goBackToList () {
