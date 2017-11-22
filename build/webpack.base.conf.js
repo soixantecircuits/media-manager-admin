@@ -14,6 +14,10 @@ module.exports = {
   entry: {
     app: './src/main.js'
   },
+  node: {
+    fs: 'empty',
+    child_process: 'empty'
+  },
   output: {
     path: config.build.assetsRoot,
     // this causes absolute path in builds, which makes them non-distribuable on an other machine
@@ -38,7 +42,8 @@ module.exports = {
   vue: {
     autoprefixer: {
       browsers: ['last 2 versions']
-    }
+    },
+    loaders: utils.cssLoaders()
   },
   module: {
     loaders: [
@@ -77,9 +82,6 @@ module.exports = {
         }
       }
     ]
-  },
-  vue: {
-    loaders: utils.cssLoaders()
   },
   externals: [
     (function () {

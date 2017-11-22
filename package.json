@@ -23,6 +23,7 @@
     "fabric": "^2.0.0-rc.1",
     "fs": "^0.0.1-security",
     "gsap": "^1.18.5",
+    "spacebro-client": "^0.4.2",
     "standard-settings": "^1.1.0",
     "superagent": "^3.3.2",
     "vue": "^2.1.4",
