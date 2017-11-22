@@ -6,7 +6,7 @@
  * @returns {string}
  */
 let leadingZero = (number) => {
-  if (number > 10) {
+  if (number >= 10) {
     return number.toString()
   }
 
