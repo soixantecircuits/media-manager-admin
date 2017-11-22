@@ -67,13 +67,15 @@
         }
       },
       initCanvas () {
-        this.canvas = new fabric.Canvas('preview')
-        this.canvas.preserveObjectStacking = true
-        this.canvas.selection = false
         let size = this.getCanvasSize()
 
+        this.canvas = new fabric.Canvas('preview')
+        this.canvas.preserveObjectStacking = false
+        this.canvas.selection = false
         this.canvas.setWidth(size.width)
         this.canvas.setHeight(size.height)
+
+        this.canvas.on('object:moving', this.movingObject)
       },
       drawObjects () {
         this.drawCaret()

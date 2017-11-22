@@ -43,6 +43,17 @@ export default {
     },
   },
   methods: {
+    movingObject (ev) {
+      let pos = ev.target.get('left')
+      let size = this.getCanvasSize()
+
+      let newIn = Math.round((pos * 100 / size.width) * this.total / 100)
+      let delta = this.fragmentDuration
+
+      this.fgIn = newIn
+      this.fgOut = newIn + delta
+      this.timeUpdated()
+    },
     timeUpdated (silent) {
       this.updateFragmentSize()
 
