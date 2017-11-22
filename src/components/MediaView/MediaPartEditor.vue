@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        progressValue: 10
+        progressValue: 0
       }
     }
   }
