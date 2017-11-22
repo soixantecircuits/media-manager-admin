@@ -16,10 +16,14 @@ export default {
       video: null,
       frame: 0,
       frameWidth: 125,
-      frameHeight: 75
+      frameHeight: 75,
+      stripCanvas: null
     }
   },
   methods: {
+    rewindVideo () {
+      this.video.currentTime = this.fgIn / 1000
+    },
     drawStrip () {
       this.video.removeEventListener('canplaythrough', this.drawStrip)
 
@@ -27,25 +31,7 @@ export default {
       const w = this.video.videoWidth
       const h = this.video.videoHeight
 
-      let properties = {
-        left: x,
-        top: 28,
-        width: w,
-        height: h,
-        selectable: false,
-        hasBorders: false,
-        hasControls: false,
-        originX: 'left',
-        originY: 'top',
-        scaleX: this.frameWidth / w,
-        scaleY: this.frameHeight / h
-      }
-
-      let frameImg = new fabric.Image(this.video, properties)
-
-      this.canvas.add(frameImg)
-      this.caret.bringToFront()
-      this.canvas.renderAll()
+      this.stripCanvas.drawImage(this.video, 0, 0, w, h, x, 28, this.frameWidth, this.frameHeight)
 
       this.frame = this.frame + 1
       if (this.frame < this.totalFrames) {
@@ -57,9 +43,16 @@ export default {
     },
     initFilmStrip () {
       let video = document.querySelector(this.videoSelector)
+      let stripCanvas = document.querySelector('#strip')
+
       if(!video) {
         console.error('<video> cannot be found by given selector: ', this.videoSelector)
       } else {
+        let size = this.getCanvasSize()
+        this.stripCanvas = stripCanvas.getContext('2d')
+        stripCanvas.width = size.width
+        stripCanvas.height = size.height
+
         this.video = video
         this.video.addEventListener('canplaythrough', this.drawStrip)
       }

@@ -5,7 +5,7 @@
         <div class="editor">
           <div class="title">{{ selectedPart.index }}</div>
           <div class="video-preview">
-            <video :src="mediaUrl" id="video" controls preload></video>
+            <video :src="mediaUrl" id="video" controls></video>
           </div>
           <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
           <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
@@ -106,6 +106,12 @@
     box-sizing: border-box;
     position: relative;
     color: #fff;
+
+    #video-back {
+      position: absolute;
+      left: -1000px;
+      top: -1000px;
+    }
 
     .editor {
       background: #333;

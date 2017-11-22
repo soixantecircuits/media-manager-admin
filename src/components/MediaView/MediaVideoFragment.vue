@@ -9,8 +9,13 @@
           end : <span class="value">{{ formattedOut }}</span>
         </div>
       </div>
-      <div id="preview-container">
-        <canvas id="preview"></canvas>
+      <div class="render-area">
+        <div id="strip-container">
+          <canvas id="strip"></canvas>
+        </div>
+        <div id="preview-container">
+          <canvas id="preview"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -56,9 +61,9 @@
       },
       updateFragmentSize () {
         let caretSize = this.getFragmentSizeAndPosition()
-
         this.caret.set('left', caretSize.left).setCoords()
         this.canvas.requestRenderAll()
+        this.rewindVideo()
       },
       getCanvasSize () {
         let canvasContainer = document.getElementById('preview-container')
@@ -71,8 +76,8 @@
         let size = this.getCanvasSize()
 
         this.canvas = new fabric.Canvas('preview')
-        this.canvas.preserveObjectStacking = false
-        this.canvas.selection = false
+        this.canvas.preserveObjectStacking = true
+        this.canvas.selection = true
         this.canvas.setWidth(size.width)
         this.canvas.setHeight(size.height)
 
@@ -162,9 +167,26 @@
         right: 28px;
       }
     }
-    #preview-container {
+    .render-area {
       position: relative;
       top: 30px;
+      width: 100%;
+      height: 107px;
+    }
+    #preview-container {
+      position: absolute;
+      width: 100%;
+      height: 107px;
+      z-index: 20;
+      left: 0;
+      top: 0;
+    }
+    #strip-container {
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      z-index: 1;
       width: 100%;
       height: 107px;
     }
