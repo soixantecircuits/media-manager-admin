@@ -5,10 +5,10 @@
         <div class="editor">
           <div class="title">{{ selectedPart.index }}</div>
           <div class="video-preview">
-            <video :src="mediaUrl" muted controls></video>
+            <video :src="mediaUrl" id="video" controls preload></video>
           </div>
           <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
-          <media-video-fragment :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
+          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
           <div class="controls">
             <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
             <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
@@ -93,7 +93,7 @@
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
-        initFragmentOut: 0,
+        initFragmentOut: 0
       }
     }
   }

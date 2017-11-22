@@ -17,11 +17,12 @@
 </template>
 <script>
   import timelineBase from '../../lib/timelneBase'
+  import filmStrip from '../../lib/filmStrip'
   import { fabric } from 'fabric'
 
   export default {
     name: 'media-video-fragment',
-    mixins: [timelineBase],
+    mixins: [timelineBase, filmStrip],
     data () {
       return {
         canvas: null,
@@ -116,11 +117,12 @@
 
         this.canvas.add(group)
         this.caret = group
-      }
+      },
     },
     mounted () {
       this.initCanvas()
       this.drawObjects()
+      this.initFilmStrip()
     }
   }
 </script>
@@ -164,7 +166,7 @@
       position: relative;
       top: 30px;
       width: 100%;
-      height: 100px;
+      height: 107px;
     }
   }
 </style>
