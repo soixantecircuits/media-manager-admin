@@ -30,7 +30,7 @@
     },
     methods: {
       getFragmentSizeAndPosition () {
-        const minWidth = 50
+        const minWidth = 80
         const headerHeight = 28
         const frameWidth = 4
 
@@ -56,7 +56,7 @@
       updateFragmentSize () {
         let caretSize = this.getFragmentSizeAndPosition()
 
-        this.caret.set('left', caretSize.left)
+        this.caret.set('left', caretSize.left).setCoords()
         this.canvas.requestRenderAll()
       },
       getCanvasSize () {
