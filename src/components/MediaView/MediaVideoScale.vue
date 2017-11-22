@@ -1,6 +1,6 @@
 <template>
   <div class="media-video-scale">
-    <div class="current-time">{{ formatDuration(fragmentIn) }}</div>
+    <div class="current-time">{{ formatDuration(fgIn) }}</div>
     <div id="timeline-container">
       <canvas id="timeline"></canvas>
     </div>
@@ -32,14 +32,18 @@
     data () {
       return {
         canvas: null,
-        fragment: null
+        fragment: null,
+        fgIn: 0,
+        fgOut: 0
       }
     },
     watch: {
       fragmentIn () {
+        this.fgIn = this.fragmentIn
         this.updateFragmentSize()
       },
       fragmentOut () {
+        this.fgOut = this.fragmentOut
         this.updateFragmentSize()
       }
     },
@@ -68,6 +72,9 @@
       }
     },
     mounted () {
+      this.fgIn = this.fragmentIn
+      this.fgOut = this.fragmentOut
+
       this.initCanvas()
       this.drawObjects()
     }

@@ -5,9 +5,9 @@ export default {
       const fragmentMinWidth = 16
 
       let size = this.getCanvasSize()
-      let fragmentDuration = this.fragmentOut - this.fragmentIn
+      let fragmentDuration = this.fgOut - this.fgIn
       let width = (fragmentDuration * 100 / this.total) * size.width / 100
-      let left = (this.fragmentIn * 100 / this.total) * size.width / 100
+      let left = (this.fgIn * 100 / this.total) * size.width / 100
 
       if (fragmentDuration <= 0) {
         fragmentDuration = 1
@@ -27,6 +27,16 @@ export default {
       this.fragment.set('width', fragmentSize.width).setCoords()
       this.canvas.requestRenderAll()
     },
+    movingObject (ev) {
+      let pos = ev.target.get('left')
+      let size = this.getCanvasSize()
+
+      let newIn = Math.round((pos * 100 / size.width) * this.total / 100)
+      let delta = this.fgOut - this.fragmentIn
+
+      this.fgIn = newIn
+      this.fgOut = newIn + delta
+    },
     drawFragment () {
       let fragmentSize = this.getFragmentSizeAndPosition()
       this.fragment = new fabric.Rect({
@@ -42,6 +52,7 @@ export default {
       })
 
       this.canvas.add(this.fragment)
+      this.canvas.on('object:moving', this.movingObject)
     }
   }
 }
