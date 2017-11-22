@@ -133,6 +133,8 @@
     .controls {
       display: table;
       width: 100%;
+      position: relative;
+      z-index: 100;
 
       .left, .right {
         display: table-cell;

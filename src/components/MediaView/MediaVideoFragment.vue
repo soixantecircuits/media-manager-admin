@@ -69,7 +69,6 @@
     .preview-container {
       height: 110px;
       width: 100%;
-      background: rgba(0, 0, 0, 0.3);
     }
   }
 </style>
