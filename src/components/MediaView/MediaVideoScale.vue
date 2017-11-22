@@ -8,7 +8,7 @@
 </template>
 <script>
   import duration from '../../lib/duration'
-  import fabric from 'fabric'
+  import { fabric } from 'fabric'
 
   export default {
     name: 'media-video-scale',
@@ -26,29 +26,35 @@
         required: true
       }
     },
+    data () {
+      return {
+        canvas: null
+      }
+    },
     methods: {
-      drawLines (ctx, step, size, lineHeight) {
+      drawLines (step, size, lineHeight) {
         if (!step) {
           return
         }
 
-        ctx.scale(1, 1)
         for (let x = 0; x <= size.width; x += step) {
-          ctx.beginPath()
-          ctx.lineWidth = 1
-          ctx.strokeStyle = 'white'
-          ctx.moveTo(x, size.height)
-          ctx.lineTo(x, size.height - lineHeight)
-          ctx.closePath()
-          ctx.stroke()
+          let line = new fabric.Line([x, size.height, x, size.height - lineHeight], {
+            stroke: 'white',
+            strokeWidth: 1,
+            hasControls: false,
+            selectable: false,
+            hasRotatingPoint: false
+          })
+
+          this.canvas.add(line)
         }
       },
-      drawHours (ctx, size, hours, minutes) {
+      drawHours (size, hours, minutes) {
         let step = size.width / hours
         let draw5Minutes = false
 
         // Draw hours
-        this.drawLines(ctx, step, size, size.height)
+        this.drawLines(step, size, size.height)
 
         step = size.width / minutes
         if (step < 10) {
@@ -58,7 +64,7 @@
         }
 
         // Draw minutes
-        this.drawLines(ctx, step, size, size.height / 2)
+        this.drawLines(step, size, size.height / 3.3)
 
         if (draw5Minutes) {
           // Calculate step to draw 5 minutes for better visibility
@@ -66,11 +72,11 @@
 
           // Check if five minutes step can be showed on the timeline without looking bad
           if (step >= 10) {
-            this.drawLines(ctx, step, size, size.height / 3)
+            this.drawLines(step, size, size.height / 6)
           }
         }
       },
-      drawMinutes (ctx, size, minutes, seconds) {
+      drawMinutes (size, minutes, seconds) {
         let step = size.width / minutes
         if (step < 10) {
           // Step size is too small to be rendered properly, so scale it to 10 minutes range
@@ -78,7 +84,7 @@
         }
 
         // Draw minutes
-        this.drawLines(ctx, step, size, size.height)
+        this.drawLines(step, size, size.height)
 
         step = size.width / seconds
         if (step < 10) {
@@ -90,15 +96,14 @@
         }
 
         // Draw seconds
-        this.drawLines(ctx, step, size, size.height / 2)
+        this.drawLines(step, size, size.height / 3.3)
       },
-      drawSeconds (ctx, size, seconds) {
+      drawSeconds (size, seconds, milliseconds) {
         let step = size.width / seconds
-        this.drawLines(ctx, step, size, size.height)
-      },
-      drawMilliseconds (ctx, size, milliseconds) {
-        let step = size.width / milliseconds
-        if(!step) {
+        this.drawLines(step, size, size.height)
+
+        step = size.width / milliseconds
+        if (!step) {
           return
         }
 
@@ -106,20 +111,23 @@
           step = step * 10
         }
 
-         this.drawLines(ctx, step, size, size.height)
+        this.drawLines(step, size, size.height / 3.3)
       },
-      drawTimeLine () {
-        let canvasContainer = document.getElementById('timeline-container')
-        let canvas = document.getElementById('timeline')
-        let ctx = canvas.getContext('2d')
-        let totalDuration = this.total
-        let size = {
-          width: canvasContainer.offsetWidth,
-          height: canvasContainer.offsetHeight
+      drawMilliseconds (size, milliseconds) {
+        let step = size.width / milliseconds
+        if (!step) {
+          return
         }
 
-        ctx.canvas.width = size.width
-        ctx.canvas.height = size.height
+        while (step < 10) {
+          step = step * 10
+        }
+
+        this.drawLines(step, size, size.height)
+      },
+      drawTimeLine () {
+        let totalDuration = this.total
+        let size = this.getCanvasSize()
 
         // Draw timeline
         let hours = duration.getHours(totalDuration)
@@ -127,26 +135,55 @@
         let seconds = duration.getSeconds(totalDuration)
 
         if (hours > 1) {
-          this.drawHours(ctx, size, hours, minutes)
+          this.drawHours(size, hours, minutes)
         } else if (minutes > 1) {
-          this.drawMinutes(ctx, size, minutes, seconds)
+          this.drawMinutes(size, minutes, seconds)
         } else if (seconds > 1) {
-          this.drawSeconds(ctx, size, seconds)
+          this.drawSeconds(size, seconds, totalDuration)
         } else {
-          this.drawMilliseconds(ctx, size, totalDuration)
+          this.drawMilliseconds(size, totalDuration)
         }
+      },
+      getCanvasSize () {
+        let canvasContainer = document.getElementById('timeline-container')
+        return {
+          width: canvasContainer.offsetWidth,
+          height: canvasContainer.offsetHeight
+        }
+      },
+      drawFragment () {
+        let size = this.getCanvasSize()
+        let fragmentHeight = 8
+        let fragment = new fabric.Rect({
+          fill: '#fd4f4f', left: 0, top: size.height - fragmentHeight, width: 100, height: fragmentHeight
+        })
+
+        fragment.selectable = true
+        fragment.hasBorders = false
+        fragment.hasControls = false
+        fragment.lockMovementY = true
+
+        this.canvas.add(fragment)
+      },
+      drawObjects () {
+        this.drawFragment()
+        this.drawTimeLine()
+      },
+      initCanvas () {
+        this.canvas = new fabric.Canvas('timeline')
+        this.canvas.preserveObjectStacking = true
+        this.canvas.selection = false
+        let size = this.getCanvasSize()
+        this.canvas.setWidth(size.width)
+        this.canvas.setHeight(size.height)
       },
       formatDuration (value) {
         return duration.toDuration(value)
       }
     },
     mounted () {
-      this.drawTimeLine()
-
-      let vm = this
-      window.onresize = () => {
-        vm.drawTimeLine()
-      }
+      this.initCanvas()
+      this.drawObjects()
     }
   }
 </script>
