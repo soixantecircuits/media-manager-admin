@@ -9,7 +9,8 @@
                             v-for="(part, i) in editableParts"
                             :part="part" :index="i"
                             :selected="part.selected"
-                            @click.native="select(i)">
+                            @play="play"
+                            @select="select(i)">
       </media-edit-part-item>
     </div>
   </div>
@@ -53,6 +54,9 @@
         this.editableParts[i].selected = true
         this.$forceUpdate()
         this.$emit('selected', this.editableParts[i])
+      },
+      play(part) {
+        this.$emit('play', part)
       }
     },
     mounted () {

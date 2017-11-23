@@ -13,7 +13,12 @@
       <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-        <media-edit-parts :media="media" v-if="displayEditableParts" :selected-index="selectedIndex" @selected="partSelected"></media-edit-parts>
+        <media-edit-parts v-if="displayEditableParts"
+                          :media="media"
+                          :selected-index="selectedIndex"
+                          @play="play"
+                          @selected="partSelected">
+        </media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
         <media-part-editor v-if="displayPartEditor"
@@ -134,6 +139,9 @@
       }
     },
     methods: {
+      play (part) {
+        console.log('Play', part)
+      },
       nextPart () {
         let selectedIndex = this.selectedIndex
         if (selectedIndex < 0 || selectedIndex === this.editableParts.length - 1) {

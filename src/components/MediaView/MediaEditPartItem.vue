@@ -1,22 +1,22 @@
 <template>
   <div class="media-edit-part-item" :class="{ selected: selected }">
-    <div class="picture">
+    <div class="picture" @click="select">
       <img :src="part.thumbnail" v-if="part.thumbnail != ''">
     </div>
-    <div class="data">
+    <div class="data" @click="select">
       <span class="label">{{ part.index }}</span>
       <span class="name">{{ part.producer.title }}</span>
     </div>
-    <div class="data">
+    <div class="data" @click="select">
       <div class="label">In :</div>
       <div class="name">{{ part.in }}</div>
     </div>
-    <div class="data">
+    <div class="data" @click="select">
       <div class="label">Out :</div>
       <div class="name">{{ part.out }}</div>
     </div>
     <div class="data play">
-      <a href="#" class="">Play</a>
+      <a href="#" @click.prevent="play">Play</a>
     </div>
   </div>
 </template>
@@ -31,6 +31,14 @@
       selected: {
         type: Boolean,
         default: false
+      }
+    },
+    methods: {
+      select () {
+        this.$emit('select')
+      },
+      play () {
+        this.$emit('play', this.part)
       }
     }
   }
