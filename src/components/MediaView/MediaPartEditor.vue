@@ -18,7 +18,7 @@
 
           <!-- OK / Cancel Controls -->
           <div class="controls">
-            <div class="left"><button :disabled="!fragmentChanged" @click="cancelEdits">cancel</button></div>
+            <div class="left"><button :disabled="!fragmentChanged" @click="resetEdits">reset</button></div>
             <div class="right"> <button @click="nextPart">next</button></div>
           </div>
         </div>
@@ -123,7 +123,7 @@
       nextPart () {
         this.$emit('next')
       },
-      cancelEdits () {
+      resetEdits () {
         this.fragmentOut = this.initFragmentOut
         this.fragmentIn = this.initFragmentIn
       },
