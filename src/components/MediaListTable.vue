@@ -22,9 +22,11 @@
           <md-table-cell align="left" @click.native="details(row)"><span class="highlight">{{ row.file }}</span></md-table-cell>
           <md-table-cell align="left" @click.native="details(row)">{{ row.uploadedAt }}</md-table-cell>
           <md-table-cell align="left" @click.native="details(row)">
-            <md-icon class="email-status sent" v-if="emailSent(row)">email</md-icon>
-            <md-icon class="email-status" v-else>drafts</md-icon>
-            {{ row.meta.email }}
+            <div>
+              <md-icon class="email-status sent" v-if="emailSent(row)">email</md-icon>
+              <md-icon class="email-status" v-else>drafts</md-icon>
+              {{ row.meta.email }}
+            </div>
           </md-table-cell>
           <md-table-cell align="left" @click.native="details(row)">
             <md-image v-if="row.details && row.details.thumbnail" :md-src="row.details.thumbnail.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
@@ -66,7 +68,7 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .highlight {
     color: #fd4f4f;
     cursor: pointer;
