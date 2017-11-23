@@ -1,5 +1,7 @@
 import duration from './duration'
 
+let resizeTimeout = null
+
 export default {
   methods: {
     drawLines (step, size, lineHeight) {
@@ -110,6 +112,29 @@ export default {
       } else {
         this.drawMilliseconds(size, totalDuration)
       }
+
+      this.handleWindowResize()
+    },
+    reRenderCanvas () {
+      let vm = this
+
+      if(resizeTimeout) {
+        clearTimeout(resizeTimeout)
+      }
+
+      resizeTimeout = setTimeout(() => {
+        // Re-render objects
+        let size = vm.getCanvasSize()
+        vm.canvas.setWidth(size.width)
+        vm.canvas.clear()
+        vm.drawObjects()
+        console.log('resize')
+      }, 500)
+    },
+    handleWindowResize () {
+
+      window.removeEventListener('resize', this.reRenderCanvas)
+      window.addEventListener('resize', this.reRenderCanvas)
     }
   }
 }
