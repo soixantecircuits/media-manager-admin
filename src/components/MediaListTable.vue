@@ -17,17 +17,15 @@
           <md-table-cell>
             <md-button class="md-fab md-clean" @click.native="$emit('deleteMedia', row._id)"><md-icon>delete</md-icon></md-button>
           </md-table-cell>
-          <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
-          <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row.file }}</a></md-table-cell>
-          <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
-          <md-table-cell align="left">{{ row.meta.email }}</md-table-cell>
-          <md-table-cell align="left">
-            <a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">
-              <md-image v-if="row.details && row.details.thumbnail" :md-src="row.details.thumbnail.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
-              <md-image v-else :md-src="row.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
-            </a>
+          <md-table-cell align="left" @click.native="details(row)"><span class="highlight">{{ row._id }}</span></md-table-cell>
+          <md-table-cell align="left" @click.native="details(row)"><span class="highlight">{{ row.file }}</span></md-table-cell>
+          <md-table-cell align="left" @click.native="details(row)">{{ row.uploadedAt }}</md-table-cell>
+          <md-table-cell align="left" @click.native="details(row)">{{ row.meta.email }}</md-table-cell>
+          <md-table-cell align="left" @click.native="details(row)">
+            <md-image v-if="row.details && row.details.thumbnail" :md-src="row.details.thumbnail.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
+            <md-image v-else :md-src="row.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
           </md-table-cell>
-          <md-table-cell align="left">
+          <md-table-cell align="left" @click.native="details(row)">
             <md-input-container class="status-update">
               <md-select v-model="row.state">
                 <md-option v-for="state in statesList" :value="state" @selected="$emit('stateChanged', row._id, state)">{{ state }}</md-option>
@@ -44,7 +42,20 @@
 
   export default {
     props: ['mediasList', 'statesList', 'moderatorURL'],
+    methods: {
+      details(row) {
+        if(row) {
+          this.$emit('goToDetails', row._id)
+        }
+      }
+    }
   }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+  .highlight {
+    color: #fd4f4f;
+    cursor: pointer;
+    display: inline-block;
+  }
+</style>
