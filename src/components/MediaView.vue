@@ -63,7 +63,8 @@
   let data = {
     currentMediaState: '',
     ready: false,
-    selectedPart: {}
+    selectedPart: {},
+    active: true
   }
 
   export default {
@@ -322,61 +323,82 @@
           this.goBackToList(true)
         })
       },
-      goBackToList (silent) {
-        if(!silent && !this.checkIfCanLeave()){
-          return
-        }
-
+      goBackToListWithoutConfirmation () {
         let query = `?count=${this.mediasPerPage}`
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
         }
         this.navigate(`/media/list/${this.currentPage}${query}`)
       },
+      goBackToList (silent) {
+        if(silent) {
+          this.goBackToListWithoutConfirmation()
+        } else {
+          this.checkIfCanLeave().then(() => {
+            this.goBackToListWithoutConfirmation()
+          })
+        }
+      },
       goToPreviousMedia () {
-        if(!this.checkIfCanLeave()){
-          return
-        }
-
-        let instance = this
-        if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
-          if (this.mediaListPos === 0) {
-            this.$store.commit('setCurrentPage', this.currentPage - 1)
-            this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.navigate(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
-              instance.getPageData()
-            })
-          } else {
-            this.navigate(`${this.mediasList[this.mediaListPos - 1]._id}`)
-            this.getPageData()
+        this.checkIfCanLeave().then(() => {
+          let instance = this
+          if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
+            if (this.mediaListPos === 0) {
+              this.$store.commit('setCurrentPage', this.currentPage - 1)
+              this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
+                instance.navigate(`${instance.mediasList[instance.mediasList.length - 1]._id}`)
+                instance.getPageData()
+              })
+            } else {
+              this.navigate(`${this.mediasList[this.mediaListPos - 1]._id}`)
+              this.getPageData()
+            }
           }
-        }
+        })
       },
       goToNextMedia () {
-        if(!this.checkIfCanLeave()){
-          return
-        }
-
-        let instance = this
-        if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
-          if (this.mediaListPos === this.mediasList.length - 1) {
-            this.$store.commit('setCurrentPage', this.currentPage + 1)
-            this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
-              instance.navigate(`${instance.mediasList[0]._id}`)
-              instance.getPageData()
-            })
-          } else {
-            this.navigate(`${this.mediasList[this.mediaListPos + 1]._id}`)
-            this.getPageData()
+        this.checkIfCanLeave().then(() => {
+          let instance = this
+          if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
+            if (this.mediaListPos === this.mediasList.length - 1) {
+              this.$store.commit('setCurrentPage', this.currentPage + 1)
+              this.getMediasList(this.currentPage, this.mediasPerPage, this.stateFilter, function () {
+                instance.navigate(`${instance.mediasList[0]._id}`)
+                instance.getPageData()
+              })
+            } else {
+              this.navigate(`${this.mediasList[this.mediaListPos + 1]._id}`)
+              this.getPageData()
+            }
           }
-        }
+        })
       },
       checkIfCanLeave () {
-        if(this.haveAnyFragmentsBeenUpdated()) {
-          return window.confirm('Your changes haven\'t been saved. Click "Cancel" and then press "Render Composition" button to save your changes. Or click OK to discard changes and continue.')
-        }
+        let vm = this
+        return new Promise((resolve) => {
+          if (!vm.haveAnyFragmentsBeenUpdated()) {
+            if (resolve) {
+              resolve()
+            }
 
-        return true
+            return
+          }
+
+          this.$swal({
+            title: 'Discard changes?',
+            text: 'Your changes haven\'t been saved. Click "Cancel" and then press "Render Composition" button to save your changes. Or click OK to discard changes and continue.',
+            type: 'question',
+            focusCancel: true,
+            confirmButtonColor: '#fd4f4f',
+            showCancelButton: true
+          }).then(() => {
+            if(resolve) {
+              resolve()
+            }
+          }, () => {
+            console.log('User cancelled')
+          })
+        })
       },
       deleteFile (id) {
         let instance = this

@@ -1,6 +1,7 @@
 let cheerio = require('cheerio')
 let assignment = require('assignment')
-let duration = require('./duration')
+
+import swal from 'sweetalert'
 
 /**
  * Update entry in the melt and return updated melt code
@@ -60,7 +61,7 @@ export default {
     },
     updateComposition () {
       if (!this.$spacebro || !this.$spacebro.connected) {
-        alert('Not connected to spacebro!')
+        swal('Not connected to spacebro!')
         return
       }
 
@@ -70,7 +71,7 @@ export default {
       }
 
       if(!this.haveAnyFragmentsBeenUpdated()) {
-        alert('There\'s nothing to render. Composition haven\'t been updated.')
+        swal('There\'s nothing to render. The composition hasn\'t been updated.')
         return
       }
 

@@ -26,9 +26,11 @@
     "spacebro-client": "^0.4.2",
     "standard-settings": "^1.1.0",
     "superagent": "^3.3.2",
+    "sweetalert": "^2.0.8",
     "vue": "^2.1.4",
     "vue-material": "^0.7.1",
     "vue-router": "^2.1.0",
+    "vue-sweetalert": "^0.1.18",
     "vuex": "^2.0.0"
   },
   "devDependencies": {
