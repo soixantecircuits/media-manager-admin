@@ -15,6 +15,7 @@
         <media-info :media="media" @state-changed="setState"></media-info>
         <media-edit-parts v-if="displayEditableParts"
                           :media="media"
+                          :parts="editableParts"
                           :selected-index="selectedIndex"
                           @play="play"
                           @selected="partSelected">
@@ -45,6 +46,7 @@
   import MediaEditParts from './MediaView/MediaEditParts.vue'
   import MediaPartEditor from './MediaView/MediaPartEditor.vue'
   import mediaEditor from '../lib/mediaEditor'
+  import duration from '../lib/duration'
 
   const config = SETTINGS
 
@@ -76,13 +78,7 @@
         mediaID: 'getCurrentMediaID'
       }),
       selectedIndex () {
-        for (let i = 0; i < this.editableParts.length; i++) {
-          if (this.editableParts[i].index === this.selectedPart.index) {
-            return i
-          }
-        }
-
-        return -1
+        return this.findPart(this.selectedPart)
       },
       displayEditableParts () {
         return this.media && this.ready
@@ -157,14 +153,48 @@
         this.partSelected(this.editableParts[ selectedIndex + 1 ])
       },
       updateComposition (newIn, newOut) {
-        if (!this.selectedPart) {
+        let index = this.selectedIndex
+        if(index < 0) {
           return
         }
 
-        // TODO: Update composition in a row
+        let newInDuration = duration.toDuration(newIn)
+        let newOutDuration = duration.toDuration(newOut)
+
+        this.editableParts[index].in = newInDuration
+        this.editableParts[index].out = newOutDuration
+
+        this.$set(this, 'editableParts', this.editableParts)
+      },
+      unselectAll () {
+        for (let i = 0; i < this.editableParts.length; i++) {
+          this.editableParts[i].selected = false
+        }
+      },
+      findPart (part) {
+        if(!part || !Object.keys(part)) {
+          return -1
+        }
+
+        for (let i = 0; i < this.editableParts.length; i++) {
+          if (this.editableParts[i].index === part.index) {
+            return i
+          }
+        }
+
+        return -1
       },
       partSelected (part) {
+        let i = this.findPart(part)
+        if(i < 0 || this.editableParts[i].selected) {
+          return
+        }
+
+        this.unselectAll()
+        this.editableParts[i].selected = true
+
         this.selectedPart = Object.assign({}, this.selectedPart, part)
+        this.$forceUpdate()
       },
       getPageData () {
         let instance = this
