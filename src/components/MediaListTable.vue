@@ -9,6 +9,7 @@
           <md-table-head>Email Address</md-table-head>
           <md-table-head>Media</md-table-head>
           <md-table-head>State</md-table-head>
+          <md-table-head></md-table-head>
         </md-table-row>
       </md-table-header>
 
@@ -29,12 +30,15 @@
             <md-image v-if="row.details && row.details.thumbnail" :md-src="row.details.thumbnail.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
             <md-image v-else :md-src="row.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
           </md-table-cell>
-          <md-table-cell align="left" @click.native="details(row)">
+          <md-table-cell align="left">
             <md-input-container class="status-update">
               <md-select v-model="row.state">
                 <md-option v-for="state in statesList" :value="state" @selected="$emit('stateChanged', row._id, state)">{{ state }}</md-option>
               </md-select>
             </md-input-container>
+          </md-table-cell>
+          <md-table-cell align="left">
+            <md-button class="common-button" @click.native="sendEmail(row)">Send Email</md-button>
           </md-table-cell>
         </md-table-row>
       </md-table-body>
@@ -52,6 +56,9 @@
           this.$emit('goToDetails', row._id)
         }
       },
+      sendEmail (row) {
+        this.$emit('stateChanged', row._id, 'public')
+      },
       emailSent (row) {
         return row.meta && row.meta.altruistResponse && row.meta.altruistResponse.status === 'sent'
       }
@@ -66,10 +73,13 @@
     display: inline-block;
   }
   .email-status {
-    color: #eee;
+    color: #e0e0e0;
 
     &.sent {
       color: #3fb34f;
     }
+  }
+  .md-table .md-table-cell .md-button.common-button {
+    width: auto;
   }
 </style>
