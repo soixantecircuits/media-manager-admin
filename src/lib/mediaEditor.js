@@ -1,4 +1,3 @@
-import Vue from 'vue'
 var cheerio = require('cheerio')
 
 let editableParts = []
