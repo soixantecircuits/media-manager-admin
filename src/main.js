@@ -4,40 +4,16 @@ import 'vue-material/dist/vue-material.css'
 import App from './components/App'
 import router from './lib/router'
 import store from './vuex/store'
+import settings from './lib/settings'
 
 const { SpacebroClient } = require('spacebro-client')
 
-const client = new SpacebroClient({
-  host: 'spacebro.space',
-  port: 3333,
-  channelName: 'media-stream',
-  client: {
-    name: 'foo',
-    description: 'a foo tool',
-    in: {
-      inFoo: {
-        eventName: 'inFoo',
-        description: 'Input foo',
-        type: 'all'
-      }
-    },
-    out: {
-      outBar: {
-        eventName: 'outBar',
-        description: 'Output bar',
-        type: 'all'
-      }
-    }
-  }
-})
-
-client.on('inFoo', (data) => console.log('inFoo', data))
+const client = new SpacebroClient(settings.methods.getSettings().service.spacebro)
 
 Vue.use(VueMaterial)
 
-
-const app = new Vue({
+new Vue({
   router,
   store,
   ...App
-}).$mount('#app');
+}).$mount('#app')
