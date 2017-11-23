@@ -6,7 +6,7 @@
 </template>
 <script>
   export default {
-    name: 'media-update-progress',
+    name: 'media-render',
     computed: {
       displayProgressBar () {
         return this.progressValue > 0

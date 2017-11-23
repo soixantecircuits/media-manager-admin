@@ -24,14 +24,14 @@
         </div>
 
         <!-- Update composition progress & button -->
-        <media-update-progress :progress-value="progressValue" :disabled="!fragmentChanged" @update-click="updateComposition"></media-update-progress>
+        <media-render :progress-value="progressValue" :disabled="!fragmentChanged" @update-click="updateComposition"></media-render>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
   </div>
 </template>
 <script>
-  import MediaUpdateProgress from './MediaUpdateProgress'
+  import MediaRender from './MediaRender'
   import MediaVideoScale from './MediaVideoScale.vue'
   import MediaVideoFragment from './MediaVideoFragment.vue'
   import duration from '../../lib/duration'
@@ -42,7 +42,7 @@
     components: {
       MediaVideoFragment,
       MediaVideoScale,
-      MediaUpdateProgress
+      MediaRender
     },
     name: 'media-part-editor',
     mixins: [compositionUpdater, settings],
