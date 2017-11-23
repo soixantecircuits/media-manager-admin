@@ -61,8 +61,13 @@
       },
       updateFragmentSize () {
         let caretSize = this.getFragmentSizeAndPosition()
-        this.caret.set('left', caretSize.left).setCoords()
-        this.canvas.requestRenderAll()
+        let size = this.getCanvasSize()
+
+        if ((caretSize.left + caretSize.width) <= size.width) {
+          this.caret.set('left', caretSize.left).setCoords()
+          this.canvas.requestRenderAll()
+        }
+
         this.rewindVideo()
       },
       getCanvasSize () {
