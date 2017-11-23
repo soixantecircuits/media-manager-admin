@@ -1,5 +1,5 @@
 <template>
-  <div class="media-update-progress" :class="{ 'progress-visible': displayProgressBar }">
+  <div class="media-render" :class="{ 'progress-visible': displayProgressBar }">
     <md-progress :md-progress="progressValue" v-show="displayProgressBar"></md-progress>
     <md-button :disabled="disabled || progressValue > 0" @click.native="updateClick">Render composition</md-button>
   </div>
@@ -31,11 +31,13 @@
   }
 </script>
 <style lang="scss">
-  .media-update-progress {
+  .media-render {
     background: #333;
     padding-top: 4px;
     padding-bottom: 6px;
     padding-top: 0;
+    width: 100%;
+    margin-right: 10px;
 
     .md-theme-default.md-progress {
       background: #014e0c;

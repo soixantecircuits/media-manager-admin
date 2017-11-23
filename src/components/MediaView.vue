@@ -33,6 +33,10 @@
                            @next="nextPart"
                            @update="updateSelectedFragment">
         </media-part-editor>
+        <media-render v-show="displayPartEditor && selectedPart && Object.keys(selectedPart).length > 0"
+                      :progress-value="progressValue"
+                      @update-click="updateComposition">
+        </media-render>
       </md-layout>
     </md-layout>
   </div>
@@ -41,13 +45,15 @@
 <script>
   import { mapGetters } from 'vuex'
   import moderatorapi from '../lib/mediamanagerAPI'
+  import duration from '../lib/duration'
+  import compositionRenderer from '../lib/compositionRenderer'
   import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
   import MediaPreview from './MediaView/MediaPreview.vue'
   import MediaInfo from './MediaView/MediaInfo.vue'
   import MediaEditParts from './MediaView/MediaEditParts.vue'
   import MediaPartEditor from './MediaView/MediaPartEditor.vue'
   import mediaEditor from '../lib/mediaEditor'
-  import duration from '../lib/duration'
+  import MediaRender from './MediaView/MediaRender.vue'
 
   const config = SETTINGS
 
@@ -59,13 +65,14 @@
 
   export default {
     components: {
+      MediaRender,
       MediaPartEditor,
       MediaEditParts,
       MediaInfo,
       MediaPreview,
       MediaViewToolbar
     },
-    mixins: [mediaEditor],
+    mixins: [mediaEditor, compositionRenderer],
     data () {
       return data
     },

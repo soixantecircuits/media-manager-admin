@@ -22,30 +22,24 @@
             <div class="right"> <button @click="nextPart">next</button></div>
           </div>
         </div>
-
-        <!-- Render composition progress & button -->
-        <media-render :progress-value="progressValue" @update-click="updateComposition"></media-render>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
   </div>
 </template>
 <script>
-  import MediaRender from './MediaRender'
   import MediaVideoScale from './MediaVideoScale.vue'
   import MediaVideoFragment from './MediaVideoFragment.vue'
   import duration from '../../lib/duration'
-  import compositionRenderer from '../../lib/compositionRenderer'
   import settings from '../../lib/settings'
 
   export default {
     components: {
       MediaVideoFragment,
-      MediaVideoScale,
-      MediaRender
+      MediaVideoScale
     },
     name: 'media-part-editor',
-    mixins: [compositionRenderer, settings],
+    mixins: [settings],
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
@@ -208,9 +202,6 @@
           background: #fff;
         }
       }
-    }
-    .media-update-progress {
-      margin-top: 10px;
     }
     &.disabled {
       background: #111 repeating-linear-gradient(45deg, #141414, #141414 3px, #111 3px, #111 10px);
