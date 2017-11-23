@@ -31,7 +31,7 @@
                            :total-seconds="media.meta.duration"
                            :selected-part="selectedPart"
                            @next="nextPart"
-                           @update="updateComposition">
+                           @update="updateSelectedFragment">
         </media-part-editor>
       </md-layout>
     </md-layout>
@@ -154,20 +154,6 @@
         this.partSelected(this.editableParts[ selectedIndex + 1 ])
       },
       updateSelectedFragment (newIn, newOut) {
-        let index = this.selectedIndex
-        if(index < 0) {
-          return
-        }
-
-        let newInDuration = duration.toDuration(newIn)
-        let newOutDuration = duration.toDuration(newOut)
-
-        this.editableParts[index].in = newInDuration
-        this.editableParts[index].out = newOutDuration
-
-        this.$set(this, 'editableParts', this.editableParts)
-      },
-      updateComposition (newIn, newOut) {
         let index = this.selectedIndex
         if(index < 0) {
           return

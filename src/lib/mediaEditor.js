@@ -62,6 +62,8 @@ let extractEntries = ($, $playlists, producers) => {
             index: formatIndex(index),
             in: $(entry).attr('in'),
             out: $(entry).attr('out'),
+            initialIn: $(entry).attr('in'),
+            initialOut: $(entry).attr('out'),
             producer: producer
           })
         }

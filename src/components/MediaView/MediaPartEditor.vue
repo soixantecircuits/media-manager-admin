@@ -130,6 +130,8 @@
       fragmentChange (newIn, newOut) {
         this.fragmentIn = newIn
         this.fragmentOut = newOut
+
+        this.$emit('update', this.fragmentIn, this.fragmentOut)
       }
     },
     data () {
