@@ -1,4 +1,6 @@
-import { fabric } from 'fabric'
+
+const topOffset = 28
+const bottomOffset = 4
 
 export default {
   props: {
@@ -31,7 +33,7 @@ export default {
       const w = this.video.videoWidth
       const h = this.video.videoHeight
 
-      this.stripCanvas.drawImage(this.video, 0, 0, w, h, x, 28, this.frameWidth, this.frameHeight)
+      this.stripCanvas.drawImage(this.video, 0, 0, w, h, x, topOffset, this.frameWidth, this.frameHeight)
 
       this.frame = this.frame + 1
       if (this.frame < this.totalFrames) {
@@ -52,6 +54,9 @@ export default {
         this.stripCanvas = stripCanvas.getContext('2d')
         stripCanvas.width = size.width
         stripCanvas.height = size.height
+
+        this.stripCanvas.fillStyle = 'rgba(0, 0, 0, 0.2)'
+        this.stripCanvas.fillRect(0, topOffset, size.width, size.height - topOffset - bottomOffset)
 
         this.video = video
         this.video.addEventListener('canplaythrough', this.drawStrip)
