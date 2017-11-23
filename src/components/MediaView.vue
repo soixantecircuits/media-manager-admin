@@ -26,9 +26,9 @@
                            ref="mediaEditor"
                            :is-editable="hasEditableParts"
                            :media="media"
-                           :media-url="media.meta.etnaInput.url"
+                           :media-url="inputVideoUrl"
                            :parts="editableParts"
-                           :total-seconds="media.meta.duration"
+                           :total-seconds="inputVideoDuration"
                            :selected-part="selectedPart"
                            @next="nextPart"
                            @update="updateSelectedFragment">
@@ -86,6 +86,12 @@
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
+      inputVideoUrl () {
+        return this.media.meta && this.media.meta.etnaInput ? this.media.meta.etnaInput.url : ''
+      },
+      inputVideoDuration () {
+        return this.media.meta && this.media.meta.duration ? parseInt(this.media.meta.duration) : 0
+      },
       selectedIndex () {
         return this.findPart(this.selectedPart)
       },
@@ -93,7 +99,7 @@
         return this.media && this.ready
       },
       displayPartEditor () {
-        return this.ready && this.media.meta && this.media.meta.etnaInput
+        return this.ready && this.media.meta && this.media.meta.etnaInput && this.inputVideoDuration > 0
       },
       allowPrevious () {
         if (!this.mediasList || !this.mediasList.length) {
