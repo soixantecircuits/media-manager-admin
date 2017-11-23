@@ -19,7 +19,7 @@
           <!-- OK / Cancel Controls -->
           <div class="controls">
             <div class="left"><button :disabled="!fragmentChanged" @click="cancelEdits">cancel</button></div>
-            <div class="right"> <button @click="nextPart">ok</button></div>
+            <div class="right"> <button @click="nextPart">next</button></div>
           </div>
         </div>
 
@@ -121,13 +121,7 @@
         }, 100)
       },
       nextPart () {
-        if (!this.fragmentChanged) {
-          this.$emit('next')
-        } else {
-          this.updateComposition().then(() => {
-            this.$emit('next')
-          })
-        }
+        this.$emit('next')
       },
       cancelEdits () {
         this.fragmentOut = this.initFragmentOut
