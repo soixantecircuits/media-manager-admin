@@ -233,47 +233,37 @@
 
       goToPreviousPage() {
         if (this.currentPage > 1) {
-          let instance = this
-
-          this.getMediasList(this.currentPage - 1, this.mediasPerPage, this.stateFilter, (res) => {
-            instance.$store.commit('setCurrentPage', instance.currentPage - 1)
-            let query = `?count=${instance.mediasPerPage}`
-            if (instance.stateFilter) {
-              query += `&state=${instance.stateFilter}`
-            }
-            instance.$router.push(`${instance.currentPage}${query}`)
-          })
+          this.goToPage(this.currentPage - 1)
         }
       },
 
       goToNextPage() {
         if (this.currentPage < this.totalPages) {
-          let instance = this
-
-          this.getMediasList(this.currentPage + 1, this.mediasPerPage, this.stateFilter, (res) => {
-            instance.$store.commit('setCurrentPage', instance.currentPage + 1)
-            let query = `?count=${instance.mediasPerPage}`
-            if (instance.stateFilter) {
-              query += `&state=${instance.stateFilter}`
-            }
-            instance.$router.push(`/media/list/${instance.currentPage}${query}`)
-          })
+          this.goToPage(this.currentPage + 1)
         }
       },
 
       goToLastPage() {
         if (this.currentPage < this.totalPages) {
-          let instance = this
-
-          this.getMediasList(this.totalPages, this.mediasPerPage, this.stateFilter, (res) => {
-            instance.$store.commit('setCurrentPage', this.totalPages)
-            let query = `?count=${instance.mediasPerPage}`
-            if (instance.stateFilter) {
-              query += `&state=${instance.stateFilter}`
-            }
-            instance.$router.push(`/media/list/${instance.currentPage}${query}`)
-          })
+          this.goToPage(this.totalPages)
         }
+      },
+
+      goToPage (pageNumber) {
+        if(pageNumber < 0 || pageNumber > this.totalPages) {
+          return
+        }
+
+        let instance = this
+        this.getMediasList(pageNumber, this.mediasPerPage, this.stateFilter, (res) => {
+          instance.$store.commit('setCurrentPage', pageNumber)
+          let query = `?count=${instance.mediasPerPage}`
+          if (instance.stateFilter) {
+            query += `&state=${instance.stateFilter}`
+          }
+          instance.$router.push(`/media/list/${instance.currentPage}${query}`)
+        })
+
       },
 
       goToMediaDetails(id) {
