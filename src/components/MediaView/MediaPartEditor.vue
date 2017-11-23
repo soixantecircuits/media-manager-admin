@@ -1,5 +1,5 @@
 <template>
-  <div class="media-part-editor" :class="{ disabled: !isEditable, 'not-selected': isEditable && !selectedPart }">
+  <div class="media-part-editor" :class="{ disabled: !isEditable, 'not-selected': isEditable && !hasSelectedPart }">
     <div v-if="isEditable">
       <div v-if="hasSelectedPart">
         <div class="editor">
@@ -204,16 +204,16 @@
       background: #111 repeating-linear-gradient(45deg, #141414, #141414 3px, #111 3px, #111 10px);
     }
     &.not-selected {
-      background: #111;
+      height: 90vh;
     }
 
     .not-selected {
       font-weight: 300;
+      position: absolute;
+      bottom: 240px;
+      left: 0;
       color: #aaa;
       font-size: 22px;
-      position: absolute;
-      bottom: 270px;
-      left: 0;
       width: 100%;
     }
   }
