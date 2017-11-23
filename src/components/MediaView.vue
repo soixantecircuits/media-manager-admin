@@ -35,7 +35,7 @@
         </media-part-editor>
         <media-render v-show="displayPartEditor && selectedPart && Object.keys(selectedPart).length > 0"
                       :progress-value="progressValue"
-                      @update-click="updateComposition">
+                      @update-click="renderAndBackToList">
         </media-render>
       </md-layout>
     </md-layout>
@@ -309,7 +309,16 @@
         this.selectedPart = {}
         this.$router.push(url)
       },
-      goBackToList () {
+      renderAndBackToList () {
+        this.updateComposition().then(() => {
+          this.goBackToList(true)
+        })
+      },
+      goBackToList (silent) {
+        if(!silent && !this.checkIfCanLeave()){
+          return
+        }
+
         let query = `?count=${this.mediasPerPage}`
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
@@ -317,6 +326,10 @@
         this.navigate(`/media/list/${this.currentPage}${query}`)
       },
       goToPreviousMedia () {
+        if(!this.checkIfCanLeave()){
+          return
+        }
+
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
           if (this.mediaListPos === 0) {
@@ -332,6 +345,10 @@
         }
       },
       goToNextMedia () {
+        if(!this.checkIfCanLeave()){
+          return
+        }
+
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
           if (this.mediaListPos === this.mediasList.length - 1) {
@@ -345,6 +362,13 @@
             this.getPageData()
           }
         }
+      },
+      checkIfCanLeave () {
+        if(this.haveAnyFragmentsBeenUpdated()) {
+          return window.confirm('Your changes haven\'t been saved. Click "Cancel" and then press "Render Composition" button to save your changes. Or click OK to discard changes and continue.')
+        }
+
+        return true
       },
       deleteFile (id) {
         let instance = this
