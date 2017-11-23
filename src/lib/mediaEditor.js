@@ -1,4 +1,3 @@
-import Vue from 'vue'
 var cheerio = require('cheerio')
 
 let editableParts = []
@@ -23,6 +22,14 @@ let extractProducers = ($, $producers) => {
   return producers
 }
 
+/**
+ * Extract <entry> tags
+ * @param $
+ * @param $playlists
+ * @param producers
+ * @param thumbnail
+ * @returns {Array}
+ */
 let extractEntries = ($, $playlists, producers, thumbnail) => {
   let entries = []
 

@@ -25,6 +25,7 @@
         <media-part-editor v-if="displayPartEditor"
                            ref="mediaEditor"
                            :is-editable="hasEditableParts"
+                           :media="media"
                            :media-url="media.meta.etnaInput.url"
                            :parts="editableParts"
                            :total-seconds="media.meta.duration"
