@@ -27,10 +27,9 @@ let extractProducers = ($, $producers) => {
  * @param $
  * @param $playlists
  * @param producers
- * @param thumbnail
  * @returns {Array}
  */
-let extractEntries = ($, $playlists, producers, thumbnail) => {
+let extractEntries = ($, $playlists, producers) => {
   let entries = []
 
   let findProducerById = (producerId) => {
@@ -63,7 +62,6 @@ let extractEntries = ($, $playlists, producers, thumbnail) => {
             index: formatIndex(index),
             in: $(entry).attr('in'),
             out: $(entry).attr('out'),
-            thumbnail: thumbnail,
             producer: producer
           })
         }
@@ -92,13 +90,7 @@ let getEditableParts = (media) => {
     return []
   }
 
-  // TODO: Most likely this should be removed and a thumbnail should be taken for each video fragment in the future
-  let thumbnail = ''
-  if (media.meta && media.meta.etnaInput && media.meta.etnaInput.details && media.meta.etnaInput.details.thumbnail) {
-    thumbnail = media.meta.etnaInput.details.thumbnail.url
-  }
-
-  return extractEntries($, $playlists, extractProducers($, $producers), thumbnail)
+  return extractEntries($, $playlists, extractProducers($, $producers))
 }
 
 export default {
