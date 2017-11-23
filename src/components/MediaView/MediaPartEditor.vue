@@ -11,10 +11,10 @@
           </div>
 
           <!-- Timeline -->
-          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
+          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-scale>
 
           <!-- Timeline with video preview -->
-          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
+          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-fragment>
 
           <!-- OK / Cancel Controls -->
           <div class="controls">
@@ -133,7 +133,7 @@
         this.fragmentOut = this.initFragmentOut
         this.fragmentIn = this.initFragmentIn
       },
-      fragmentChanged (newIn, newOut) {
+      fragmentChange (newIn, newOut) {
         this.fragmentIn = newIn
         this.fragmentOut = newOut
       }
