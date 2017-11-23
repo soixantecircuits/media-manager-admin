@@ -22,21 +22,23 @@
         </media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
-        <media-part-editor v-if="displayPartEditor"
-                           ref="mediaEditor"
-                           :is-editable="hasEditableParts"
-                           :media="media"
-                           :media-url="inputVideoUrl"
-                           :parts="editableParts"
-                           :total-seconds="inputVideoDuration"
-                           :selected-part="selectedPart"
-                           @next="nextPart"
-                           @update="updateSelectedFragment">
-        </media-part-editor>
-        <media-render v-show="displayPartEditor && selectedPart && Object.keys(selectedPart).length > 0"
-                      :progress-value="progressValue"
-                      @update-click="renderAndBackToList">
-        </media-render>
+        <div class="editor-container">
+          <media-part-editor v-if="displayPartEditor"
+                             ref="mediaEditor"
+                             :is-editable="hasEditableParts"
+                             :media="media"
+                             :media-url="inputVideoUrl"
+                             :parts="editableParts"
+                             :total-seconds="inputVideoDuration"
+                             :selected-part="selectedPart"
+                             @next="nextPart"
+                             @update="updateSelectedFragment">
+          </media-part-editor>
+          <media-render v-show="displayPartEditor && selectedPart && Object.keys(selectedPart).length > 0"
+                        :progress-value="progressValue"
+                        @update-click="renderAndBackToList">
+          </media-render>
+        </div>
       </md-layout>
     </md-layout>
   </div>
@@ -405,6 +407,10 @@
     top: 7px;
   }
 
+  .editor-container {
+    padding-right: 10px;
+    width: 100%;
+  }
   .section {
     padding: 10px;
     text-align: left;

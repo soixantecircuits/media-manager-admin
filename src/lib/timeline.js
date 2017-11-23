@@ -110,6 +110,8 @@ export default {
       } else {
         this.drawMilliseconds(size, totalDuration)
       }
+
+      this.handleWindowResize()
     }
   }
 }

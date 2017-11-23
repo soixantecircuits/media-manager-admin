@@ -28,7 +28,8 @@ export default {
   data () {
     return {
       fgIn: 0,
-      fgOut: 0
+      fgOut: 0,
+      resizeTimeout: null
     }
   },
   computed: {
@@ -43,6 +44,25 @@ export default {
     },
   },
   methods: {
+    reRenderCanvas () {
+      let vm = this
+
+      if(this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout)
+      }
+
+      this.resizeTimeout = setTimeout(() => {
+        // Re-render objects
+        let size = vm.getCanvasSize()
+        vm.canvas.setWidth(size.width)
+        vm.canvas.clear()
+        vm.drawObjects()
+      }, 500)
+    },
+    handleWindowResize () {
+      window.removeEventListener('resize', this.reRenderCanvas)
+      window.addEventListener('resize', this.reRenderCanvas)
+    },
     movingObject (ev) {
       let target = ev.target
 
