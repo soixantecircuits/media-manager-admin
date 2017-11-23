@@ -35,7 +35,7 @@
   import MediaVideoScale from './MediaVideoScale.vue'
   import MediaVideoFragment from './MediaVideoFragment.vue'
   import duration from '../../lib/duration'
-  import compositionUpdater from '../../lib/compositionUpdater'
+  import compositionRenderer from '../../lib/compositionRenderer'
   import settings from '../../lib/settings'
 
   export default {
@@ -45,7 +45,7 @@
       MediaRender
     },
     name: 'media-part-editor',
-    mixins: [compositionUpdater, settings],
+    mixins: [compositionRenderer, settings],
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
