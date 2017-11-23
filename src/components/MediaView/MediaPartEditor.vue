@@ -18,13 +18,13 @@
 
           <!-- OK / Cancel Controls -->
           <div class="controls">
-            <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
+            <div class="left"><button :disabled="!fragmentChanged" @click="cancelEdits">cancel</button></div>
             <div class="right"> <button @click="nextPart">ok</button></div>
           </div>
         </div>
 
         <!-- Update composition progress & button -->
-        <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged" @update-click="updateComposition"></media-update-progress>
+        <media-update-progress :progress-value="progressValue" :disabled="!fragmentChanged" @update-click="updateComposition"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
@@ -50,7 +50,7 @@
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
       },
-      compositionChanged () {
+      fragmentChanged () {
         return this.initFragmentIn !== this.fragmentIn || this.initFragmentOut !== this.fragmentOut
       },
       totalMilliseconds () {
@@ -121,7 +121,7 @@
         }, 100)
       },
       nextPart () {
-        if (!this.compositionChanged) {
+        if (!this.fragmentChanged) {
           this.$emit('next')
         } else {
           this.updateComposition().then(() => {
