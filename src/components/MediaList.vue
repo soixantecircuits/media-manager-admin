@@ -7,7 +7,7 @@
     <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
                            :currentPage="currentPage" :totalPages="totalPages"
                            @stateFilterChanged="setStateFilter" @mediasPerPageChanged="setMediasPerPage"
-                           @previousPage="goToPreviousPage" @nextPage="goToNextPage">
+                           @previousPage="goToPreviousPage" @nextPage="goToNextPage" @lastPage="goToLastPage">
     </media-list-pagination>
 
     <div v-if="mediasList.length <= 0">
@@ -20,7 +20,7 @@
     <media-list-pagination :statesList="statesList" :pageOptions="pageOptions"
                            :currentPage="currentPage" :totalPages="totalPages"
                            @stateFilterChanged="setStateFilter" @mediasPerPageChanged="setMediasPerPage"
-                           @previousPage="goToPreviousPage" @nextPage="goToNextPage">
+                           @previousPage="goToPreviousPage" @nextPage="goToNextPage" @lastPage="goToLastPage">
     </media-list-pagination>
 
   </md-table-card>
@@ -252,6 +252,21 @@
 
           this.getMediasList(this.currentPage + 1, this.mediasPerPage, this.stateFilter, (res) => {
             instance.$store.commit('setCurrentPage', instance.currentPage + 1)
+            let query = `?count=${instance.mediasPerPage}`
+            if (instance.stateFilter) {
+              query += `&state=${instance.stateFilter}`
+            }
+            instance.$router.push(`/media/list/${instance.currentPage}${query}`)
+          })
+        }
+      },
+
+      goToLastPage() {
+        if (this.currentPage < this.totalPages) {
+          let instance = this
+
+          this.getMediasList(this.totalPages, this.mediasPerPage, this.stateFilter, (res) => {
+            instance.$store.commit('setCurrentPage', this.totalPages)
             let query = `?count=${instance.mediasPerPage}`
             if (instance.stateFilter) {
               query += `&state=${instance.stateFilter}`

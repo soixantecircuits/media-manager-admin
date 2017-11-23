@@ -22,6 +22,10 @@
     <md-button class="md-icon-button md-table-pagination-next" @click.native="$emit('nextPage')" :disabled="currentPage >= totalPages">
       <md-icon>keyboard_arrow_right</md-icon>
     </md-button>
+
+    <md-button class="md-icon-button md-table-pagination-next" @click.native="$emit('lastPage')" :disabled="currentPage >= totalPages">
+      <md-icon>last_page</md-icon>
+    </md-button>
   </div>
 </template>
 
