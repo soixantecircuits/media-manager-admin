@@ -80,3 +80,10 @@ div.md-toolbar.md-theme-grey.topbar {
     flex: 0 1 100%;
   }
 }
+.swal-button {
+  background-color: #ff5858;
+
+  &:active {
+    background-color: #ef4848;
+  }
+}
