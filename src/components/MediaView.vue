@@ -126,7 +126,7 @@
     },
     methods: {
       nextPart () {
-
+        console.log('go to next')
       },
       updateComposition (newIn, newOut) {
         if (!this.selectedPart) {

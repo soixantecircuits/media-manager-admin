@@ -7,14 +7,21 @@
           <div class="video-preview">
             <video :src="mediaUrl" id="video" controls></video>
           </div>
-          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
-          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
+          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds"
+                             @change="fragmentChanged"></media-video-scale>
+          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut"
+                                :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
           <div class="controls">
-            <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
-            <div class="right"><button :disabled="!compositionChanged" @click="nextPart">ok</button></div>
+            <div class="left">
+              <button :disabled="!compositionChanged" @click="cancelEdits">cancel</button>
+            </div>
+            <div class="right">
+              <button @click="nextPart">ok</button>
+            </div>
           </div>
         </div>
-        <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged" @update-click="updateComposition"></media-update-progress>
+        <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged"
+                               @update-click="updateComposition"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
@@ -30,7 +37,8 @@
     components: {
       MediaVideoFragment,
       MediaVideoScale,
-      MediaUpdateProgress },
+      MediaUpdateProgress
+    },
     name: 'media-part-editor',
     computed: {
       hasSelectedPart () {
@@ -77,24 +85,39 @@
     },
     methods: {
       nextPart () {
-        this.$emit('next')
+        if (!this.compositionChanged) {
+          this.$emit('next')
+        } else {
+          this.updateComposition().then(() => {
+            this.$emit('next')
+          })
+        }
       },
       updateComposition () {
         // Fake progress
         // Replace with posting to spacebro
+
         let vm = this
-        let interval = setInterval(() => {
-          vm.progressValue += 10
+        let promise = new Promise((resolve) => {
+          let interval = setInterval(() => {
+            vm.progressValue += 10
 
-          if(vm.progressValue >= 100) {
-            vm.progressValue = 0
-            clearInterval(interval)
+            if (vm.progressValue >= 100) {
+              vm.progressValue = 0
+              clearInterval(interval)
 
-            vm.initFragmentIn = vm.fragmentIn
-            vm.initFragmentOut = vm.fragmentOut
-            vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
-          }
-        }, 100)
+              vm.initFragmentIn = vm.fragmentIn
+              vm.initFragmentOut = vm.fragmentOut
+              vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
+
+              if (resolve) {
+                resolve()
+              }
+            }
+          }, 100)
+        })
+
+        return promise
       },
       cancelEdits () {
         this.fragmentOut = this.initFragmentOut
