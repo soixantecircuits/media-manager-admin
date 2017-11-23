@@ -12,6 +12,49 @@
       "server": "faune.estu.la",
       "port": 36200,
       "apiRoute": "/api/v1"
+    },
+    "spacebro": {
+      "host" : "spacebro.space",
+      "port" : 3333,
+      "channelName": "media-stream",
+      "client" : {
+        "name": "media-manager-admin",
+        "description": "Admin for media-manager",
+        "in": {
+          "mediaCreated": {
+            "eventName": "mediaCreated",
+            "description": "Input media to add do the db",
+            "type": "all"
+          },
+          "mediaUpdated": {
+            "eventName": "mediaUpdated",
+            "description": "Update media in db",
+            "type": "all"
+          }
+        },
+        "out": {
+          "mediaCreate": {
+            "eventName": "mediaCreate",
+            "description": "Media saved in db",
+            "type": "all"
+          },
+          "mediaUpdate": {
+            "eventName": "mediaUpdate",
+            "description": "Media in db was updated",
+            "type": "all"
+          },
+          "mediaRemove": {
+            "eventName": "mediaRemove",
+            "description": "media in db deleted",
+            "type": "all"
+          },
+          "outMedia": {
+            "eventName": "outMedia",
+            "description": "send media to other apps",
+            "type": "all"
+          }
+        }
+      }
     }
   }
 }
