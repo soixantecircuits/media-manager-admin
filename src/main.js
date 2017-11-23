@@ -10,6 +10,7 @@ const { SpacebroClient } = require('spacebro-client')
 
 const client = new SpacebroClient(settings.methods.getSettings().service.spacebro)
 
+Vue.prototype.$spacebro = client
 Vue.use(VueMaterial)
 
 new Vue({

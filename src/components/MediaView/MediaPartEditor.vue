@@ -31,8 +31,9 @@
 <script>
   import MediaUpdateProgress from './MediaUpdateProgress'
   import MediaVideoScale from './MediaVideoScale.vue'
-  import duration from '../../lib/duration'
   import MediaVideoFragment from './MediaVideoFragment.vue'
+  import duration from '../../lib/duration'
+  import compositionUpdater from '../../lib/compositionUpdater'
 
   export default {
     components: {
@@ -41,6 +42,7 @@
       MediaUpdateProgress
     },
     name: 'media-part-editor',
+    mixins: [compositionUpdater],
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
@@ -124,32 +126,6 @@
           })
         }
       },
-      updateComposition () {
-        // Fake progress
-        // Replace with posting to spacebro
-
-        let vm = this
-        let promise = new Promise((resolve) => {
-          let interval = setInterval(() => {
-            vm.progressValue += 10
-
-            if (vm.progressValue >= 100) {
-              vm.progressValue = 0
-              clearInterval(interval)
-
-              vm.initFragmentIn = vm.fragmentIn
-              vm.initFragmentOut = vm.fragmentOut
-              vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
-
-              if (resolve) {
-                resolve()
-              }
-            }
-          }, 100)
-        })
-
-        return promise
-      },
       cancelEdits () {
         this.fragmentOut = this.initFragmentOut
         this.fragmentIn = this.initFragmentIn
@@ -161,7 +137,6 @@
     },
     data () {
       return {
-        progressValue: 0,
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
