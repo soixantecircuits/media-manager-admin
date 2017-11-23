@@ -14,7 +14,7 @@
             <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
           </div>
         </div>
-        <media-update-progress :progress-value="progressValue"></media-update-progress>
+        <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged" @update-click="updateComposition"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
