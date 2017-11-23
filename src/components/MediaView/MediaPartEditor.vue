@@ -31,7 +31,6 @@
   import MediaVideoScale from './MediaVideoScale.vue'
   import MediaVideoFragment from './MediaVideoFragment.vue'
   import duration from '../../lib/duration'
-  import settings from '../../lib/settings'
 
   export default {
     components: {
@@ -39,7 +38,6 @@
       MediaVideoScale
     },
     name: 'media-part-editor',
-    mixins: [settings],
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0

@@ -9,16 +9,18 @@ let duration = require('./duration')
  * @param newInMilliseconds
  * @param newOutMilliseconds
  */
-let getUpdatedMelt = (melt, part, newInMilliseconds, newOutMilliseconds) => {
+let getUpdatedMelt = (melt, parts) => {
   let $ = cheerio.load(melt, {xmlMode: true})
-  let $entry = $('entry[producer="' + part.producer.id + '"]')
 
-  if($entry.length > 0) {
-    let newIn = duration.toDuration(newInMilliseconds)
-    let newOut = duration.toDuration(newOutMilliseconds)
+  if(parts && parts.length) {
+    for(let i = 0; i < parts.length; i++) {
+      let $entry = $('entry[producer="' + parts[i].producer.id + '"]')
 
-    $entry.attr('in', newIn)
-    $entry.attr('out', newOut)
+      if($entry.length > 0) {
+        $entry.attr('in', parts[i].in)
+        $entry.attr('out', parts[i].out)
+      }
+    }
   }
 
   return $.html()
@@ -38,7 +40,7 @@ export default {
       mediaData = assignment(mediaData, {
         meta: {
           melt: {
-            scriptString: getUpdatedMelt(this.media.meta.melt.scriptString, this.selectedPart, this.fragmentIn, this.fragmentOut)
+            scriptString: getUpdatedMelt(this.media.meta.melt.scriptString, this.editableParts)
           }
         }
       })
@@ -71,7 +73,6 @@ export default {
         alert('There\'s nothing to render. Composition haven\'t been updated.')
         return
       }
-
 
       this.emitSpacebroUpdateEvent()
 

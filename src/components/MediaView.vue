@@ -47,6 +47,7 @@
   import moderatorapi from '../lib/mediamanagerAPI'
   import duration from '../lib/duration'
   import compositionRenderer from '../lib/compositionRenderer'
+  import settings from '../lib/settings'
   import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
   import MediaPreview from './MediaView/MediaPreview.vue'
   import MediaInfo from './MediaView/MediaInfo.vue'
@@ -72,7 +73,7 @@
       MediaPreview,
       MediaViewToolbar
     },
-    mixins: [mediaEditor, compositionRenderer],
+    mixins: [mediaEditor, compositionRenderer, settings],
     data () {
       return data
     },
