@@ -6,7 +6,7 @@
           <md-table-head>ID</md-table-head>
           <md-table-head>Filename</md-table-head>
           <md-table-head>Created at</md-table-head>
-          <md-table-head>Last Update</md-table-head>
+          <md-table-head>Email Address</md-table-head>
           <md-table-head>Media</md-table-head>
           <md-table-head>State</md-table-head>
         </md-table-row>
@@ -20,7 +20,7 @@
           <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row._id }}</a></md-table-cell>
           <md-table-cell align="left"><a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">{{ row.file }}</a></md-table-cell>
           <md-table-cell align="left">{{ row.uploadedAt }}</md-table-cell>
-          <md-table-cell align="left">{{ row.updatedAt }}</md-table-cell>
+          <md-table-cell align="left">{{ row.meta.email }}</md-table-cell>
           <md-table-cell align="left">
             <a @click="$emit('goToDetails', row._id)" style="cursor: pointer;">
               <md-image v-if="row.details && row.details.thumbnail" :md-src="row.details.thumbnail.url" style="max-width:200px; max-height:200px;" width="auto" height="auto"></md-image>
