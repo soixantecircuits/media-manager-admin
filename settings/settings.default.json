@@ -14,8 +14,8 @@
       "apiRoute": "/api/v1"
     },
     "spacebro": {
-      "host" : "spacebro.space",
-      "port" : 3333,
+      "host" : "faune.estu.la",
+      "port" : 36000,
       "channelName": "media-stream",
       "client" : {
         "name": "media-manager-admin",
