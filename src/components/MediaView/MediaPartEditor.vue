@@ -80,13 +80,10 @@
     },
     watch: {
       selectedPart (part) {
-        let start = duration.toMilliseconds(part.in)
-        let end = duration.toMilliseconds(part.out)
-
-        this.fragmentIn = start
-        this.fragmentOut = end
-        this.initFragmentIn = start
-        this.initFragmentOut = end
+        this.fragmentIn = duration.toMilliseconds(part.in)
+        this.fragmentOut = duration.toMilliseconds(part.out)
+        this.initFragmentIn = duration.toMilliseconds(part.initialIn)
+        this.initFragmentOut = duration.toMilliseconds(part.initialOut)
       }
     },
     methods: {
@@ -124,8 +121,7 @@
         this.$emit('next')
       },
       resetEdits () {
-        this.fragmentOut = this.initFragmentOut
-        this.fragmentIn = this.initFragmentIn
+        this.fragmentChange(this.initFragmentIn, this.initFragmentOut)
       },
       fragmentChange (newIn, newOut) {
         this.fragmentIn = newIn
