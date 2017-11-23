@@ -137,7 +137,6 @@
   .media-part-editor {
     margin: 10px 10px 10px 0;
     width: 100%;
-    min-height: 90%;
     box-sizing: border-box;
     position: relative;
     color: #fff;
