@@ -15,7 +15,8 @@
     props: {
       disabled: {
         type: Boolean,
-        required: true
+        default: false,
+        required: false
       },
       progressValue: {
         type: Number,
