@@ -11,7 +11,7 @@
           <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
           <div class="controls">
             <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
-            <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
+            <div class="right"><button :disabled="!compositionChanged" @click="nextPart">ok</button></div>
           </div>
         </div>
         <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged" @update-click="updateComposition"></media-update-progress>
@@ -76,6 +76,9 @@
       }
     },
     methods: {
+      nextPart () {
+        this.$emit('next')
+      },
       updateComposition () {
         // Fake progress
         // Replace with posting to spacebro
@@ -174,6 +177,8 @@
         border-radius: 30px;
         color: #fff;
         padding: 6px 15px;
+        text-align: center;
+        min-width: 120px;
 
         &:disabled {
           opacity: 0.5;

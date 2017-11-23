@@ -22,6 +22,7 @@
                            :parts="editableParts"
                            :total-seconds="media.meta.duration"
                            :selected-part="selectedPart"
+                           @next="nextPart"
                            @update="updateComposition">
         </media-part-editor>
       </md-layout>
@@ -124,6 +125,9 @@
       }
     },
     methods: {
+      nextPart () {
+
+      },
       updateComposition (newIn, newOut) {
         if (!this.selectedPart) {
           return
@@ -148,7 +152,6 @@
             console.log(err)
           })
       },
-
       getServerConfig () {
         let instance = this
         return new Promise((resolve, reject) => {
@@ -161,7 +164,6 @@
             })
         })
       },
-
       getBuckets () {
         const instance = this
         moderatorapi.getBuckets()
@@ -172,7 +174,6 @@
             console.error(err)
           })
       },
-
       getMediaInfos () {
         let instance = this
         moderatorapi.getMediaInfos(this.mediaID)
@@ -189,7 +190,6 @@
             console.log(err)
           })
       },
-
       setState (state) {
         let instance = this
         moderatorapi.setState(this.media._id, state)
@@ -201,7 +201,6 @@
             console.log(err)
           })
       },
-
       getMediasList (page, perPage, state, callback) {
         let instance = this
         moderatorapi.getMediasList(page, perPage, state)
@@ -223,7 +222,6 @@
             console.log(err)
           })
       },
-
       updateTotalMedias () {
         let instance = this
         moderatorapi.getTotalMedias()
@@ -251,7 +249,6 @@
         }
         this.navigate(`/media/list/${this.currentPage}${query}`)
       },
-
       goToPreviousMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
@@ -267,7 +264,6 @@
           }
         }
       },
-
       goToNextMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
@@ -283,7 +279,6 @@
           }
         }
       },
-
       deleteFile (id) {
         let instance = this
         moderatorapi.deleteFile(id)
