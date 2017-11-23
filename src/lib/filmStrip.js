@@ -59,6 +59,7 @@ export default {
         this.stripCanvas.fillRect(0, topOffset, size.width, size.height - topOffset - bottomOffset)
 
         this.video = video
+        this.video.currentTime = 0
         this.video.addEventListener('canplaythrough', this.drawStrip)
       }
 

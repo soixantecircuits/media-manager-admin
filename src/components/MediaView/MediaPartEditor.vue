@@ -6,7 +6,9 @@
           <div class="title">{{ selectedPart.index }}</div>
 
           <!-- Video Preview -->
-          <div class="video-preview"><video :src="mediaUrl" id="video" controls></video></div>
+          <div class="video-preview">
+            <video :src="mediaUrl" id="video" controls></video>
+          </div>
 
           <!-- Timeline -->
           <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
@@ -156,12 +158,6 @@
     position: relative;
     color: #fff;
 
-    #video-back {
-      position: absolute;
-      left: -1000px;
-      top: -1000px;
-    }
-
     .editor {
       background: #333;
       border: 1px solid #fd4f4f;
@@ -170,6 +166,7 @@
       .video-preview {
         width: 100%;
         overflow: hidden;
+        position: relative;
 
         video {
           width: 100%;
