@@ -34,10 +34,7 @@
     background: #333;
     padding-top: 4px;
     padding-bottom: 6px;
-
-    &.progress-visible {
-      padding-top: 0;
-    }
+    padding-top: 0;
 
     .md-theme-default.md-progress {
       background: #014e0c;
