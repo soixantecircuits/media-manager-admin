@@ -23,8 +23,8 @@
           </div>
         </div>
 
-        <!-- Update composition progress & button -->
-        <media-render :progress-value="progressValue" :disabled="!fragmentChanged" @update-click="updateComposition"></media-render>
+        <!-- Render composition progress & button -->
+        <media-render :progress-value="progressValue" @update-click="updateComposition"></media-render>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
