@@ -63,7 +63,7 @@
         let caretSize = this.getFragmentSizeAndPosition()
         let size = this.getCanvasSize()
 
-        if ((caretSize.left + caretSize.width) <= size.width) {
+        if (caretSize.left <= size.width) {
           this.caret.set('left', caretSize.left).setCoords()
           this.canvas.requestRenderAll()
         }

@@ -73,7 +73,7 @@ export default {
         target.left = Math.max(target.left, target.left - target.getBoundingRect().left)
       }
 
-      if (target.getBoundingRect().left + target.getBoundingRect().width > target.canvas.width) {
+      if (target.getBoundingRect().left > target.canvas.width) {
         target.left = Math.min(target.left, target.canvas.width - target.getBoundingRect().width + target.left - target.getBoundingRect().left)
       }      
 
