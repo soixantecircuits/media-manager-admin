@@ -1,7 +1,7 @@
 <template>
   <div class="media-update-progress" :class="{ 'progress-visible': displayProgressBar }">
     <md-progress :md-progress="progressValue" v-show="displayProgressBar"></md-progress>
-    <md-button :disabled="disabled || progressValue > 0" @click.native="updateClick">Update Composition</md-button>
+    <md-button :disabled="disabled || progressValue > 0" @click.native="updateClick">Render composition</md-button>
   </div>
 </template>
 <script>
