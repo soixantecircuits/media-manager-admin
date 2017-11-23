@@ -26,13 +26,17 @@
                            ref="mediaEditor"
                            :is-editable="hasEditableParts"
                            :media="media"
-                           :media-url="media.meta.etnaInput.url"
+                           :media-url="inputVideoUrl"
                            :parts="editableParts"
-                           :total-seconds="media.meta.duration"
+                           :total-seconds="inputVideoDuration"
                            :selected-part="selectedPart"
                            @next="nextPart"
-                           @update="updateComposition">
+                           @update="updateSelectedFragment">
         </media-part-editor>
+        <media-render v-show="displayPartEditor && selectedPart && Object.keys(selectedPart).length > 0"
+                      :progress-value="progressValue"
+                      @update-click="renderAndBackToList">
+        </media-render>
       </md-layout>
     </md-layout>
   </div>
@@ -41,13 +45,16 @@
 <script>
   import { mapGetters } from 'vuex'
   import moderatorapi from '../lib/mediamanagerAPI'
+  import duration from '../lib/duration'
+  import compositionRenderer from '../lib/compositionRenderer'
+  import settings from '../lib/settings'
   import MediaViewToolbar from './MediaView/MediaViewToolbar.vue'
   import MediaPreview from './MediaView/MediaPreview.vue'
   import MediaInfo from './MediaView/MediaInfo.vue'
   import MediaEditParts from './MediaView/MediaEditParts.vue'
   import MediaPartEditor from './MediaView/MediaPartEditor.vue'
   import mediaEditor from '../lib/mediaEditor'
-  import duration from '../lib/duration'
+  import MediaRender from './MediaView/MediaRender.vue'
 
   const config = SETTINGS
 
@@ -59,13 +66,14 @@
 
   export default {
     components: {
+      MediaRender,
       MediaPartEditor,
       MediaEditParts,
       MediaInfo,
       MediaPreview,
       MediaViewToolbar
     },
-    mixins: [mediaEditor],
+    mixins: [mediaEditor, compositionRenderer, settings],
     data () {
       return data
     },
@@ -78,6 +86,12 @@
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
+      inputVideoUrl () {
+        return this.media.meta && this.media.meta.etnaInput ? this.media.meta.etnaInput.url : ''
+      },
+      inputVideoDuration () {
+        return this.media.meta && this.media.meta.duration ? parseInt(this.media.meta.duration) : 0
+      },
       selectedIndex () {
         return this.findPart(this.selectedPart)
       },
@@ -85,7 +99,7 @@
         return this.media && this.ready
       },
       displayPartEditor () {
-        return this.ready && this.media.meta && this.media.meta.etnaInput
+        return this.ready && this.media.meta && this.media.meta.etnaInput && this.inputVideoDuration > 0
       },
       allowPrevious () {
         if (!this.mediasList || !this.mediasList.length) {
@@ -153,7 +167,7 @@
 
         this.partSelected(this.editableParts[ selectedIndex + 1 ])
       },
-      updateComposition (newIn, newOut) {
+      updateSelectedFragment (newIn, newOut) {
         let index = this.selectedIndex
         if(index < 0) {
           return
@@ -301,7 +315,16 @@
         this.selectedPart = {}
         this.$router.push(url)
       },
-      goBackToList () {
+      renderAndBackToList () {
+        this.updateComposition().then(() => {
+          this.goBackToList(true)
+        })
+      },
+      goBackToList (silent) {
+        if(!silent && !this.checkIfCanLeave()){
+          return
+        }
+
         let query = `?count=${this.mediasPerPage}`
         if (this.stateFilter) {
           query += `&state=${this.stateFilter}`
@@ -309,6 +332,10 @@
         this.navigate(`/media/list/${this.currentPage}${query}`)
       },
       goToPreviousMedia () {
+        if(!this.checkIfCanLeave()){
+          return
+        }
+
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
           if (this.mediaListPos === 0) {
@@ -324,6 +351,10 @@
         }
       },
       goToNextMedia () {
+        if(!this.checkIfCanLeave()){
+          return
+        }
+
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
           if (this.mediaListPos === this.mediasList.length - 1) {
@@ -337,6 +368,13 @@
             this.getPageData()
           }
         }
+      },
+      checkIfCanLeave () {
+        if(this.haveAnyFragmentsBeenUpdated()) {
+          return window.confirm('Your changes haven\'t been saved. Click "Cancel" and then press "Render Composition" button to save your changes. Or click OK to discard changes and continue.')
+        }
+
+        return true
       },
       deleteFile (id) {
         let instance = this

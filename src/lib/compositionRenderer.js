@@ -9,28 +9,24 @@ let duration = require('./duration')
  * @param newInMilliseconds
  * @param newOutMilliseconds
  */
-let getUpdatedMelt = (melt, part, newInMilliseconds, newOutMilliseconds) => {
+let getUpdatedMelt = (melt, parts) => {
   let $ = cheerio.load(melt, {xmlMode: true})
-  let $entry = $('entry[producer="' + part.producer.id + '"]')
 
-  if($entry.length > 0) {
-    let newIn = duration.toDuration(newInMilliseconds)
-    let newOut = duration.toDuration(newOutMilliseconds)
+  if(parts && parts.length) {
+    for(let i = 0; i < parts.length; i++) {
+      let $entry = $('entry[producer="' + parts[i].producer.id + '"]')
 
-    $entry.attr('in', newIn)
-    $entry.attr('out', newOut)
+      if($entry.length > 0) {
+        $entry.attr('in', parts[i].in)
+        $entry.attr('out', parts[i].out)
+      }
+    }
   }
 
   return $.html()
 }
 
 export default {
-  props: {
-    media: {
-      type: Object,
-      required: true
-    }
-  },
   methods: {
     compositionWasUpdated () {
       this.progressValue = 0
@@ -44,12 +40,23 @@ export default {
       mediaData = assignment(mediaData, {
         meta: {
           melt: {
-            scriptString: getUpdatedMelt(this.media.meta.melt.scriptString, this.selectedPart, this.fragmentIn, this.fragmentOut)
+            scriptString: getUpdatedMelt(this.media.meta.melt.scriptString, this.editableParts)
           }
         }
       })
 
       this.$spacebro.emit(this.getSettings().service.spacebro.client.out.outMedia.eventName, mediaData)
+    },
+    haveAnyFragmentsBeenUpdated () {
+      let updated = false
+      for(let i = 0; i < this.editableParts.length; i++) {
+        if(this.editableParts[i].in !== this.editableParts[i].initialIn || this.editableParts[i].out !== this.editableParts[i].initialOut) {
+          updated = true
+          break
+        }
+      }
+
+      return updated
     },
     updateComposition () {
       if (!this.$spacebro || !this.$spacebro.connected) {
@@ -62,8 +69,8 @@ export default {
         return
       }
 
-      if (!this.selectedPart) {
-        console.error('No part has been selected')
+      if(!this.haveAnyFragmentsBeenUpdated()) {
+        alert('There\'s nothing to render. Composition haven\'t been updated.')
         return
       }
 

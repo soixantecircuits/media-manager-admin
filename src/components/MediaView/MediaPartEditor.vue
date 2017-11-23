@@ -11,46 +11,38 @@
           </div>
 
           <!-- Timeline -->
-          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
+          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-scale>
 
           <!-- Timeline with video preview -->
-          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
+          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-fragment>
 
           <!-- OK / Cancel Controls -->
           <div class="controls">
-            <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
-            <div class="right"> <button @click="nextPart">ok</button></div>
+            <div class="left"><button :disabled="!fragmentChanged" @click="resetEdits">reset</button></div>
+            <div class="right"> <button @click="nextPart">next</button></div>
           </div>
         </div>
-
-        <!-- Update composition progress & button -->
-        <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged" @update-click="updateComposition"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
   </div>
 </template>
 <script>
-  import MediaUpdateProgress from './MediaUpdateProgress'
   import MediaVideoScale from './MediaVideoScale.vue'
   import MediaVideoFragment from './MediaVideoFragment.vue'
   import duration from '../../lib/duration'
-  import compositionUpdater from '../../lib/compositionUpdater'
-  import settings from '../../lib/settings'
 
   export default {
     components: {
       MediaVideoFragment,
-      MediaVideoScale,
-      MediaUpdateProgress
+      MediaVideoScale
     },
     name: 'media-part-editor',
-    mixins: [compositionUpdater, settings],
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
       },
-      compositionChanged () {
+      fragmentChanged () {
         return this.initFragmentIn !== this.fragmentIn || this.initFragmentOut !== this.fragmentOut
       },
       totalMilliseconds () {
@@ -80,13 +72,10 @@
     },
     watch: {
       selectedPart (part) {
-        let start = duration.toMilliseconds(part.in)
-        let end = duration.toMilliseconds(part.out)
-
-        this.fragmentIn = start
-        this.fragmentOut = end
-        this.initFragmentIn = start
-        this.initFragmentOut = end
+        this.fragmentIn = duration.toMilliseconds(part.in)
+        this.fragmentOut = duration.toMilliseconds(part.out)
+        this.initFragmentIn = duration.toMilliseconds(part.initialIn)
+        this.initFragmentOut = duration.toMilliseconds(part.initialOut)
       }
     },
     methods: {
@@ -121,21 +110,16 @@
         }, 100)
       },
       nextPart () {
-        if (!this.compositionChanged) {
-          this.$emit('next')
-        } else {
-          this.updateComposition().then(() => {
-            this.$emit('next')
-          })
-        }
+        this.$emit('next')
       },
-      cancelEdits () {
-        this.fragmentOut = this.initFragmentOut
-        this.fragmentIn = this.initFragmentIn
+      resetEdits () {
+        this.fragmentChange(this.initFragmentIn, this.initFragmentOut)
       },
-      fragmentChanged (newIn, newOut) {
+      fragmentChange (newIn, newOut) {
         this.fragmentIn = newIn
         this.fragmentOut = newOut
+
+        this.$emit('update', this.fragmentIn, this.fragmentOut)
       }
     },
     data () {
@@ -216,9 +200,6 @@
           background: #fff;
         }
       }
-    }
-    .media-update-progress {
-      margin-top: 10px;
     }
     &.disabled {
       background: #111 repeating-linear-gradient(45deg, #141414, #141414 3px, #111 3px, #111 10px);

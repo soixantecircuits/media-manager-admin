@@ -1,12 +1,12 @@
 <template>
-  <div class="media-update-progress" :class="{ 'progress-visible': displayProgressBar }">
-    <md-progress :md-progress="progressValue" v-show="displayProgressBar"></md-progress>
-    <md-button :disabled="disabled || progressValue > 0" @click.native="updateClick">Update Composition</md-button>
+  <div class="media-render" :class="{ 'progress-visible': displayProgressBar }">
+    <md-progress :md-progress="progressValue"></md-progress>
+    <md-button :disabled="disabled || progressValue > 0" @click.native="updateClick">Render composition</md-button>
   </div>
 </template>
 <script>
   export default {
-    name: 'media-update-progress',
+    name: 'media-render',
     computed: {
       displayProgressBar () {
         return this.progressValue > 0
@@ -15,7 +15,8 @@
     props: {
       disabled: {
         type: Boolean,
-        required: true
+        default: false,
+        required: false
       },
       progressValue: {
         type: Number,
@@ -30,14 +31,22 @@
   }
 </script>
 <style lang="scss">
-  .media-update-progress {
+  .media-render {
     background: #333;
     padding-top: 4px;
     padding-bottom: 6px;
     padding-top: 0;
+    width: 100%;
+    margin-right: 10px;
 
     .md-theme-default.md-progress {
-      background: #014e0c;
+      background: transparent;
+    }
+
+    &.progress-visible {
+      .md-theme-default.md-progress {
+        background: #014e0c;
+      }
     }
     .md-theme-default.md-progress .md-progress-track {
       background: #3fb34f !important;
