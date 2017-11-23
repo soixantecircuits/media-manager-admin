@@ -31,18 +31,30 @@
         let delta = this.fragmentDuration
         let ms = duration.toMilliseconds(val)
 
+        if(ms + delta > this.total || ms < 0) {
+          return
+        }
+
         this.fgIn = ms
         this.fgOut = ms + delta
         this.timeUpdated()
       },
       increaseTime () {
         let incVal = this.getIncrementalValue()
+        if(this.fgOut + incVal > this.total) {
+          return
+        }
+
         this.fgIn += incVal
         this.fgOut += incVal
         this.timeUpdated()
       },
       decreaseTime () {
         let incVal = this.getIncrementalValue()
+        if(this.fgIn - incVal < 0) {
+          return
+        }
+
         this.fgIn -= incVal
         this.fgOut -= incVal
         this.timeUpdated()

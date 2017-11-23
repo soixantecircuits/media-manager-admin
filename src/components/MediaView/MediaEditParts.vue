@@ -6,10 +6,11 @@
         This video doesn't contain any editable parts.
       </div>
       <media-edit-part-item v-if="hasEditableParts"
-                            v-for="(part, i) in editableParts"
+                            v-for="(part, i) in partsList"
                             :part="part" :index="i"
-                            :selected="part.selected"
-                            @click.native="select(i)">
+                            :selected="i === selectedIndex"
+                            @play="play"
+                            @select="select(i)">
       </media-edit-part-item>
     </div>
   </div>
@@ -26,27 +27,32 @@
       media: {
         type: Object,
         required: true
+      },
+      parts: {
+        type: Array,
+        required: true
+      },
+      selectedIndex: {
+        type: Number,
+        required: true
       }
     },
     methods: {
-      unselectAll () {
-        for (let i = 0; i < this.editableParts.length; i++) {
-          this.editableParts[i].selected = false
-        }
-      },
       select (i) {
-        if (this.editableParts[i].selected) {
-          return
-        }
-
-        this.unselectAll()
-        this.editableParts[i].selected = true
-        this.$forceUpdate()
-        this.$emit('selected', this.editableParts[i])
+        this.$emit('selected', this.partsList[i])
+      },
+      play(part) {
+        this.$emit('play', part)
       }
     },
     mounted () {
       this.initMediaEditor()
+      this.partsList = this.parts
+    },
+    data () {
+      return {
+        partsList: []
+      }
     }
   }
 </script>

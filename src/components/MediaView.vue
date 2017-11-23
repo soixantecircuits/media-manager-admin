@@ -13,15 +13,23 @@
       <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-        <media-edit-parts :media="media" v-if="displayEditableParts" @selected="partSelected"></media-edit-parts>
+        <media-edit-parts v-if="displayEditableParts"
+                          :media="media"
+                          :parts="editableParts"
+                          :selected-index="selectedIndex"
+                          @play="play"
+                          @selected="partSelected">
+        </media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
         <media-part-editor v-if="displayPartEditor"
+                           ref="mediaEditor"
                            :is-editable="hasEditableParts"
                            :media-url="media.meta.etnaInput.url"
                            :parts="editableParts"
                            :total-seconds="media.meta.duration"
                            :selected-part="selectedPart"
+                           @next="nextPart"
                            @update="updateComposition">
         </media-part-editor>
       </md-layout>
@@ -38,6 +46,7 @@
   import MediaEditParts from './MediaView/MediaEditParts.vue'
   import MediaPartEditor from './MediaView/MediaPartEditor.vue'
   import mediaEditor from '../lib/mediaEditor'
+  import duration from '../lib/duration'
 
   const config = SETTINGS
 
@@ -68,6 +77,9 @@
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
+      selectedIndex () {
+        return this.findPart(this.selectedPart)
+      },
       displayEditableParts () {
         return this.media && this.ready
       },
@@ -124,15 +136,65 @@
       }
     },
     methods: {
-      updateComposition (newIn, newOut) {
-        if (!this.selectedPart) {
+      play (part) {
+        if(this.selectedIndex < 0) {
+          this.partSelected(part)
+        }
+
+        this.$refs.mediaEditor.playFragment(part)
+      },
+      nextPart () {
+        let selectedIndex = this.selectedIndex
+        if (selectedIndex < 0 || selectedIndex === this.editableParts.length - 1) {
+          // Last step or not found
           return
         }
 
-        // TODO: Update composition in a row
+        this.partSelected(this.editableParts[ selectedIndex + 1 ])
+      },
+      updateComposition (newIn, newOut) {
+        let index = this.selectedIndex
+        if(index < 0) {
+          return
+        }
+
+        let newInDuration = duration.toDuration(newIn)
+        let newOutDuration = duration.toDuration(newOut)
+
+        this.editableParts[index].in = newInDuration
+        this.editableParts[index].out = newOutDuration
+
+        this.$set(this, 'editableParts', this.editableParts)
+      },
+      unselectAll () {
+        for (let i = 0; i < this.editableParts.length; i++) {
+          this.editableParts[i].selected = false
+        }
+      },
+      findPart (part) {
+        if(!part || !Object.keys(part)) {
+          return -1
+        }
+
+        for (let i = 0; i < this.editableParts.length; i++) {
+          if (this.editableParts[i].index === part.index) {
+            return i
+          }
+        }
+
+        return -1
       },
       partSelected (part) {
+        let i = this.findPart(part)
+        if(i < 0 || this.editableParts[i].selected) {
+          return
+        }
+
+        this.unselectAll()
+        this.editableParts[i].selected = true
+
         this.selectedPart = Object.assign({}, this.selectedPart, part)
+        this.$forceUpdate()
       },
       getPageData () {
         let instance = this
@@ -148,7 +210,6 @@
             console.log(err)
           })
       },
-
       getServerConfig () {
         let instance = this
         return new Promise((resolve, reject) => {
@@ -161,7 +222,6 @@
             })
         })
       },
-
       getBuckets () {
         const instance = this
         moderatorapi.getBuckets()
@@ -172,7 +232,6 @@
             console.error(err)
           })
       },
-
       getMediaInfos () {
         let instance = this
         moderatorapi.getMediaInfos(this.mediaID)
@@ -189,7 +248,6 @@
             console.log(err)
           })
       },
-
       setState (state) {
         let instance = this
         moderatorapi.setState(this.media._id, state)
@@ -201,7 +259,6 @@
             console.log(err)
           })
       },
-
       getMediasList (page, perPage, state, callback) {
         let instance = this
         moderatorapi.getMediasList(page, perPage, state)
@@ -223,7 +280,6 @@
             console.log(err)
           })
       },
-
       updateTotalMedias () {
         let instance = this
         moderatorapi.getTotalMedias()
@@ -251,7 +307,6 @@
         }
         this.navigate(`/media/list/${this.currentPage}${query}`)
       },
-
       goToPreviousMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === 1 && this.mediaListPos === 0) === false) {
@@ -267,7 +322,6 @@
           }
         }
       },
-
       goToNextMedia () {
         let instance = this
         if (this.mediasList.length > 0 && (this.currentPage === this.totalPages && this.mediaListPos === this.mediasList.length - 1) === false) {
@@ -283,7 +337,6 @@
           }
         }
       },
-
       deleteFile (id) {
         let instance = this
         moderatorapi.deleteFile(id)

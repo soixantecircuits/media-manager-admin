@@ -44,7 +44,20 @@ export default {
   },
   methods: {
     movingObject (ev) {
-      let pos = ev.target.get('left')
+      let target = ev.target
+
+      // Check bounds
+      target.setCoords()
+
+      if (target.getBoundingRect().left < 0) {
+        target.left = Math.max(target.left, target.left - target.getBoundingRect().left)
+      }
+
+      if (target.getBoundingRect().left + target.getBoundingRect().width > target.canvas.width) {
+        target.left = Math.min(target.left, target.canvas.width - target.getBoundingRect().width + target.left - target.getBoundingRect().left)
+      }      
+
+      let pos = target.get('left')
       let size = this.getCanvasSize()
 
       let newIn = Math.round((pos * 100 / size.width) * this.total / 100)

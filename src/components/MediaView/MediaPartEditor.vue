@@ -4,17 +4,25 @@
       <div v-if="hasSelectedPart">
         <div class="editor">
           <div class="title">{{ selectedPart.index }}</div>
-          <div class="video-preview">
-            <video :src="mediaUrl" id="video" controls></video>
-          </div>
+
+          <!-- Video Preview -->
+          <div class="video-preview"><video :src="mediaUrl" id="video" controls></video></div>
+
+          <!-- Timeline -->
           <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-scale>
+
+          <!-- Timeline with video preview -->
           <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChanged"></media-video-fragment>
+
+          <!-- OK / Cancel Controls -->
           <div class="controls">
             <div class="left"><button :disabled="!compositionChanged" @click="cancelEdits">cancel</button></div>
-            <div class="right"><button :disabled="!compositionChanged" @click="updateComposition">update</button></div>
+            <div class="right"> <button @click="nextPart">ok</button></div>
           </div>
         </div>
-        <media-update-progress :progress-value="progressValue"></media-update-progress>
+
+        <!-- Update composition progress & button -->
+        <media-update-progress :progress-value="progressValue" :disabled="!compositionChanged" @update-click="updateComposition"></media-update-progress>
       </div>
       <div v-else class="not-selected">&larr; Please, selected a video part for editing.</div>
     </div>
@@ -30,7 +38,8 @@
     components: {
       MediaVideoFragment,
       MediaVideoScale,
-      MediaUpdateProgress },
+      MediaUpdateProgress
+    },
     name: 'media-part-editor',
     computed: {
       hasSelectedPart () {
@@ -76,22 +85,70 @@
       }
     },
     methods: {
+      playFragment(part) {
+        if(!part) {
+          return
+        }
+
+        let start = duration.toMilliseconds(part.in) / 1000
+        let end = duration.toMilliseconds(part.out) / 1000
+
+        let video = document.querySelector('#video')
+        if(!video) {
+          return
+        }
+
+        let vm = this
+
+        if(vm.playFragmentInterval) {
+          clearInterval(vm.playFragmentInterval)
+        }
+
+        // Play fragment
+        video.currentTime = start
+        video.play()
+        vm.playFragmentInterval = setInterval(() => {
+          if(video.currentTime >= end) {
+            video.pause()
+            clearInterval(vm.playFragmentInterval)
+            vm.playFragmentInterval = null
+          }
+        }, 100)
+      },
+      nextPart () {
+        if (!this.compositionChanged) {
+          this.$emit('next')
+        } else {
+          this.updateComposition().then(() => {
+            this.$emit('next')
+          })
+        }
+      },
       updateComposition () {
         // Fake progress
         // Replace with posting to spacebro
+
         let vm = this
-        let interval = setInterval(() => {
-          vm.progressValue += 10
+        let promise = new Promise((resolve) => {
+          let interval = setInterval(() => {
+            vm.progressValue += 10
 
-          if(vm.progressValue >= 100) {
-            vm.progressValue = 0
-            clearInterval(interval)
+            if (vm.progressValue >= 100) {
+              vm.progressValue = 0
+              clearInterval(interval)
 
-            vm.initFragmentIn = vm.fragmentIn
-            vm.initFragmentOut = vm.fragmentOut
-            vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
-          }
-        }, 100)
+              vm.initFragmentIn = vm.fragmentIn
+              vm.initFragmentOut = vm.fragmentOut
+              vm.$emit('update', vm.fragmentIn, vm.fragmentOut)
+
+              if (resolve) {
+                resolve()
+              }
+            }
+          }, 100)
+        })
+
+        return promise
       },
       cancelEdits () {
         this.fragmentOut = this.initFragmentOut
@@ -108,7 +165,8 @@
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
-        initFragmentOut: 0
+        initFragmentOut: 0,
+        playFragmentInterval: null
       }
     }
   }
@@ -174,6 +232,8 @@
         border-radius: 30px;
         color: #fff;
         padding: 6px 15px;
+        text-align: center;
+        min-width: 120px;
 
         &:disabled {
           opacity: 0.5;
