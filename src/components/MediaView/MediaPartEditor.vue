@@ -34,6 +34,7 @@
   import MediaVideoFragment from './MediaVideoFragment.vue'
   import duration from '../../lib/duration'
   import compositionUpdater from '../../lib/compositionUpdater'
+  import settings from '../../lib/settings'
 
   export default {
     components: {
@@ -42,7 +43,7 @@
       MediaUpdateProgress
     },
     name: 'media-part-editor',
-    mixins: [compositionUpdater],
+    mixins: [compositionUpdater, settings],
     computed: {
       hasSelectedPart () {
         return this.selectedPart && Object.keys(this.selectedPart).length > 0
