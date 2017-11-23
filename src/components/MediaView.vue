@@ -22,6 +22,7 @@
       </md-layout>
       <md-layout :md-flex="50">
         <media-part-editor v-if="displayPartEditor"
+                           ref="mediaEditor"
                            :is-editable="hasEditableParts"
                            :media-url="media.meta.etnaInput.url"
                            :parts="editableParts"
@@ -140,7 +141,11 @@
     },
     methods: {
       play (part) {
-        console.log('Play', part)
+        if(this.selectedIndex < 0) {
+          this.partSelected(part)
+        }
+
+        this.$refs.mediaEditor.playFragment(part)
       },
       nextPart () {
         let selectedIndex = this.selectedIndex

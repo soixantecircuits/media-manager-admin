@@ -85,6 +85,36 @@
       }
     },
     methods: {
+      playFragment(part) {
+        if(!part) {
+          return
+        }
+
+        let start = duration.toMilliseconds(part.in) / 1000
+        let end = duration.toMilliseconds(part.out) / 1000
+
+        let video = document.querySelector('#video')
+        if(!video) {
+          return
+        }
+
+        let vm = this
+
+        if(vm.playFragmentInterval) {
+          clearInterval(vm.playFragmentInterval)
+        }
+
+        // Play fragment
+        video.currentTime = start
+        video.play()
+        vm.playFragmentInterval = setInterval(() => {
+          if(video.currentTime >= end) {
+            video.pause()
+            clearInterval(vm.playFragmentInterval)
+            vm.playFragmentInterval = null
+          }
+        }, 100)
+      },
       nextPart () {
         if (!this.compositionChanged) {
           this.$emit('next')
@@ -135,7 +165,8 @@
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
-        initFragmentOut: 0
+        initFragmentOut: 0,
+        playFragmentInterval: null
       }
     }
   }
