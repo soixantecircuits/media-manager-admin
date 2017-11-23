@@ -26,6 +26,16 @@
       media: {
         type: Object,
         required: true
+      },
+      selectedIndex: {
+        type: Number,
+        required: true
+      }
+    },
+    watch: {
+      selectedIndex () {
+        this.unselectAll()
+        this.select(this.selectedIndex)
       }
     },
     methods: {

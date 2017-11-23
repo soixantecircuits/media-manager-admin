@@ -13,7 +13,7 @@
       <md-layout md-column :md-flex="50" class="section">
         <media-preview :media="media"></media-preview>
         <media-info :media="media" @state-changed="setState"></media-info>
-        <media-edit-parts :media="media" v-if="displayEditableParts" @selected="partSelected"></media-edit-parts>
+        <media-edit-parts :media="media" v-if="displayEditableParts" :selected-index="selectedIndex" @selected="partSelected"></media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
         <media-part-editor v-if="displayPartEditor"
@@ -69,6 +69,15 @@
         media: 'getCurrentMedia',
         mediaID: 'getCurrentMediaID'
       }),
+      selectedIndex () {
+        for (let i = 0; i < this.editableParts.length; i++) {
+          if (this.editableParts[i].index === this.selectedPart.index) {
+            return i
+          }
+        }
+
+        return -1
+      },
       displayEditableParts () {
         return this.media && this.ready
       },
@@ -126,7 +135,13 @@
     },
     methods: {
       nextPart () {
+        let selectedIndex = this.selectedIndex
+        if (selectedIndex < 0 || selectedIndex === this.editableParts.length - 1) {
+          // Last step or not found
+          return
+        }
 
+        this.partSelected(this.editableParts[ selectedIndex + 1 ])
       },
       updateComposition (newIn, newOut) {
         if (!this.selectedPart) {
