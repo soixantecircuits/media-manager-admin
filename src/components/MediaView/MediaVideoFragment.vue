@@ -90,6 +90,7 @@
       },
       drawObjects () {
         this.drawCaret()
+        this.initFilmStrip()
       },
       drawCaret () {
         let caretSize = this.getFragmentSizeAndPosition()
@@ -132,7 +133,7 @@
     mounted () {
       this.initCanvas()
       this.drawObjects()
-      this.initFilmStrip()
+      this.handleWindowResize()
     }
   }
 </script>
