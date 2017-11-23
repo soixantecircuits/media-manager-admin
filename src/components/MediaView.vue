@@ -22,7 +22,7 @@
         </media-edit-parts>
       </md-layout>
       <md-layout :md-flex="50">
-        <div class="editor-contiainer">
+        <div class="editor-container">
           <media-part-editor v-if="displayPartEditor"
                              ref="mediaEditor"
                              :is-editable="hasEditableParts"
@@ -407,7 +407,7 @@
     top: 7px;
   }
 
-  .editor-contiainer {
+  .editor-container {
     padding-right: 10px;
     width: 100%;
   }
