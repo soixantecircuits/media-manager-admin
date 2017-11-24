@@ -153,6 +153,7 @@
 
         video {
           width: 100%;
+          max-height: 405px;
         }
       }
 
