@@ -160,6 +160,7 @@
             })
 
             if (instance.isSameList(instance.mediasList, res.data) === false) {
+              console.log(res.data)
               instance.$store.commit('setMediasList', res.data)
               instance.setTotalMedias()
             }
@@ -285,7 +286,8 @@
               item1.state !== item2.state ||
               item1.type !== item2.type ||
               item1.updatedAt !== item2.updatedAt ||
-              item1.uploadedAt !== item2.uploadedAt)
+              item1.uploadedAt !== item2.uploadedAt ||
+              item1.meta !== item2.meta)
               return false
         }
         return true
