@@ -1,6 +1,7 @@
 <template>
   <div class="media-info">
     <div class="item">
+      <div class="debug-link" v-if="mediaPreviewShowDebugInfo"><a href="#" @click.prevent="expandDebugInfo=!expandDebugInfo">View Debug Data</a></div>
       <h2 class="media-name"><small>Nom: </small>{{ media.file }}</h2>
     </div>
     <div class="item">
@@ -26,11 +27,11 @@
     </div>
     <div class="item">
       <md-layout md-row>
-        <md-layout :md-flex="30">Uploaded at: <span class="value">{{ media.uploadedAt }}</span></md-layout>
-        <md-layout :md-flex="30">ID: <span class="value">{{ media._id }}</span></md-layout>
-        <md-layout :md-flex="15">From: <span class="value">{{ etnaFrom }}</span></md-layout>
-        <md-layout :md-flex="15">To: <span class="value">{{ etnaTo }}</span></md-layout>
-        <md-layout :md-flex="10" v-if="mediaPreviewShowDebugInfo"><a href="#" @click.prevent="expandDebugInfo=!expandDebugInfo">Debug</a></md-layout>
+        <md-layout :md-flex="25">Uploaded at: <span class="value">{{ media.uploadedAt }}</span></md-layout>
+        <md-layout :md-flex="25">ID: <span class="value">{{ media._id }}</span></md-layout>
+        <md-layout :md-flex="25">Email: <span class="value">{{ media.meta.email }}</span></md-layout>
+        <md-layout :md-flex="12">From: <span class="value">{{ etnaFrom }}</span></md-layout>
+        <md-layout :md-flex="12">To: <span class="value">{{ etnaTo }}</span></md-layout>
       </md-layout>
     </div>
     <div class="item" v-if="mediaPreviewShowDebugInfo && expandDebugInfo">
@@ -178,6 +179,9 @@
     .debug-value {
       max-height: 300px;
       overflow: auto;
+    }
+    .debug-link {
+      float: right;
     }
   }
 </style>
