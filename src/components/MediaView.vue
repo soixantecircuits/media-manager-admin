@@ -5,6 +5,7 @@
         @previous="goToPreviousMedia"
         @next="goToNextMedia"
         @delete="deleteFile(mediaID)"
+        @email="sendEmail"
         :show-navigation="mediasList.length > 0"
         :allow-previous="allowPrevious"
         :allow-next="allowNext">
@@ -399,6 +400,12 @@
             console.log('User cancelled')
           })
         })
+      },
+      sendEmail () {
+        moderatorapi.setState(this.media._id, 'public')
+          .catch((err) => {
+            console.log(err)
+          })
       },
       deleteFile (id) {
         let instance = this

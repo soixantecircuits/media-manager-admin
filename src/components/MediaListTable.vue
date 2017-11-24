@@ -15,11 +15,8 @@
 
       <md-table-body>
         <md-table-row v-for="(row, rowIndex) in mediasList" :key="rowIndex" :md-item="row">
-          <md-table-cell align="left">
-            <md-button class="common-button" @click.native="sendEmail(row, rowIndex)">
-              <span v-show="!row.sending">Send Email</span>
-              <span v-if="row.sending"><dots-spinner></dots-spinner></span>
-            </md-button>
+          <md-table-cell>
+            <md-button class="md-fab md-clean" @click.native="$emit('deleteMedia', row._id)"><md-icon>delete</md-icon></md-button>
           </md-table-cell>
           <md-table-cell align="left" @click.native="details(row)"><span class="highlight">{{ row._id }}</span></md-table-cell>
           <md-table-cell align="left" @click.native="details(row)"><span class="highlight">{{ row.file }}</span></md-table-cell>
@@ -42,8 +39,11 @@
               </md-select>
             </md-input-container>
           </md-table-cell>
-          <md-table-cell>
-            <md-button class="md-fab md-clean" @click.native="$emit('deleteMedia', row._id)"><md-icon>delete</md-icon></md-button>
+          <md-table-cell align="left">
+            <md-button class="common-button" @click.native="sendEmail(row, rowIndex)">
+              <span v-show="!row.sending">Send Email</span>
+              <span v-if="row.sending"><dots-spinner></dots-spinner></span>
+            </md-button>
           </md-table-cell>
         </md-table-row>
       </md-table-body>

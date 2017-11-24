@@ -8,12 +8,18 @@
         <md-button :disabled="!allowNext" @click.native="$emit('next')">Next</md-button>
       </div>
       <div class="flex"></div>
-      <md-button @click.native="$emit('delete')">Delete this file</md-button>
+      <md-button @click.native="sendEmail">
+        <span v-show="!sendingEmail">Send Email</span>
+        <dots-spinner v-if="sendingEmail"></dots-spinner>
+      </md-button>
     </md-toolbar>
   </div>
 </template>
 <script>
+  import DotsSpinner from '../DotsSpinner.vue'
+
   export default {
+    components: {DotsSpinner},
     name: 'media-view-toolbar',
     props: {
       allowPrevious: {
@@ -27,6 +33,22 @@
       showNavigation: {
         type: Boolean,
         default: false
+      }
+    },
+    methods: {
+      sendEmail () {
+        let vm = this
+        vm.sendingEmail = true
+        this.$emit('email')
+
+        setTimeout(() => {
+          vm.sendingEmail = false
+        }, 2500)
+      }
+    },
+    data () {
+      return {
+        sendingEmail: false
       }
     }
   }
