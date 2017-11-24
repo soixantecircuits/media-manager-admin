@@ -160,7 +160,6 @@
             })
 
             if (instance.isSameList(instance.mediasList, res.data) === false) {
-              console.log(res.data)
               instance.$store.commit('setMediasList', res.data)
               instance.setTotalMedias()
             }
