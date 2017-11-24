@@ -40,7 +40,7 @@
             </md-input-container>
           </md-table-cell>
           <md-table-cell align="left">
-            <md-button class="common-button" @click.native="sendEmail(row, rowIndex)">
+            <md-button class="common-button" @click.native="sendEmail(row, rowIndex)" :disabled="row.sending">
               <span v-show="!row.sending">Send Email</span>
               <span v-if="row.sending"><dots-spinner></dots-spinner></span>
             </md-button>
