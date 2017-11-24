@@ -6,6 +6,7 @@
         @next="goToNextMedia"
         @delete="deleteFile(mediaID)"
         @email="sendEmail"
+        :ready="ready"
         :show-navigation="mediasList.length > 0"
         :allow-previous="allowPrevious"
         :allow-next="allowNext">

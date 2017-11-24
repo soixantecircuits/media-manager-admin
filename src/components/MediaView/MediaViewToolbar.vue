@@ -8,7 +8,7 @@
         <md-button :disabled="!allowNext" @click.native="$emit('next')">Next</md-button>
       </div>
       <div class="flex"></div>
-      <md-button @click.native="sendEmail" :disabled="sendingEmail">
+      <md-button @click.native="sendEmail" :disabled="sendingEmail || !ready">
         <span v-show="!sendingEmail">Send Email</span>
         <dots-spinner v-if="sendingEmail"></dots-spinner>
       </md-button>
@@ -29,6 +29,10 @@
       allowNext: {
         type: Boolean,
         default: false
+      },
+      ready: {
+        type: Boolean,
+        required: true
       },
       showNavigation: {
         type: Boolean,
