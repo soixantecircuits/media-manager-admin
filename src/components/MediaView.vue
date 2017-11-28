@@ -31,7 +31,7 @@
                              :media="media"
                              :media-url="inputVideoUrl"
                              :parts="editableParts"
-                             :total-seconds="inputVideoDuration"
+                             :auto-detect-duration="true"
                              :selected-part="selectedPart"
                              @next="nextPart"
                              @update="updateSelectedFragment">

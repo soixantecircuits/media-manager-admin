@@ -29,7 +29,7 @@
       <md-layout md-row>
         <md-layout :md-flex="25">Uploaded at: <span class="value">{{ media.uploadedAt }}</span></md-layout>
         <md-layout :md-flex="25">ID: <span class="value">{{ media._id }}</span></md-layout>
-        <md-layout :md-flex="25">Email: <span class="value">{{ media.meta.email }}</span></md-layout>
+        <md-layout :md-flex="25">Email: <span class="value">{{ media && media.meta && media.meta.email }}</span></md-layout>
         <md-layout :md-flex="12">From: <span class="value">{{ etnaFrom }}</span></md-layout>
         <md-layout :md-flex="12">To: <span class="value">{{ etnaTo }}</span></md-layout>
       </md-layout>
