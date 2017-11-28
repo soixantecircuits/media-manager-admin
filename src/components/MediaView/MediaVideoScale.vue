@@ -3,6 +3,7 @@
     <div class="current-time">
       <input type="text" v-model="formattedIn" id="current-time-input" @keyup.up="increaseTime" @keyup.down="decreaseTime" @keyup.enter="inputTime">
       <span class="hint">(press Enter to apply, &uarr; &darr; to increment / decrement)</span>
+      <span class="out-of-range" v-if="outOfRange">&larr; out of range of the input video time-line</span>
     </div>
     <div id="timeline-container">
       <canvas id="timeline"></canvas>
@@ -23,6 +24,11 @@
       return {
         canvas: null,
         fragment: null
+      }
+    },
+    computed: {
+      outOfRange () {
+        return this.fragmentIn > this.total
       }
     },
     methods: {
@@ -116,7 +122,7 @@
           border-bottom: 1px solid #fd4f4f;
         }
       }
-      .hint {
+      .hint, .out-of-range {
         font-size: 12px;
         font-weight: normal;
         position: absolute;
@@ -127,6 +133,13 @@
       }
       input:focus + .hint {
         display: inline-block;
+      }
+      .out-of-range {
+        display: inline-block;
+        color: #fd4f4f;
+      }
+      input:focus + .hint + .out-of-range {
+        display: none;
       }
     }
 
