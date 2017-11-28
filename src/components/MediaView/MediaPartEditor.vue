@@ -10,16 +10,21 @@
             <video :src="mediaUrl" id="video" controls></video>
           </div>
 
-          <!-- Timeline -->
-          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-scale>
+          <div v-if="inputVideoDurationSeconds > 0">
+            <!-- Timeline -->
+            <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-scale>
 
-          <!-- Timeline with video preview -->
-          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-fragment>
+            <!-- Timeline with video preview -->
+            <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-fragment>
 
-          <!-- OK / Cancel Controls -->
-          <div class="controls">
-            <div class="left"><button :disabled="!fragmentChanged" @click="resetEdits">reset</button></div>
-            <div class="right"> <button @click="nextPart">next</button></div>
+            <!-- OK / Cancel Controls -->
+            <div class="controls">
+              <div class="left"><button :disabled="!fragmentChanged" @click="resetEdits">reset</button></div>
+              <div class="right"> <button @click="nextPart">next</button></div>
+            </div>
+          </div>
+          <div class="initializing" v-else>
+            Initializing video, just a second...
           </div>
         </div>
       </div>
@@ -65,9 +70,15 @@
       selectedPart: {
         type: Object
       },
+      autoDetectDuration: {
+        type: Boolean,
+        default: false,
+        required: false
+      },
       totalSeconds: {
         type: Number,
-        required: true
+        default: 0,
+        required: false
       }
     },
     watch: {
@@ -122,8 +133,18 @@
         this.$emit('update', this.fragmentIn, this.fragmentOut)
       }
     },
+    mounted () {
+      if (!this.autoDetectDuration) {
+        if (this.totalSeconds <= 0) {
+          console.error('totalSeconds property should be passed if autoDetectDuration is off!')
+        } else {
+          this.inputVideoDurationSeconds = this.totalSeconds
+        }
+      }
+    },
     data () {
       return {
+        inputVideoDurationSeconds: 0,
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
@@ -140,6 +161,11 @@
     box-sizing: border-box;
     position: relative;
     color: #fff;
+
+    .initializing {
+      text-align: center;
+      padding: 10px;
+    }
 
     .editor {
       background: #333;
