@@ -51,7 +51,7 @@
         return this.initFragmentIn !== this.fragmentIn || this.initFragmentOut !== this.fragmentOut
       },
       totalMilliseconds () {
-        return this.totalSeconds * 1000
+        return this.inputVideoDurationSeconds * 1000
       }
     },
     props: {
@@ -82,6 +82,15 @@
       }
     },
     watch: {
+      hasSelectedPart () {
+        if (this.videoInitDone) {
+          return
+        }
+
+        if (this.hasSelectedPart && this.autoDetectDuration) {
+          this.detectVideoDuration()
+        }
+      },
       selectedPart (part) {
         this.fragmentIn = duration.toMilliseconds(part.in)
         this.fragmentOut = duration.toMilliseconds(part.out)
@@ -131,9 +140,29 @@
         this.fragmentOut = newOut
 
         this.$emit('update', this.fragmentIn, this.fragmentOut)
+      },
+      videoLoaded () {
+        let video = document.querySelector('#video')
+        video.removeEventListener('loadedmetadata', this.videoLoaded)
+        this.inputVideoDurationSeconds = video.duration
+      },
+      detectVideoDuration () {
+        let vm = this
+        vm.$nextTick(() => {
+          let video = document.getElementById('video')
+          if(!video) {
+            console.error('Video object cannot be found!')
+            return
+          }
+
+          video.removeEventListener('loadedmetadata', vm.videoLoaded)
+          video.addEventListener('loadedmetadata', vm.videoLoaded)
+        })
       }
     },
     mounted () {
+      this.videoInitDone = false
+
       if (!this.autoDetectDuration) {
         if (this.totalSeconds <= 0) {
           console.error('totalSeconds property should be passed if autoDetectDuration is off!')
@@ -145,6 +174,7 @@
     data () {
       return {
         inputVideoDurationSeconds: 0,
+        videoInitDone: false,
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
