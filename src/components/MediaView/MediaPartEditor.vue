@@ -10,16 +10,21 @@
             <video :src="mediaUrl" id="video" controls></video>
           </div>
 
-          <!-- Timeline -->
-          <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-scale>
+          <div v-if="inputVideoDurationSeconds > 0">
+            <!-- Timeline -->
+            <media-video-scale :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-scale>
 
-          <!-- Timeline with video preview -->
-          <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-fragment>
+            <!-- Timeline with video preview -->
+            <media-video-fragment :video-selector="'#video'" :fragment-in="fragmentIn" :fragment-out="fragmentOut" :total="totalMilliseconds" @change="fragmentChange"></media-video-fragment>
 
-          <!-- OK / Cancel Controls -->
-          <div class="controls">
-            <div class="left"><button :disabled="!fragmentChanged" @click="resetEdits">reset</button></div>
-            <div class="right"> <button @click="nextPart">next</button></div>
+            <!-- OK / Cancel Controls -->
+            <div class="controls">
+              <div class="left"><button :disabled="!fragmentChanged" @click="resetEdits">reset</button></div>
+              <div class="right"> <button @click="nextPart">next</button></div>
+            </div>
+          </div>
+          <div class="initializing" v-else>
+            Initializing video, just a second...
           </div>
         </div>
       </div>
@@ -46,7 +51,7 @@
         return this.initFragmentIn !== this.fragmentIn || this.initFragmentOut !== this.fragmentOut
       },
       totalMilliseconds () {
-        return this.totalSeconds * 1000
+        return this.inputVideoDurationSeconds * 1000
       }
     },
     props: {
@@ -65,12 +70,27 @@
       selectedPart: {
         type: Object
       },
+      autoDetectDuration: {
+        type: Boolean,
+        default: false,
+        required: false
+      },
       totalSeconds: {
         type: Number,
-        required: true
+        default: 0,
+        required: false
       }
     },
     watch: {
+      hasSelectedPart () {
+        if (this.videoInitDone) {
+          return
+        }
+
+        if (this.hasSelectedPart && this.autoDetectDuration) {
+          this.detectVideoDuration()
+        }
+      },
       selectedPart (part) {
         this.fragmentIn = duration.toMilliseconds(part.in)
         this.fragmentOut = duration.toMilliseconds(part.out)
@@ -120,10 +140,41 @@
         this.fragmentOut = newOut
 
         this.$emit('update', this.fragmentIn, this.fragmentOut)
+      },
+      videoLoaded () {
+        let video = document.querySelector('#video')
+        video.removeEventListener('loadedmetadata', this.videoLoaded)
+        this.inputVideoDurationSeconds = video.duration
+      },
+      detectVideoDuration () {
+        let vm = this
+        vm.$nextTick(() => {
+          let video = document.getElementById('video')
+          if(!video) {
+            console.error('Video object cannot be found!')
+            return
+          }
+
+          video.removeEventListener('loadedmetadata', vm.videoLoaded)
+          video.addEventListener('loadedmetadata', vm.videoLoaded)
+        })
+      }
+    },
+    mounted () {
+      this.videoInitDone = false
+
+      if (!this.autoDetectDuration) {
+        if (this.totalSeconds <= 0) {
+          console.error('totalSeconds property should be passed if autoDetectDuration is off!')
+        } else {
+          this.inputVideoDurationSeconds = this.totalSeconds
+        }
       }
     },
     data () {
       return {
+        inputVideoDurationSeconds: 0,
+        videoInitDone: false,
         fragmentIn: 0,
         fragmentOut: 0,
         initFragmentIn: 0,
@@ -140,6 +191,11 @@
     box-sizing: border-box;
     position: relative;
     color: #fff;
+
+    .initializing {
+      text-align: center;
+      padding: 10px;
+    }
 
     .editor {
       background: #333;
